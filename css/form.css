@@ -347,10 +347,13 @@
 /* Imagem do alimento dentro do card */
 .food-card img {
   width: 100%;
-  height: 100px; /* ← Altere aqui para mudar o tamanho da imagem */
+  aspect-ratio: 4 / 3;
+  height: auto;
   object-fit: cover;
+  object-position: center;
   border-radius: 8px;
   flex-shrink: 0;
+  display: block;
 }
 /* Nome do alimento ("Arroz 5kg") */
 .food-card-name {
@@ -1535,7 +1538,8 @@
     max-height: 260px;
   }
   .food-card img {
-    height: 80px;
+    aspect-ratio: 4 / 3;
+    height: auto;
   }
   .form-step {
     padding: 56px 18px 20px;
