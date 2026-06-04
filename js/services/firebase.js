@@ -81,10 +81,10 @@ async function _insert(colecao, payload) {
   return Object.assign({ id: ref.id }, dados);
 }
 
-/* Atualiza campos de um documento pelo ID */
+/* Atualiza campos de um documento pelo ID (cria se não existir) */
 async function _update(colecao, id, dados) {
   var atualizado = Object.assign({}, dados, { updated_at: _now() });
-  await _db.collection(colecao).doc(id).update(atualizado);
+  await _db.collection(colecao).doc(id).set(atualizado, { merge: true });
   return Object.assign({ id: id }, atualizado);
 }
 
