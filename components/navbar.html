@@ -1,0 +1,822 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DoaVida — components/navbar.html                                   ║
+  ║  Ação Social Semear + Comunidade Evangélica Maanaim — Belém, PA     ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ESTA VERSÃO:                                                        ║
+  ║  ✅ Logos REAIS das organizações lado a lado (imagens em base64)    ║
+  ║  ✅ "Seja um Voluntário" no menu desktop e no drawer mobile         ║
+  ║  ✅ Dashboard removido do menu público                               ║
+  ║  ✅ Todos os links atualizados (#mission, #how, #gallery)           ║
+  ║                                                                      ║
+  ║  COMO USAR:                                                          ║
+  ║    Copie este bloco diretamente após <body> em qualquer página.     ║
+  ║    OU injete via JS: injetarComponente('div-id', 'navbar.html')     ║
+  ║                                                                      ║
+  ║  ⚠️  Fragmento HTML — sem <!DOCTYPE>, <html>, <head> ou <body>      ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     ESTILOS DO COMPONENTE
+     Complementam o global.css com os estilos das logos reais.
+     Podem ser movidos para um CSS separado se necessário.
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+
+  /* ── Navbar com fundo sólido desde o início ──────────────────
+     Sobrescreve o #nav do global.css para que a navbar tenha
+     fundo escuro mesmo antes do scroll, acomodando as logos.
+  ─────────────────────────────────────────────────────────────── */
+  #nav {
+    position:        fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 9999;
+    background: #ffffff; /* branco gelo */
+    backdrop-filter: blur(16px);
+    border-bottom:   1px solid rgba(0, 0, 0, 0.07);
+    padding:         0;                       /* sem padding — altura vem do container */
+    transition:      box-shadow var(--t2);
+  }
+
+  /* Sombra extra ao rolar a página */
+  #nav.scrolled {
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+    padding:    0;
+  }
+
+  /* Container interno: altura fixa 72px, logos sempre do mesmo tamanho */
+  #nav .container { 
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    height:          72px;
+    gap:             16px;
+   padding: 0 5%; }
+
+  /* ── Link que envolve as duas logos (lado esquerdo) ───────── */
+  .nav-brand {
+    display:         flex;
+    align-items:     center;
+    gap:             18px;
+    flex-shrink:     0;       /* não encolhe se faltar espaço */
+    text-decoration: none;
+  }
+
+  /* Separador vertical entre as duas logos */
+  .nav-brand-sep {
+    width:      1px;
+    height:     36px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
+    flex-shrink: 0;
+  }
+
+  /* ── Um item de logo (imagem circular + textos) ────────────── */
+  .nav-logo-item {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+  }
+
+    /* Container base das logos */
+  .nav-logo-img-wrap {
+    overflow:     hidden;
+    flex-shrink:  0;
+    border:       2px solid rgba(0, 0, 0, 0.08);
+    transition:   border-color var(--t), box-shadow var(--t);
+    box-shadow:   0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* Semear: formato retrato (853×1280) — mostra a imagem original sem corte circular */
+  .nav-logo-item.semear .nav-logo-img-wrap {
+    width:         42px;
+    height:        62px;
+    border-radius: 8px;
+    background:    #ffffff;
+    border-color:  rgba(90, 138, 74, 0.45);
+  }
+
+  /* Maanaim: circular (logo já é redonda por design) */
+  .nav-logo-item.maanaim .nav-logo-img-wrap {
+    width:         56px;
+    height:        56px;
+    border-radius: 50%;
+    background:    #f5f0e8;
+    border-color:  rgba(138, 24, 24, 0.30);
+  }
+
+  /* Hover */
+  .nav-brand:hover .nav-logo-item.semear  .nav-logo-img-wrap {
+    border-color: rgba(90, 138, 74, 0.80);
+    box-shadow:   0 3px 12px rgba(90, 138, 74, 0.25);
+  }
+  .nav-brand:hover .nav-logo-item.maanaim .nav-logo-img-wrap {
+    border-color: rgba(138, 24, 24, 0.65);
+    box-shadow:   0 3px 12px rgba(138, 24, 24, 0.18);
+  }
+
+  /* Imagens dentro dos containers */
+  .nav-logo-img-wrap img {
+    width:      100%;
+    height:     100%;
+    object-fit: contain;
+    display:    block;
+  }
+
+  /* ── Coluna de textos ao lado da imagem ────────────────────── */
+  .nav-logo-texts {
+    display:        flex;
+    flex-direction: column;
+    gap:            1px;
+    line-height:    1.2;
+  }
+
+  /* Título da organização (ex: "AÇÃO SOCIAL") */
+  .nav-logo-title {
+    font-family:    var(--ff-display);
+    font-size:      0.82rem;
+    font-weight:    700;
+    letter-spacing: 0.04em;
+    color: #333;
+    text-transform: uppercase;
+  }
+
+  /* Subtítulo (ex: "Semear") */
+  .nav-logo-sub {
+    font-family:    var(--ff-mono);
+    font-size:      0.58rem;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+
+  /* Verde para Semear, dourado para Maanaim */
+  .nav-logo-item.semear  .nav-logo-sub { color: var(--sage2, #7dc063); }
+  .nav-logo-item.maanaim .nav-logo-sub { color: var(--gold); }
+
+  /* ── Drawer mobile — bloco de logos no topo ────────────────── */
+  .drawer-brand {
+    display:        flex;
+    flex-direction: column;
+    gap:            12px;
+    padding-bottom: 16px;
+    border-bottom:  1px solid var(--border);
+    margin-bottom:  8px;
+  }
+
+  .drawer-logo-item { display: flex; align-items: center; gap: 12px; }
+
+  .drawer-logo-img {
+    overflow:    hidden;
+    flex-shrink: 0;
+    border:      1.5px solid rgba(255, 255, 255, 0.10);
+  }
+
+  /* Semear — retrato */
+  .drawer-logo-item.semear .drawer-logo-img {
+    width:         28px;
+    height:        42px;
+    border-radius: 5px;
+    background:    #ffffff;
+    border-color:  rgba(125, 192, 99, 0.30);
+  }
+  /* Maanaim — circular */
+  .drawer-logo-item.maanaim .drawer-logo-img {
+    width:         40px;
+    height:        40px;
+    border-radius: 50%;
+    background:    #f5f0e8;
+    border-color:  rgba(232, 201, 106, 0.30);
+  }
+
+  .drawer-logo-img img { width:100%; height:100%; object-fit:contain; display:block; }
+
+  .drawer-logo-texts { display: flex; flex-direction: column; gap: 2px; }
+
+  .drawer-logo-texts strong {
+    font-family: var(--ff-display);
+    font-size:   0.82rem;
+    font-weight: 700;
+    color: #333;
+    display:     block;
+  }
+
+  .drawer-logo-texts span {
+    font-family:    var(--ff-mono);
+    font-size:      0.60rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display:        block;
+  }
+
+  .drawer-logo-item.semear  .drawer-logo-texts span { color: var(--sage2, #7dc063); }
+  .drawer-logo-item.maanaim .drawer-logo-texts span { color: var(--gold); }
+
+  /* ── Textos das logos em telas pequenas (< 480px) ─────────── */
+  @media (max-width: 480px) {
+    /* Garante que textos ficam visíveis */
+    .nav-logo-texts { display: flex; }
+    .nav-brand-sep  { display: none; }
+    /* Fontes e tamanhos herdados do clamp() do bloco 768px acima —
+       o bloco 390px refina ainda mais em telas muito estreitas.
+       Não sobrescrever aqui para evitar conflito. */
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     JELLO SLIDING TAB NAVIGATION
+     Mobile: barra fixa no rodapé com indicador deslizante jello
+     Desktop: indicador deslizante sob os links do topo
+  ══════════════════════════════════════════════════════════════ */
+
+  /* ── Keyframes do efeito Jello ─────────────────────────────── */
+  @keyframes jelloSquish {
+    0%   { transform: scaleX(1)    scaleY(1);    }
+    18%  { transform: scaleX(1.35) scaleY(0.72); }
+    36%  { transform: scaleX(0.80) scaleY(1.20); }
+    54%  { transform: scaleX(1.15) scaleY(0.88); }
+    72%  { transform: scaleX(0.94) scaleY(1.06); }
+    86%  { transform: scaleX(1.04) scaleY(0.97); }
+    100% { transform: scaleX(1)    scaleY(1);    }
+  }
+
+  /* ── Barra mobile ──────────────────────────────────────────── */
+  .jello-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: #ffffff;
+    border-top: 1px solid rgba(26, 51, 18, 0.10);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -6px 32px rgba(0,0,0,0.11), 0 -2px 6px rgba(0,0,0,0.05);
+  }
+
+  /* Jello nav apenas no desktop — mobile usa hamburguer/drawer */
+  @media (max-width: 1023px) {
+    .jello-nav { display: none !important; }
+  }
+
+  /* Trilha — contém o pill e os itens */
+  .jello-track {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    padding: 6px 6px 8px;
+  }
+
+  /* ── Pill deslizante ───────────────────────────────────────── */
+  .jello-pill {
+    position: absolute;
+    top: 6px;
+    height: calc(100% - 14px);
+    background: rgba(26, 51, 18, 0.09);
+    border-radius: 14px;
+    pointer-events: none;
+    /* Transição elástica para left e width */
+    transition:
+      left  0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+      width 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: left, width, transform;
+  }
+  /* Pill do CTA (Doar) tem cor verde */
+  .jello-pill.cta-pill { background: rgba(74, 138, 57, 0.13); }
+  /* Classe que dispara a animação jello */
+  .jello-pill.jello-go {
+    animation: jelloSquish 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  /* ── Item de navegação ─────────────────────────────────────── */
+  .jello-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    padding: 6px 4px 4px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.60rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+    z-index: 1; /* sobre o pill */
+    transition: color 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .jello-item.is-active { color: #1A3312; }
+  .jello-item.is-cta    { color: #4a8a39; }
+
+  /* Pressionar = encolhe levemente */
+  .jello-item:active { transform: scale(0.92); transition: transform 0.1s ease; }
+
+  /* ── Ícone SVG ─────────────────────────────────────────────── */
+  .jello-icon {
+    width: 32px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .jello-icon svg {
+    width: 20px;
+    height: 20px;
+    overflow: visible;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Animações granulares nos ícones ao ativar ─────────────── */
+  @keyframes jelloIconPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.30); }
+    65%  { transform: scale(0.88); }
+    82%  { transform: scale(1.10); }
+    100% { transform: scale(1); }
+  }
+  .jello-item.is-active .jello-icon svg {
+    animation: jelloIconPop 0.50s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  /* Partes específicas do SVG — animações extras */
+  .icon-home-roof {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: 11px 4px;
+  }
+  .jello-item.is-active .icon-home-roof { transform: translateY(-3px); }
+
+  .icon-heart {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: 11px 12px;
+  }
+  .jello-item.is-active .icon-heart { transform: scale(1.20); }
+
+  .icon-box-lid {
+    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: 11px 5px;
+  }
+  .jello-item.is-active .icon-box-lid { transform: translateY(-3px) rotate(-10deg); }
+
+  @keyframes jelloHandWave {
+    0%, 100% { transform: rotate(0deg); }
+    30%      { transform: rotate(18deg); }
+    70%      { transform: rotate(-10deg); }
+  }
+  .jello-item.is-active .icon-hand {
+    animation: jelloHandWave 0.55s ease;
+    transform-origin: 11px 16px;
+  }
+
+  .icon-lock-shackle {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: 11px 7px;
+  }
+  .jello-item.is-active .icon-lock-shackle { transform: translateY(-3px); }
+
+  /* ══════════════════════════════════════════════════════════════
+     DESKTOP: indicador deslizante sob o ul.nav-links
+  ══════════════════════════════════════════════════════════════ */
+  @media (min-width: 1024px) {
+    /* Container relativo para o pill do desktop */
+    .nav-links-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    /* Pill do desktop — barra sob os links */
+    .nav-links-pill {
+      position: absolute;
+      bottom: -4px;
+      height: 3px;
+      background: #1A3312;
+      border-radius: 3px;
+      pointer-events: none;
+      opacity: 0;
+      transition:
+        left    0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        width   0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.25s ease;
+      will-change: left, width;
+    }
+    .nav-links-pill.jello-go {
+      animation: jelloSquish 0.50s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    /* Links do desktop — transição de cor */
+    .nav-links a {
+      transition: color 0.22s ease !important;
+      padding-bottom: 6px;
+    }
+  }
+
+
+  /* Estilos forçados para fundo claro (Global) */
+  #nav .nav-logo-title { color: #1a3312; }
+  #nav .nav-logo-sub { opacity: 0.8; color: #1a3312; }
+  #nav .nav-links a { color: #333 !important; }
+  #nav .nav-links a:hover { color: var(--sage2, #7dc063) !important; }
+  #nav .hamburger span { background: #333 !important; }
+  #nav.scrolled { z-index: 9999; }
+  #nav { z-index: 9999; }
+
+  /* ══ MOBILE — header seguro para notch / Dynamic Island / safe area ══
+     Todos os ajustes abaixo são isolados em max-width:768px e não
+     afetam o layout desktop em nenhuma circunstância.
+  ══════════════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* 1. A navbar fixa cresce para acomodar o safe-area do topo
+          (notch, câmera, Dynamic Island).
+          env() com fallback 0px = zero impacto em dispositivos sem notch. */
+    #nav {
+      padding: 0 !important;
+      padding-top: env(safe-area-inset-top, 0px) !important;
+      background-color: #ffffff !important;
+      border-bottom: 1px solid rgba(26, 51, 18, 0.08) !important;
+    }
+    #nav.scrolled {
+      padding: 0 !important;
+      padding-top: env(safe-area-inset-top, 0px) !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 3px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* 2. Container: safe area nas laterais evita que o hamburguer
+          fique atrás do canto arredondado ou da câmera selfie lateral.
+          height:auto + min-height permite crescer se as logos quebrarem linha. */
+    #nav .container {
+      padding-left:  calc(14px + env(safe-area-inset-left,  0px)) !important;
+      padding-right: calc(14px + env(safe-area-inset-right, 0px)) !important;
+      max-width:   100%;
+      width:       100%;
+      box-sizing:  border-box !important;
+      display:     flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      height:      auto !important;
+      min-height:  64px !important;
+      gap:         8px !important;
+    }
+
+    /* 3. Área das logos: cresce para ocupar o espaço disponível,
+          SEM overflow:hidden — o texto nunca é cortado.
+          flex-wrap:wrap permite quebrar linha em telas muito estreitas.
+          Os itens individuais encolhem com flex-shrink:1 se necessário. */
+    .nav-brand {
+      display:         flex !important;
+      flex-direction:  row !important;
+      align-items:     center !important;
+      justify-content: flex-start !important;
+      flex-wrap:       wrap !important;
+      gap:             10px !important;
+      margin:          0 !important;
+      padding:         6px 0 !important;
+      min-width:       0 !important;
+      overflow:        visible !important;  /* texto nunca cortado */
+      flex:            1 1 0 !important;
+    }
+
+    /* Cada logo item pode encolher livremente */
+    .nav-logo-item {
+      flex-shrink: 1 !important;
+      min-width:   0 !important;
+      gap:         6px !important;
+    }
+
+    /* 4. Hamburguer: área clicável mínima de 44×44px (guideline iOS/Android),
+          flex-shrink:0 garante que NUNCA seja comprimido pelo logo,
+          z-index alto garante que nunca fique sob outro elemento. */
+    #hamburger-btn,
+    #nav .hamburger {
+      flex-shrink:     0 !important;
+      min-width:       44px !important;
+      min-height:      44px !important;
+      width:           44px !important;
+      height:          44px !important;
+      display:         flex !important;
+      align-items:     center !important;
+      justify-content: center !important;
+      position:        relative !important;
+      z-index:         10001 !important;
+      padding:         0 !important;
+      margin-left:     4px !important;
+      border-radius:   8px !important;
+    }
+
+    /* Semear no mobile: retrato — clamp ajusta automaticamente ao viewport */
+    .nav-logo-item.semear .nav-logo-img-wrap {
+      width:         clamp(28px, 8vw, 38px) !important;
+      height:        clamp(42px, 12vw, 57px) !important;
+      border-radius: 6px !important;
+      flex-shrink:   0 !important;
+      margin:        0 !important;
+      padding:       0 !important;
+      box-shadow:    0 2px 8px rgba(0,0,0,0.10) !important;
+      border:        2px solid rgba(90, 138, 74, 0.5) !important;
+    }
+    /* Maanaim no mobile: circular */
+    .nav-logo-item.maanaim .nav-logo-img-wrap {
+      width:         clamp(36px, 10vw, 50px) !important;
+      height:        clamp(36px, 10vw, 50px) !important;
+      border-radius: 50% !important;
+      flex-shrink:   0 !important;
+      margin:        0 !important;
+      padding:       0 !important;
+      box-shadow:    0 2px 8px rgba(0,0,0,0.10) !important;
+      border:        2px solid rgba(138, 24, 24, 0.35) !important;
+    }
+
+    /* Fontes com clamp — escalam suavemente entre viewports */
+    #nav .nav-logo-title {
+      color:          #1a3312 !important;
+      font-size:      clamp(0.60rem, 2.4vw, 0.80rem) !important;
+      white-space:    nowrap !important;
+    }
+    #nav .nav-logo-sub {
+      color:          #5a8a4a !important;
+      opacity:        1 !important;
+      font-size:      clamp(0.44rem, 1.6vw, 0.60rem) !important;
+      letter-spacing: 0.05em !important;
+      white-space:    nowrap !important;
+    }
+
+    /* Cores para fundo claro no mobile */
+    #nav .hamburger span { background: #1a3312 !important; }
+    .nav-brand-sep       { display: none !important; }
+  }
+
+  /* Refinamento para telas muito pequenas (≤ 390px) */
+  @media (max-width: 390px) {
+    #nav .nav-logo-title {
+      font-size: clamp(0.56rem, 2.1vw, 0.65rem) !important;
+    }
+    #nav .nav-logo-sub {
+      font-size: clamp(0.42rem, 1.5vw, 0.50rem) !important;
+      letter-spacing: 0.03em !important;
+    }
+    .nav-logo-item.semear .nav-logo-img-wrap {
+      width:  clamp(24px, 7vw, 30px) !important;
+      height: clamp(36px, 10.5vw, 45px) !important;
+    }
+    .nav-logo-item.maanaim .nav-logo-img-wrap {
+      width:  clamp(30px, 9vw, 38px) !important;
+      height: clamp(30px, 9vw, 38px) !important;
+    }
+    .nav-brand { gap: 8px !important; }
+    .nav-logo-item { gap: 5px !important; }
+  }
+
+</style>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     NAVBAR — Menu de Navegação Principal
+     id="nav" → app.js adiciona classe "scrolled" ao rolar
+═══════════════════════════════════════════════════════════════════ -->
+<nav id="nav" role="navigation" aria-label="Menu principal de navegação">
+  <div class="container">
+
+    <!-- ── LOGOS DAS ORGANIZAÇÕES (lado esquerdo) ───────────── -->
+    <!--
+      .nav-brand = link clicável que vai à página inicial.
+      Exibe as duas logos (Semear + Maanaim) lado a lado.
+      As imagens estão em base64 — funcionam sem servidor externo.
+    -->
+    <a href="index.html"
+       class="nav-brand"
+       aria-label="DoaVida — Ir para a página inicial">
+
+      <!-- LOGO 1: Ação Social Semear ─────────────────────── -->
+      <div class="nav-logo-item semear">
+        <div class="nav-logo-img-wrap">
+          <!--
+            Imagem em base64: funciona abrindo o HTML diretamente
+            no navegador (sem servidor web necessário).
+            alt="" pois a informação está no texto ao lado.
+          -->
+          <img src="logo-semear.jpeg"
+               alt="Logo Ação Social Semear"
+               loading="eager" />
+        </div>
+        <div class="nav-logo-texts">
+          <span class="nav-logo-title">Ação Social</span>
+          <span class="nav-logo-sub">Semear</span>
+        </div>
+      </div>
+
+      <!-- Separador visual entre as logos -->
+      <div class="nav-brand-sep" aria-hidden="true"></div>
+
+      <!-- LOGO 2: Comunidade Maanaim ─────────────────────── -->
+      <div class="nav-logo-item maanaim">
+        <div class="nav-logo-img-wrap">
+          <img src="logo-maanaim.jpeg"
+               alt="Logo Comunidade Maanaim"
+               loading="eager" />
+        </div>
+        <div class="nav-logo-texts">
+          <span class="nav-logo-title">Maanaim</span>
+          <span class="nav-logo-sub">Comunidade Evangélica</span>
+        </div>
+      </div>
+
+    </a><!-- fim .nav-brand -->
+
+
+    <!-- ── LINKS DE NAVEGAÇÃO (desktop, ocultos < 1024px) ───── -->
+    <!--
+      global.css oculta .nav-links em telas < 1024px.
+      Em mobile esses links aparecem na .jello-nav abaixo.
+      .nav-links-wrap = container relativo para o pill deslizante.
+    -->
+    <div class="nav-links-wrap">
+      <div class="nav-links-pill" id="nav-links-pill" aria-hidden="true"></div>
+    <ul class="nav-links" role="list">
+
+      <li>
+        <a href="index.html">Início</a>
+      </li>
+
+      <li>
+        <!--
+          Link para a página de voluntariado.
+          aria-current="page" é adicionado dinamicamente pelo JS
+          quando necessário, ou hardcodado em cada página.
+        -->
+        <a href="voluntario.html">Seja um Voluntário</a>
+      </li>
+
+      <!-- Dashboard removido do menu público (acesso só via admin) -->
+
+    </ul><!-- fim .nav-links -->
+    </div><!-- fim .nav-links-wrap -->
+
+
+    <!-- ── CTA PRINCIPAL (desktop) ──────────────────────────── -->
+    <div class="nav-cta">
+      <a href="form.html"
+         class="btn btn-primary btn-sm"
+         style="color:#ffffff;"
+         aria-label="Ir para o formulário de doação">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        Quero Doar
+      </a>
+    </div>
+
+
+    <!-- ── BOTÃO HAMBURGUER (mobile, visível < 1024px) ──────── -->
+    <!--
+      global.css mostra .hamburger apenas em telas < 1024px.
+      app.js controla o abrir/fechar do drawer ao clicar.
+      aria-controls="nav-drawer" → referencia o drawer abaixo.
+    -->
+    <button
+      class="hamburger"
+      id="hamburger-btn"
+      type="button"
+      aria-controls="nav-drawer"
+      aria-expanded="false"
+      aria-label="Abrir menu de navegação"
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+
+  </div><!-- fim .container -->
+</nav><!-- fim #nav -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DRAWER — Menu Mobile
+     app.js adiciona/remove classe "open" ao clicar no hamburguer.
+     global.css controla display: none → flex via .nav-drawer.open.
+═══════════════════════════════════════════════════════════════════ -->
+<div
+  id="nav-drawer"
+  class="nav-drawer"
+  role="dialog"
+  aria-modal="false"
+  aria-label="Menu de navegação mobile"
+  aria-hidden="true"
+>
+
+
+
+  <!-- Links de navegação do drawer -->
+  <!-- .nav-drawer-link = estilo definido no global.css -->
+
+  <a href="index.html" class="nav-drawer-link">
+    <i class="fas fa-home" aria-hidden="true"></i>
+    Início
+  </a>
+
+  <a href="form.html" class="nav-drawer-link">
+    <i class="fas fa-box-open" aria-hidden="true"></i>
+    Fazer Doação
+  </a>
+
+  <!-- Seja um Voluntário: destacado em dourado no drawer -->
+  <a href="voluntario.html" class="nav-drawer-link"
+     style="color: var(--gold);">
+    <i class="fas fa-hands-helping" aria-hidden="true"
+       style="color: var(--gold);"></i>
+    Seja um Voluntário
+  </a>
+
+  <!-- Dashboard removido do menu público -->
+
+  <a href="admin.html" class="nav-drawer-link">
+    <i class="fas fa-lock" aria-hidden="true"></i>
+    Admin
+  </a>
+
+  <!-- Separador antes do CTA -->
+  <div style="height:1px; background:var(--border); margin:4px 0;"
+       aria-hidden="true"></div>
+
+  <!-- CTA em destaque (dourado, largura total) -->
+  <a href="form.html"
+     class="btn btn-primary"
+     style="text-align:center; justify-content:center;
+            width:100%; margin-top:4px;"
+     aria-label="Ir para o formulário de doação">
+    <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
+    Quero Fazer uma Doação
+  </a>
+
+</div><!-- fim #nav-drawer -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     JELLO SLIDING TAB NAVIGATION — Mobile (fixada no rodapé)
+     Visível apenas em telas < 1024px.
+     .jello-pill desliza sob o item ativo com efeito jello.
+     Lógica em js/app.js → inicializarJelloNav()
+═══════════════════════════════════════════════════════════════════ -->
+<nav class="jello-nav" id="jello-nav" aria-label="Navegação rápida">
+  <div class="jello-track" id="jello-track">
+
+    <!-- Pill deslizante — posicionado via JS -->
+    <div class="jello-pill" id="jello-pill" aria-hidden="true"></div>
+
+    <!-- Item 0: Início -->
+    <a href="index.html" class="jello-item" data-jello-index="0" aria-label="Início">
+      <div class="jello-icon">
+        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline class="icon-home-roof" points="3,9.5 11,3 19,9.5"/>
+          <path d="M5 9.5V19a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1V9.5"/>
+        </svg>
+      </div>
+      <span>Início</span>
+    </a>
+
+    <!-- Item 2: Doar — CTA central, pill verde -->
+    <a href="form.html" class="jello-item is-cta" data-jello-index="2" aria-label="Fazer Doação">
+      <div class="jello-icon">
+        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path class="icon-box-lid" d="M4 7h14l-1.5-4h-11z"/>
+          <path d="M4 7v11a1 1 0 001 1h12a1 1 0 001-1V7"/>
+          <line x1="11" y1="7" x2="11" y2="19"/>
+        </svg>
+      </div>
+      <span>Doar</span>
+    </a>
+
+    <!-- Item 3: Voluntário -->
+    <a href="voluntario.html" class="jello-item" data-jello-index="3" aria-label="Seja um Voluntário">
+      <div class="jello-icon">
+        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="6" r="3"/>
+          <path class="icon-hand" d="M6 19v-2a5 5 0 0110 0v2"/>
+          <path d="M2 14c1-2 3-3 5-2"/>
+          <path d="M20 14c-1-2-3-3-5-2"/>
+        </svg>
+      </div>
+      <span>Voluntário</span>
+    </a>
+
+    <!-- Item 4: Admin -->
+    <a href="admin.html" class="jello-item" data-jello-index="4" aria-label="Área administrativa">
+      <div class="jello-icon">
+        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="4" y="11" width="14" height="9" rx="2"/>
+          <path class="icon-lock-shackle" d="M7 11V8a4 4 0 018 0v3"/>
+        </svg>
+      </div>
+      <span>Admin</span>
+    </a>
+
+  </div><!-- fim .jello-track -->
+</nav><!-- fim .jello-nav -->

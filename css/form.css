@@ -1,0 +1,1857 @@
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DoaVida — css/form.css                                             ║
+  ║  Estilos do formulário de doação em 3 passos (form.html)            ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  COMO ESTE ARQUIVO SE RELACIONA COM OS OUTROS:                      ║
+  ║    global.css  → variáveis, reset, navbar, footer, toast, botões    ║
+  ║    form.css    → tudo específico do formulário de 3 passos          ║
+  ║    form.js     → lógica JS do formulário (carrega após este CSS)     ║
+  ║    api.js      → salva a doação e envia WhatsApp ao admin           ║
+  ║                                                                      ║
+  ║  SE VOCÊ MUDAR:                                                      ║
+  ║    Cor do botão dourado → altere --gold em global.css               ║
+  ║    Tamanho do modal → altere .form-modal max-width abaixo           ║
+  ║    Cores do recibo → altere as regras .receipt-* abaixo            ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+/* ══════════════════════════════════════════════════════════════════════
+   VARIÁVEIS LOCAIS DO FORMULÁRIO
+   Complementam global.css sem sobrescrevê-las.
+   Usadas apenas dentro das classes definidas neste arquivo.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Cor de destaque do formulário (passo ativo, botão confirmar) */
+  --form-accent: var(--gold);
+  /* Verde para passo concluído */
+  --form-done: #4caf50;
+  /* Vermelho para erros de validação */
+  --field-error: #e55a5a;
+  /* Verde para campos válidos */
+  --field-success: #4caf50;
+  /* Fundo do recibo térmico (estilo papel creme) */
+  --receipt-bg: #fdf8f0;
+  /* Texto do recibo */
+  --receipt-text: #1a1612;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 1 — PÁGINA DO FORMULÁRIO
+   A página form.html é uma página completa com navbar + footer.
+   O formulário fica centralizado no conteúdo.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Wrapper que ocupa a tela inteira e centraliza o modal.
+  padding-top = altura da navbar fixa (definida em global.css).
+*/
+.form-page {
+  min-height: 100vh;
+  padding-top: 72px; /* Compensação da navbar fixa */
+  padding-bottom: 80px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--bg);
+}
+
+/* Container que limita a largura máxima do modal */
+.form-page .container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 48px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 2 — MODAL DO FORMULÁRIO (caixa principal dos 3 passos)
+   Aparece como um card centralizado na página.
+   Não é um overlay/popup — fica diretamente no fluxo da página.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  .form-modal = o card principal que contém os 3 passos.
+  Animação de entrada fadeInUp ao carregar a página.
+*/
+.form-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  max-width: 560px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  animation: formModalIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Animação de entrada do modal */
+@keyframes formModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Botão "< VOLTAR" no topo do modal ── */
+/*
+  Aparece sempre no canto superior esquerdo.
+  Chama fecharForm() ou voltarPasso() dependendo do passo ativo.
+*/
+.form-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  font-family: var(--ff-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 12px rgba(232, 201, 106, 0.35);
+  z-index: 10;
+}
+.form-back-btn:hover {
+  background: #f5d98a;
+  transform: translateY(-1px);
+}
+
+/* ── Barra de progresso (faixa no topo do modal) ── */
+/*
+  Avança de 33% → 66% → 100% conforme o usuário avança nos passos.
+  Controlada por JS: doaIrPasso(n) em form.js.
+*/
+.form-progress-bar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+.form-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #f5a623);
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 3 — PASSOS (step panels)
+   Cada passo é um .form-step — só um fica visível por vez.
+   JS alterna a classe .active para mostrar/esconder.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Passo padrão: escondido */
+.form-step {
+  display: none;
+  padding: 60px 28px 28px; /* 60px no topo para não sobrepor o botão voltar */
+  animation: stepSlideIn 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+/* Passo ativo: visível */
+.form-step.active {
+  display: block;
+}
+
+/* Animação ao trocar de passo — fade + sobe suavemente, sem movimento lateral */
+@keyframes stepSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Label acima do título ("PASSO 1 DE 3 — ALIMENTOS") */
+.step-label {
+  font-family: var(--ff-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+/* Título principal do passo ("O que você quer doar?") */
+.step-title {
+  font-family: var(--ff-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 3px;
+}
+/* Subtítulo ("Escolha os alimentos e defina a quantidade") */
+.step-sub {
+  font-size: 0.84rem;
+  color: var(--text2);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 4 — INDICADORES DE PROGRESSO (bolinhas 1–2–3)
+   Exibidos dentro de cada passo para orientar o usuário.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Container das 3 bolinhas + linhas conectoras */
+.step-dots {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+/* Bolinha individual (círculo numerado) */
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+/* Círculo do número */
+.step-dot-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  display: grid;
+  place-items: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text2);
+  transition: all 0.3s;
+}
+/* Label abaixo do círculo ("Alimentos", "Seus dados", "Confirmar") */
+.step-dot-label {
+  font-size: 0.62rem;
+  color: var(--text2);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Estado: passo atual (ativo) */
+.step-dot.on .step-dot-circle {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg);
+  box-shadow: 0 0 14px rgba(232, 201, 106, 0.45);
+}
+.step-dot.on .step-dot-label {
+  color: var(--gold);
+}
+
+/* Estado: passo concluído (check verde) */
+.step-dot.done .step-dot-circle {
+  background: var(--form-done);
+  border-color: var(--form-done);
+  color: #fff;
+}
+.step-dot.done .step-dot-label {
+  color: var(--form-done);
+}
+
+/* Linha horizontal entre bolinhas */
+.step-dot-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin-bottom: 16px;
+  transition: background 0.3s;
+  min-width: 20px;
+}
+/* Linha concluída (fica verde) */
+.step-dot-line.done {
+  background: var(--form-done);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 5 — PASSO 1: GRADE DE ALIMENTOS + CARRINHO
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Layout do passo 1:
+  [grade de alimentos (esquerda)] | [carrinho lateral (direita)]
+*/
+.step1-inner {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+/* ── Grade de cards de alimentos ── */
+/*
+  Os cards são gerados por JS: doaRenderGrid() em form.js.
+  Cada card representa um alimento disponível para doação.
+*/
+.foods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+/* Scrollbar minimalista */
+.foods-grid::-webkit-scrollbar {
+  width: 3px;
+}
+.foods-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ── Card individual de alimento ── */
+.food-card {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.food-card:hover {
+  border-color: rgba(232, 201, 106, 0.45);
+  box-shadow: 0 0 0 2px rgba(232, 201, 106, 0.12);
+}
+.food-card.selected {
+  border-color: var(--gold);
+  background: rgba(232, 201, 106, 0.07);
+}
+.food-card.goal-reached {
+  opacity: 0.55;
+  border-color: var(--form-done);
+}
+
+/* Imagem do alimento dentro do card */
+.food-card img {
+  width: 100%;
+  height: 100px; /* ← Altere aqui para mudar o tamanho da imagem */
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+/* Nome do alimento ("Arroz 5kg") */
+.food-card-name {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1.3;
+}
+/* Progresso ("60% da meta") */
+.food-card-pct {
+  font-size: 0.65rem;
+  color: var(--text2);
+}
+/* Badge "Meta atingida" */
+.food-card-done {
+  font-size: 0.65rem;
+  color: var(--form-done);
+  font-weight: 700;
+}
+
+/* ── Controles de quantidade (+/-) dentro do card ── */
+.food-qty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+/* Botões + e - */
+.food-qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.food-qty-btn:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg);
+}
+.food-qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+/* Número da quantidade */
+.food-qty-val {
+  font-family: var(--ff-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 22px;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SISTEMA DE CARDS NOVO — classes .fcard-* geradas por doaRenderGrid()
+   em form.js. SEM este bloco as imagens entram sem dimensão e somem
+   no mobile porque o browser não tem como saber qual altura usar.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Card principal */
+.fcard {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.fcard:hover {
+  border-color: rgba(74, 138, 57, 0.4);
+  box-shadow: 0 0 0 2px rgba(74, 138, 57, 0.12);
+}
+/* Item adicionado ao carrinho */
+.fcard--ativo {
+  border-color: var(--gold);
+  background: rgba(74, 138, 57, 0.06);
+}
+/* Meta atingida — bloqueado */
+.fcard--meta {
+  opacity: 0.55;
+  border-color: var(--form-done);
+}
+
+/* Container da imagem — proporção fixa via padding-top (evita CLS) */
+.fcard-img-wrap {
+  position: relative;          /* ancora os filhos posicionados */
+  width: 100%;
+  padding-top: 70%;             /* altura = 70% da largura — aspecto 10:7 */
+  background: var(--surface2);
+  overflow: hidden;
+  flex-shrink: 0;               /* não encolhe em flex column */
+}
+
+/* Imagem preenche todo o container — a chave para não "desaparecer" */
+.fcard-img {
+  position: absolute;           /* sai do fluxo, mas respeita o .fcard-img-wrap */
+  inset: 0;                     /* top:0 right:0 bottom:0 left:0 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;            /* não distorce */
+  display: block;
+}
+
+/* Emoji fallback quando imagem falha ou não existe */
+.fcard-emoji-fb {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: var(--surface2);
+}
+
+/* Badge de peso/disponibilidade (canto inferior esquerdo da imagem) */
+.fcard-avail-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* Badge de progresso em % (canto superior direito da imagem) */
+.fcard-pct-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+/* Faixa "✓ Meta atingida" entre imagem e corpo */
+.fcard-meta-strip {
+  background: var(--form-done);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 8px;
+  letter-spacing: 0.04em;
+}
+
+/* Corpo do card */
+.fcard-body {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+/* Nome do alimento */
+.fcard-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1.3;
+}
+
+/* Texto de peso por unidade */
+.fcard-price-txt {
+  font-size: 0.65rem;
+  color: var(--text2);
+  line-height: 1.3;
+}
+
+/* Rodapé: quantidade + botões alinhados */
+.fcard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* Label "2 un." */
+.fcard-qty-display {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 28px;
+}
+
+/* Controles −/+ em pílula */
+.fcard-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+/* Botões − e + */
+.fcard-btn-minus,
+.fcard-btn-plus {
+  background: none;
+  border: none;
+  color: var(--cream);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+.fcard-btn-minus:hover { color: var(--field-error); }
+.fcard-btn-plus:hover  { color: var(--gold); }
+
+/* Número da quantidade */
+.fcard-qty-num {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cream);
+  min-width: 16px;
+  text-align: center;
+  font-family: var(--ff-mono);
+}
+
+/* Botão "Adicionar" */
+.fcard-order-btn {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+}
+.fcard-order-btn:hover {
+  background: var(--sage2, #67b050);
+  transform: scale(1.03);
+}
+
+/* ── Carrinho lateral ── */
+/*
+  Aparece à direita da grade de alimentos.
+  Atualizado em tempo real por doaAtualizarCarrinho() em form.js.
+*/
+.cart-panel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+/* Título do carrinho (" "C:\Users\flank\Downloads\icons8-shopping-cart-100.png" Sua doação") */
+.cart-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cream);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cart-panel-icon {
+  width: 20px;
+  height: 20px;
+}
+/* Lista de itens no carrinho */
+.cart-items {
+  min-height: 55px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+/* Item individual no carrinho (imagem + nome + kg) */
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.73rem;
+}
+.cart-item:last-child {
+  border-bottom: none;
+}
+.cart-item img {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.cart-item-name {
+  flex: 1;
+  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cart-item-kg {
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 0.7rem;
+}
+/* Mensagem quando carrinho vazio */
+.cart-empty {
+  font-size: 0.74rem;
+  color: var(--text2);
+  text-align: center;
+  padding: 12px 0;
+}
+/* Linha de total */
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.cart-total-label {
+  font-size: 0.68rem;
+  color: var(--text2);
+}
+.cart-total-val {
+  font-family: var(--ff-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* Botão Continuar dentro do cart-panel (sidebar desktop) */
+.cart-panel-continuar {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 100px;
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  font-family: var(--ff-body);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.cart-panel-continuar:disabled { opacity: .35; cursor: default; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 6 — PASSO 2: FORMULÁRIO DE DADOS
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Resumo compacto dos itens selecionados (aparece no topo do passo 2) */
+.step2-resume {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* Texto dos itens ("Feijão 2.0kg") */
+.step2-resume-items {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+/* Total em kg ("2.0 kg") — em dourado */
+.step2-resume-kg {
+  font-family: var(--ff-mono);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ── Campo de formulário (label + input + mensagem de erro) ── */
+.form-field {
+  margin-bottom: 18px;
+}
+.form-field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 7px;
+}
+/* Asterisco de campo obrigatório */
+.form-field .req {
+  color: #e55a5a;
+  margin-left: 3px;
+}
+/* Sufixo "(opcional)" */
+.form-field .opt {
+  font-size: 0.67rem;
+  color: var(--text2);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+/* Wrapper do input (para ícones posicionados absolutamente) */
+.form-input-wrap {
+  position: relative;
+}
+/* Prefixo (ex: 📱 no campo de telefone) */
+.form-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+  font-size: 0.95rem;
+}
+
+/* Input e textarea base */
+.form-input,
+.form-textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 42px 13px 14px;
+  color: var(--cream);
+  font-size: 0.93rem;
+  font-family: var(--ff-body);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  line-height: 1.5;
+}
+/* Input com prefixo (ex: telefone) */
+.form-input.has-prefix {
+  padding-left: 42px;
+}
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text2);
+  opacity: 0.55;
+}
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 201, 106, 0.12);
+}
+/* Textarea (campo de oração) */
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+  padding: 13px 14px 30px;
+}
+
+/* Estados de validação */
+.form-field.ok .form-input {
+  border-color: var(--form-done);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.12);
+}
+.form-field.err .form-input {
+  border-color: var(--field-error);
+  box-shadow: 0 0 0 2px rgba(229, 90, 90, 0.12);
+  animation: fieldShake 0.4s ease;
+}
+
+/* Animação de shake para campo inválido */
+@keyframes fieldShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Contador de caracteres (textarea) */
+.char-count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.67rem;
+  color: var(--text2);
+  font-family: var(--ff-mono);
+  pointer-events: none;
+}
+.char-count.near {
+  color: var(--gold);
+}
+.char-count.full {
+  color: var(--field-error);
+}
+
+/* Mensagem de erro abaixo do campo */
+.field-msg {
+  font-size: 0.73rem;
+  margin-top: 5px;
+  min-height: 16px;
+  color: var(--text2);
+}
+.form-field.ok .field-msg {
+  color: var(--form-done);
+}
+.form-field.err .field-msg {
+  color: var(--field-error);
+}
+
+/* ── Cards de forma de entrega ── */
+/*
+  Dois cards clicáveis: "Entrega na Igreja" e "Coleta no Endereço".
+  Clicado → recebe classe .selected + visual dourado.
+*/
+.delivery-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.delivery-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  outline: none;
+}
+.delivery-card:hover {
+  border-color: rgba(232, 201, 106, 0.4);
+  transform: translateY(-1px);
+}
+.delivery-card.selected {
+  border-color: var(--gold);
+  background: rgba(232, 201, 106, 0.06);
+  box-shadow: 0 0 0 2px rgba(232, 201, 106, 0.2);
+}
+/* Ícone do card de entrega */
+.delivery-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.delivery-card.selected .delivery-icon {
+  background: rgba(232, 201, 106, 0.1);
+  border-color: rgba(232, 201, 106, 0.3);
+  color: var(--gold);
+}
+.delivery-icon svg {
+  width: 26px;
+  height: 26px;
+}
+/* Textos do card de entrega */
+.delivery-info {
+  flex: 1;
+}
+.delivery-name {
+  font-weight: 700;
+  color: var(--cream);
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+}
+.delivery-card.selected .delivery-name {
+  color: var(--gold);
+}
+.delivery-desc {
+  font-size: 0.75rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+/* Ícone de check que aparece quando selecionado */
+.delivery-check {
+  width: 18px;
+  height: 18px;
+  color: var(--gold);
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.4) rotate(-20deg);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.delivery-card.selected .delivery-check {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 7 — BOTÕES DO FORMULÁRIO
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Linha de botões (voltar + confirmar) */
+.form-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Botão primário (dourado — "Continuar", "Confirmar") */
+.form-btn-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: var(--gold);
+  border: none;
+  border-radius: 100px;
+  color: var(--bg);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.form-btn-primary:hover {
+  background: #f5d98a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(232, 201, 106, 0.3);
+}
+.form-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+/* Variante: botão de confirmar (dourado → laranja gradiente) */
+.form-btn-primary.submit {
+  background: linear-gradient(135deg, var(--gold), #e8863a);
+}
+.form-btn-primary.submit:hover {
+  background: linear-gradient(135deg, #f5d98a, #f09542);
+}
+
+/* Spinner de carregamento dentro do botão */
+.btn-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: var(--bg);
+  border-radius: 50%;
+  animation: btnSpin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+/* Quando o botão está carregando, mostra spinner e esconde texto */
+.form-btn-primary.loading .btn-spinner {
+  display: block;
+}
+.form-btn-primary.loading .btn-label,
+.form-btn-primary.loading svg:not(.btn-spinner) {
+  display: none;
+}
+@keyframes btnSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Botão secundário (voltar, outline) */
+.form-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 14px 18px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  color: var(--text2);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.form-btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 8 — PASSO 3: RECIBO TÉRMICO
+   Estilo de cupom fiscal / nota de papel creme.
+   Preenchido por doaBuildRecibo() em form.js.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Tela de sucesso (ícone + título + mensagem acima do recibo) */
+.success-area {
+  text-align: center;
+  padding: 8px 0 14px;
+}
+.success-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 10px;
+  animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.success-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes successBounce {
+  from {
+    transform: scale(0.3) rotate(-10deg);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.success-title {
+  font-family: var(--ff-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--cream);
+  margin-bottom: 5px;
+}
+.success-message {
+  font-size: 0.87rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+/* Badge WhatsApp (aparece quando WA está ativo) */
+.wa-badge {
+  display: none; /* JS muda para flex quando WA configurado */
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgba(37, 211, 102, 0.07);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  color: #25d366;
+  margin: 0 auto 14px;
+  width: fit-content;
+}
+
+/* ── Recibo (papel creme) ── */
+/* ══════════════════════════════════════════════════════════════════════
+   RECIBO ESTILO CUPOM FISCAL
+   Redesenhado para parecer um comprovante de compra de alimentos real.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Wrapper do papel térmico */
+.receipt {
+  background: #fff;
+  color: #111;
+  font-family: "Courier Prime", "Courier New", monospace;
+  box-shadow:
+    0 2px 0 #ddd,
+    0 6px 20px rgba(0,0,0,0.18),
+    4px 4px 0 rgba(0,0,0,0.06);
+  margin: 0 auto 20px;
+  max-width: 360px;
+  width: 90%;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* Perfuração (papel picotado) */
+.receipt-perf {
+  height: 10px;
+  background: #fff;
+  background-image: radial-gradient(circle at 8px -1px, transparent 5px, #fff 5px);
+  background-size: 14px 10px;
+  border-bottom: 1px dashed #bbb;
+}
+.receipt-perf.bot {
+  border-bottom: none;
+  border-top: 1px dashed #bbb;
+  background-image: radial-gradient(circle at 8px 11px, transparent 5px, #fff 5px);
+}
+
+/* Corpo do recibo */
+.receipt-body {
+  padding: 14px 18px 10px;
+}
+
+/* ── Cabeçalho ── */
+.rcpt-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* Linha com os dois logos lado a lado */
+.rcpt-logos-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 6px 0 8px;
+}
+
+/* Cada bloco logo + texto */
+.rcpt-logo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Logo Semear no recibo: formato retrato original */
+.rcpt-logo-item.semear-logo .rcpt-logo-img,
+.rcpt-logo-img.semear {
+  width:           46px;
+  height:          68px;
+  border-radius:   7px;
+  object-fit:      cover;
+  object-position: center top;
+  border:          1.5px solid rgba(90,138,74,0.4);
+  display:         block;
+}
+
+/* Logo Maanaim no recibo: circular */
+.rcpt-logo-img {
+  width:           58px;
+  height:          58px;
+  border-radius:   50%;
+  object-fit:      cover;
+  object-position: center top;
+  border:          1.5px solid #ccc;
+  display:         block;
+}
+
+/* Texto abaixo do logo */
+.rcpt-logo-label {
+  font-size: 0.55rem;
+  color: #444;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.3;
+}
+.rcpt-logo-label strong {
+  font-size: 0.60rem;
+  color: #111;
+  letter-spacing: 0.06em;
+}
+
+/* Separador entre os dois logos */
+.rcpt-logo-sep {
+  font-size: 0.7rem;
+  color: #aaa;
+  align-self: center;
+  padding-bottom: 16px;
+}
+
+.rcpt-store-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #111;
+  display: block;
+}
+.rcpt-store-sub {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #222;
+  display: block;
+  margin-top: 2px;
+}
+.rcpt-store-info {
+  font-size: 0.62rem;
+  color: #666;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+/* ── Separadores e títulos ── */
+.rcpt-dashes {
+  font-size: 0.62rem;
+  color: #aaa;
+  text-align: center;
+  margin: 5px 0;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+.rcpt-doc-title {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: #222;
+  padding: 2px 0;
+}
+.rcpt-section-title {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #333;
+  margin: 5px 0 3px;
+}
+
+/* ── Linhas de dados (protocolo, doador, etc.) ── */
+.rcpt-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  flex-wrap: wrap;
+}
+.rcpt-k {
+  color: #777;
+  font-size: 0.65rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rcpt-v {
+  color: #111;
+  font-weight: 700;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ── Cabeçalho dos itens ── */
+.rcpt-items-head {
+  display: flex;
+  font-size: 0.62rem;
+  color: #555;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.rcpt-ih-desc { flex: 1; }
+.rcpt-ih-qty  { width: 40px; text-align: center; }
+.rcpt-ih-total { width: 56px; text-align: right; }
+
+/* ── Linha de item ── */
+.rcpt-item-row {
+  display: flex;
+  align-items: center;
+  font-size: 0.68rem;
+  line-height: 1.8;
+  border-bottom: 1px dotted #eee;
+}
+.rcpt-item-desc  { flex: 1; color: #111; font-weight: 600; }
+.rcpt-item-qty   { width: 40px; text-align: center; color: #555; }
+.rcpt-item-total { width: 56px; text-align: right; color: #111; font-weight: 700; }
+
+/* ── Linha total ── */
+.rcpt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0 2px;
+}
+.rcpt-total-k {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #111;
+}
+.rcpt-total-v {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 0.06em;
+}
+
+/* ── Mensagem de oração ── */
+.rcpt-msg-text {
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #555;
+  line-height: 1.5;
+  padding: 4px 0;
+}
+
+/* ── Rodapé espiritual ── */
+.rcpt-spiritual {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.rcpt-verse {
+  font-size: 0.66rem;
+  font-style: italic;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 2px;
+}
+.rcpt-ref {
+  font-size: 0.6rem;
+  color: #888;
+  margin-bottom: 6px;
+}
+.rcpt-thanks {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #222;
+  margin-top: 4px;
+}
+
+/* ── Código de barras simulado ── */
+.rcpt-barcode-wrap {
+  margin-top: 10px;
+  text-align: center;
+}
+.rcpt-barcode {
+  height: 38px;
+  margin: 0 auto 4px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #111 0px, #111 2px,
+    transparent 2px, transparent 5px,
+    #111 5px, #111 6px,
+    transparent 6px, transparent 9px,
+    #111 9px, #111 12px,
+    transparent 12px, transparent 14px,
+    #111 14px, #111 15px,
+    transparent 15px, transparent 19px,
+    #111 19px, #111 22px,
+    transparent 22px, transparent 24px,
+    #111 24px, #111 25px,
+    transparent 25px, transparent 28px,
+    #111 28px, #111 31px,
+    transparent 31px, transparent 33px,
+    #111 33px, #111 35px,
+    transparent 35px, transparent 38px,
+    #111 38px, #111 40px,
+    transparent 40px, transparent 44px,
+    #111 44px, #111 46px,
+    transparent 46px, transparent 49px,
+    #111 49px, #111 50px
+  );
+  background-size: 50px 100%;
+  width: 200px;
+}
+.rcpt-barcode-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: #888;
+}
+
+.receipt-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.receipt-act-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 0.77rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--ff-body);
+}
+.receipt-act-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.receipt-act-btn::before {
+  content: '';
+  position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease; pointer-events: none;
+}
+.receipt-act-btn:hover::before { left: 140%; }
+.receipt-act-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(232,201,106,0.30);
+}
+.receipt-act-btn:active { transform: translateY(0) scale(0.96); }
+.receipt-act-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Botão primário de compartilhamento (WhatsApp) ──────────
+   Verde do WhatsApp como destaque — é a ação principal.
+   Os demais botões mantêm estilo neutro.
+────────────────────────────────────────────────────────── */
+.receipt-act-btn.share-primary {
+  background: #25d366;           /* verde oficial do WhatsApp     */
+  color: #fff;                   /* texto branco para contraste   */
+  border-color: #25d366;
+  font-weight: 600;
+}
+.receipt-act-btn.share-primary:hover {
+  background: #1fa855;           /* verde mais escuro no hover    */
+  border-color: #1fa855;
+  color: #fff;
+  transform: scale(1.03);        /* sutil zoom no hover           */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 9 — RESPONSIVIDADE
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Tablet (≤768px) */
+@media (max-width: 768px) {
+  .form-page {
+    padding-top: 64px;
+  }
+  .form-modal {
+    border-radius: 20px;
+  }
+}
+
+/* Mobile grande (≤600px) */
+@media (max-width: 600px) {
+  .form-page .container {
+    padding-top: 16px;
+  }
+  .step1-inner {
+    grid-template-columns: 1fr;
+  }
+  .cart-panel {
+    width: 100%;
+  }
+  .foods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-height: 260px;
+  }
+  .food-card img {
+    height: 80px;
+  }
+  .form-step {
+    padding: 56px 18px 20px;
+  }
+  .delivery-card {
+    padding: 12px;
+  }
+}
+
+/* Mobile pequeno (≤400px) */
+@media (max-width: 400px) {
+  .foods-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PASSO 1 — PÁGINA CHEIA (estilo app de mercado)
+   Quando body.etapa1 está ativo, o modal vira página inteira.
+   ══════════════════════════════════════════════════════════════════════ */
+
+body.etapa1 .form-page {
+  padding-bottom: 0;
+  align-items: flex-start;
+}
+
+body.etapa1 .form-page .container {
+  max-width: 100%;
+  padding: 0;
+}
+
+/* Modal sem card: sem borda, sem sombra, sem raio */
+body.etapa1 .form-modal {
+  max-width: 100%;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: var(--bg);
+  min-height: calc(100vh - 72px);
+}
+
+/* Passo 1 com padding generoso e espaço para o cart fixo */
+body.etapa1 #fs1 {
+  padding: 24px 20px 120px;
+}
+
+/* Remover restrição de altura da grade */
+body.etapa1 .foods-grid {
+  max-height: none;
+  overflow-y: visible;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+/* step1-inner: grade ocupa 100% */
+body.etapa1 .step1-inner {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+/* Esconde TUDO do step1-inner exceto o foods-grid */
+body.etapa1 .step1-inner {
+  display: block;
+}
+
+/* Cart-panel oculto em mobile/tablet — substituído pela barra fixa.
+   Sem !important para o @media desktop poder sobrescrever. */
+body.etapa1 .cart-panel {
+  display: none;
+}
+
+/* Botão Continuar do modal também oculto — substituído pela barra fixa */
+body.etapa1 #fs1 .form-btn-row {
+  display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SMART CART — barra fixa + gaveta mobile + sidebar desktop
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Filtro dourado — aplicado em todos os ícones de carrinho */
+.cart-bar-icon,
+.cart-panel-icon {
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: invert(68%) sepia(42%) saturate(600%) hue-rotate(5deg) brightness(95%);
+}
+
+/* Tamanho na barra fixa */
+.cart-bar-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+  /* converte preto → dourado (#c9a84c) */
+  filter: invert(68%) sepia(42%) saturate(600%) hue-rotate(5deg) brightness(95%);
+}
+
+/* ── Barra fixa inferior (mobile/tablet) ── */
+.cart-bar-fixa {
+  display: flex;           /* visível por padrão — desktop esconde abaixo */
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 300;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 -6px 28px rgba(0,0,0,.35);
+}
+/* Desktop: sidebar lateral assume o papel do carrinho */
+@media (min-width: 769px) {
+  .cart-bar-fixa { display: none !important; }
+}
+
+.cart-bar-resumo {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; padding: 4px 0;
+  user-select: none;
+}
+.cart-bar-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.cart-bar-total { font-size: .9rem; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.cart-bar-itens { font-size: .7rem; color: var(--text2); white-space: nowrap; }
+.cart-bar-btn {
+  padding: 12px 22px; border-radius: 100px;
+  background: var(--gold); color: var(--bg);
+  border: none; font-family: var(--ff-body);
+  font-size: .82rem; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  position: relative; overflow: hidden;
+  transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.cart-bar-btn::before {
+  content: '';
+  position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease; pointer-events: none;
+}
+.cart-bar-btn:not(:disabled):hover::before { left: 140%; }
+.cart-bar-btn:not(:disabled):hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 22px rgba(232,201,106,0.50);
+}
+.cart-bar-btn:not(:disabled):active { transform: translateY(0) scale(0.96); }
+.cart-bar-btn:disabled { opacity: .35; cursor: default; }
+
+/* ── Gaveta do carrinho (desliza de baixo) ── */
+.cart-drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 500;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  max-height: 82vh;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.32,1,.23,1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.45);
+}
+.cart-drawer.open { transform: translateY(0); }
+
+.cart-drawer-handle {
+  width: 40px; height: 4px;
+  background: var(--border); border-radius: 2px;
+  margin: 10px auto 0; flex-shrink: 0;
+}
+.cart-drawer-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cart-drawer-title {
+  font-family: var(--ff-mono); font-size: .8rem;
+  font-weight: 700; letter-spacing: .12em; color: var(--cream);
+}
+.cart-drawer-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text2); display: flex; align-items: center; padding: 4px;
+}
+.cart-drawer-limpar {
+  background: none; border: none; cursor: pointer;
+  color: #e57373; font-size: .78rem; font-weight: 600; padding: 4px 8px;
+}
+.cart-drawer-body { flex: 1; overflow-y: auto; padding: 4px 16px 8px; }
+
+/* Item na gaveta */
+.cart-drawer-vazio { text-align: center; color: var(--text2); font-size: .85rem; padding: 28px 0; }
+.cart-drawer-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.cart-drawer-item:last-child { border-bottom: none; }
+.cart-drawer-item-img {
+  width: 48px; height: 48px; border-radius: 10px;
+  object-fit: cover; background: var(--bg); flex-shrink: 0;
+}
+.cart-drawer-item-emoji {
+  width: 48px; height: 48px; border-radius: 10px;
+  background: var(--bg); display: flex; align-items: center;
+  justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+}
+.cart-drawer-item-nome {
+  flex: 1; font-size: .82rem; font-weight: 600;
+  color: var(--cream); line-height: 1.3; min-width: 0;
+}
+.cart-drawer-item-ctrl {
+  display: flex; align-items: center;
+  background: var(--bg); border-radius: 100px;
+  border: 1px solid var(--border); overflow: hidden; flex-shrink: 0;
+}
+.cart-drawer-item-ctrl button {
+  width: 32px; height: 32px; background: transparent; border: none;
+  cursor: pointer; font-size: 1rem; color: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+}
+.cart-drawer-item-ctrl button:hover { background: rgba(0,0,0,.07); }
+.cart-drawer-item-ctrl span {
+  min-width: 28px; text-align: center; font-size: .85rem;
+  font-weight: 700; color: var(--gold);
+  border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  height: 32px; line-height: 32px;
+}
+.cart-drawer-mais {
+  width: 100%; background: none; border: 1px dashed var(--border);
+  border-radius: 10px; color: var(--gold); font-size: .8rem;
+  padding: 10px; margin: 10px 0 4px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.cart-drawer-footer {
+  padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.cart-drawer-total-row {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 10px;
+}
+.cart-drawer-total-label { font-size: .78rem; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; }
+.cart-drawer-total-val   { font-size: 1rem; font-weight: 700; color: var(--gold); }
+.cart-drawer-continuar {
+  width: 100%; padding: 14px; border-radius: 100px;
+  background: var(--gold); color: var(--bg); border: none;
+  font-family: var(--ff-body); font-size: .9rem; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; cursor: pointer;
+  transition: opacity .2s;
+}
+.cart-drawer-continuar:disabled { opacity: .35; cursor: default; }
+
+/* ── Overlay ── */
+.cart-overlay {
+  display: none; position: fixed; inset: 0;
+  z-index: 450; background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+}
+.cart-overlay.visible { display: block; }
+
+/* ── Desktop: sidebar fixa à direita ── */
+@media (min-width: 1024px) {
+  body.etapa1 #fs1 {
+    padding: 24px calc(300px + 32px) 40px 32px;
+  }
+  body.etapa1 .foods-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  /* Esconde barra de rodapé no desktop */
+  body.etapa1 .cart-bar-fixa {
+    display: none;
+  }
+  /* Mostra o cart-panel como sidebar fixa */
+  body.etapa1 .cart-panel {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 72px; right: 0; bottom: 0;
+    width: 280px;
+    border-radius: 0;
+    border: none;
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    padding: 16px 12px; /* reduzido de 20px 16px — mais compacto */
+    overflow-y: auto;
+    z-index: 100;
+  }
+  body.etapa1 .cart-panel .cart-items {
+    max-height: none;
+    overflow-y: auto;
+  }
+  body.etapa1 .cart-panel .cart-total-row {
+    margin-top: auto;
+  }
+}
+
+/* ── Tablet: 2 colunas fixas ── */
+@media (max-width: 768px) {
+  body.etapa1 .foods-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+/* ── Mobile: 2 colunas ── */
+@media (max-width: 480px) {
+  body.etapa1 .foods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  body.etapa1 #fs1 {
+    padding: 16px 14px 100px;
+  }
+}

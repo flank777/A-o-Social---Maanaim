@@ -1,0 +1,5 @@
+name,phone,food,amount,total_kg,delivery,observacao,status
+Maria Silva,91999990001,Arroz 5kg,1,5,retirada,,pendente
+Joao Santos,91999990002,Feijao 1kg,2,2,entrega,Deus abencoe,pendente
+Ana Oliveira,91999990003,Oleo de Soja 1L,1,1,retirada,,confirmado
+Pedro Costa,91999990004,Acucar 1kg,1,1,entrega,,entregue

@@ -1,0 +1,281 @@
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  admin-charts-premium.css                                           ║
+  ║  Upgrade visual dos cards de gráfico — 4 seções específicas        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Adicionar no admin.html APÓS admin.css:                            ║
+  ║  <link rel="stylesheet" href="css/admin-charts-premium.css">        ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD DE GRÁFICO — upgrade do .prem-chart-card existente
+   (sobrescreve com especificidade maior)
+═══════════════════════════════════════════════════════════════════ */
+.prem-chart-card {
+  background: rgba(255, 255, 255, 0.025) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 20px !important;
+  padding: 22px 26px !important;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.3s ease,
+    box-shadow   0.3s ease,
+    transform    0.25s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Brilho de canto superior esquerdo (decorativo) */
+.prem-chart-card::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.06) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.prem-chart-card:hover {
+  border-color: rgba(59, 130, 246, 0.22) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(59, 130, 246, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CABEÇALHO DO CARD
+═══════════════════════════════════════════════════════════════════ */
+.prem-chart-card-hdr {
+  margin-bottom: 18px !important;
+}
+
+.prem-chart-title {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #F0EBE0 !important;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px !important;
+}
+
+.prem-chart-title i {
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.prem-chart-sub {
+  font-size: 0.72rem !important;
+  color: #6B7280 !important;
+  letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ESTADO VAZIO
+═══════════════════════════════════════════════════════════════════ */
+.prem-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  color: #4B5563;
+  font-size: 0.78rem;
+  font-family: 'Space Mono', monospace;
+  gap: 10px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.prem-chart-empty i {
+  font-size: 2rem;
+  opacity: 0.2;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GRID 2 COLUNAS
+═══════════════════════════════════════════════════════════════════ */
+.prem-charts-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KPI CARDS — upgrade sutil
+═══════════════════════════════════════════════════════════════════ */
+.prem-kpi-card {
+  background: rgba(255, 255, 255, 0.025) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 16px !important;
+  transition:
+    transform    0.25s ease,
+    box-shadow   0.25s ease,
+    border-color 0.25s ease !important;
+  overflow: hidden;
+}
+
+.prem-kpi-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 0 24px color-mix(in srgb, var(--kpi-c, #F59E0B) 15%, transparent);
+}
+
+.prem-kpi-card::before {
+  /* Linha de topo já existente — só ajusta a opacidade do glow */
+  background: var(--kpi-c, #F59E0B) !important;
+  box-shadow: 0 0 12px var(--kpi-c, #F59E0B);
+}
+
+.prem-kpi-num {
+  font-size: 2.2rem !important;
+  line-height: 1 !important;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--kpi-c, #F59E0B) 40%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMAÇÃO DE ENTRADA DOS CARDS (keyframes)
+═══════════════════════════════════════════════════════════════════ */
+@keyframes premCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Aplica apenas aos cards das 4 seções alvo */
+#tab-donations   .prem-chart-card,
+#tab-donations   .prem-kpi-card,
+#tab-voluntarios .prem-chart-card,
+#tab-voluntarios .prem-kpi-card,
+#tab-oracoes     .prem-chart-card,
+#tab-oracoes     .prem-kpi-card,
+#tab-tarefas     .prem-chart-card,
+#tab-tarefas     .prem-kpi-card {
+  animation: premCardIn 0.45s ease both;
+}
+
+/* Delay em cascata para os KPI cards */
+.prem-kpi-grid .prem-kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.prem-kpi-grid .prem-kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.prem-kpi-grid .prem-kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.prem-kpi-grid .prem-kpi-card:nth-child(4) { animation-delay: 0.20s; }
+.prem-kpi-grid .prem-kpi-card:nth-child(5) { animation-delay: 0.25s; }
+
+.prem-charts-2col .prem-chart-card:nth-child(1) { animation-delay: 0.18s; }
+.prem-charts-2col .prem-chart-card:nth-child(2) { animation-delay: 0.28s; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CANVAS WRAP — garante dimensionamento correto para Chart.js
+═══════════════════════════════════════════════════════════════════ */
+.prem-chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.prem-chart-wrap canvas {
+  cursor: crosshair;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYOUT DONUT + BREAKDOWN (voluntários por tipo)
+   .prem-tipo-inner organiza o donut à esquerda e a legenda à direita
+═══════════════════════════════════════════════════════════════════ */
+.prem-tipo-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.prem-tipo-inner .prem-chart-wrap {
+  flex: 0 0 175px;
+  width: 175px !important;
+  height: 175px !important;
+}
+
+#vol-tipo-breakdown {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding-top: 4px;
+}
+
+#vol-tipo-breakdown > div:last-child {
+  border-bottom: none !important;
+}
+
+@media (max-width: 900px) {
+  .prem-tipo-inner {
+    flex-direction: column;
+    align-items: center;
+  }
+  .prem-tipo-inner .prem-chart-wrap {
+    flex: none;
+    width: 160px !important;
+    height: 160px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVIDADE
+═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .prem-charts-2col {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .prem-charts-2col {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .prem-chart-card {
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .prem-kpi-num {
+    font-size: 1.7rem !important;
+  }
+
+  .prem-kpi-card:hover {
+    transform: none !important;
+  }
+
+  .prem-chart-card:hover {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .prem-chart-card {
+    padding: 14px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .prem-kpi-num {
+    font-size: 1.5rem !important;
+  }
+}

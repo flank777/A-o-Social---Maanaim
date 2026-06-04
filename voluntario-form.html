@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Seja Voluntário | Semear Ação Social</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <style>
+    :root {
+      --green-main: #2d6e1f;
+      --green-light: #3a8a27;
+      --green-pale: #e8f5e2;
+      --green-border: #b8dba8;
+      --radius: 20px;
+    }
+    body { background: #f4f6f2; min-height: 100vh; }
+    /*  Navbar  */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 14px 0;
+      background: rgba(240,248,255,0.97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+    #nav .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .nav-back {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .85rem; font-weight: 600; color: var(--green-main);
+      text-decoration: none; transition: gap .2s;
+    }
+    .nav-back:hover { gap: 12px; }
+    .nav-back i { font-size: .8rem; }
+    .nav-brand-text {
+      font-family: var(--ff-display); font-size: 1rem; font-weight: 900;
+      color: var(--green-main); letter-spacing: .02em;
+    }
+    .nav-brand-text span { color: #888; font-family: var(--ff-body); font-weight: 400; font-size: .8rem; }
+    /*  Wrapper  */
+    .vol-form-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 80px;
+    }
+    /*  Card principal  */
+    .vol-form-card {
+      background: #ffffff;
+      border-radius: var(--radius);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 760px;
+      position: relative;
+    }
+    /*  Cabeçalho verde  */
+    .vfc-header {
+      background: linear-gradient(135deg, #2d6e1f 0%, #3a8a27 60%, #4a9e32 100%);
+      padding: 36px 40px 28px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .vfc-header::before {
+      content: '';
+      position: absolute; bottom: -30px; right: -30px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .vfc-header::after {
+      content: '';
+      position: absolute; bottom: -10px; right: 60px;
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .vfc-header-icon {
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 14px;
+    }
+    .vfc-header h1 {
+      font-family: var(--ff-display); font-size: 1.7rem;
+      font-weight: 900; margin: 0 0 6px; color: #fff;
+    }
+    .vfc-header p {
+      font-size: .9rem; opacity: .85; margin: 0; color: #fff;
+    }
+    /*  Barra de progresso  */
+    .vfc-progress {
+      padding: 0 40px;
+      background: #f7f9f6;
+      border-bottom: 1px solid #e8ede5;
+    }
+    .vfc-steps {
+      display: flex; align-items: center;
+      padding: 20px 0;
+    }
+    .vfc-step-item {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1;
+    }
+    .vfc-step-item:last-child { flex: 0; }
+    .vfc-step-bubble {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #dde8d9;
+      color: #888;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700;
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+    .vfc-step-bubble.active {
+      background: var(--green-main);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(45,110,31,.35);
+    }
+    .vfc-step-bubble.done {
+      background: var(--green-main);
+      color: #fff;
+    }
+    .vfc-step-label {
+      font-size: .78rem; font-weight: 600;
+      color: #aaa;
+      white-space: nowrap;
+      transition: color .3s;
+    }
+    .vfc-step-label.active { color: var(--green-main); }
+    .vfc-step-label.done   { color: var(--green-main); }
+    .vfc-step-line {
+      flex: 1;
+      height: 2px;
+      background: #dde8d9;
+      margin: 0 10px;
+      border-radius: 2px;
+      transition: background .3s;
+    }
+    .vfc-step-line.done { background: var(--green-main); }
+    /*  Corpo  */
+    .vfc-body { padding: 36px 40px 12px; }
+    /*  Títulos de passo  */
+    .step-title {
+      font-family: var(--ff-display); font-size: 1.35rem; font-weight: 700;
+      color: #1a3312; margin: 0 0 6px;
+    }
+    .step-subtitle {
+      font-size: .88rem; color: #666; margin: 0 0 18px;
+    }
+    /*  Grade de opções (passo 1)  */
+    .help-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    .help-opt {
+      border: 2.5px solid #e8ede5;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all .25s;
+      background: #fff;
+      text-align: left;
+      position: relative;
+      user-select: none;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+    .help-opt:hover {
+      border-color: #7bbf6a;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(45,110,31,.16);
+    }
+    .help-opt.selected {
+      border-color: var(--green-main);
+      border-width: 3px;
+      box-shadow: 0 8px 32px rgba(45,110,31,.28);
+      transform: translateY(-3px);
+    }
+    /* Check badge */
+    .help-opt-check {
+      position: absolute; top: 10px; right: 10px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--green-main);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem;
+      opacity: 0;
+      transform: scale(.5) rotate(-45deg);
+      transition: all .25s cubic-bezier(.34,1.56,.64,1);
+      z-index: 3;
+      box-shadow: 0 3px 12px rgba(45,110,31,.5);
+    }
+    .help-opt.selected .help-opt-check {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+    /* Foto no topo */
+    .help-opt-img {
+      width: 100%;
+      height: 120px;
+      overflow: hidden;
+      position: relative;
+    }
+    /* Overlay verde ao selecionar */
+    .help-opt-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(45,110,31,0);
+      transition: background .25s;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .help-opt.selected .help-opt-img::after {
+      background: rgba(45,110,31,0.18);
+    }
+    .help-opt-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .35s ease;
+    }
+    .help-opt:hover .help-opt-img img { transform: scale(1.06); }
+    .help-opt.selected .help-opt-img img { transform: scale(1.05); }
+    /* Área de texto */
+    .help-opt-body {
+      padding: 16px 18px 18px;
+      background: #fff;
+      transition: background .25s;
+    }
+    .help-opt.selected .help-opt-body {
+      background: #f2fbee;
+    }
+    .help-opt-name {
+      font-size: .95rem; font-weight: 700;
+      color: #1a1a1a; margin: 0 0 6px;
+      line-height: 1.3;
+      font-family: var(--ff-display);
+      transition: color .2s;
+    }
+    .help-opt.selected .help-opt-name { color: var(--green-main); }
+    .help-opt-desc {
+      font-size: .78rem; color: #777; line-height: 1.5; margin: 0;
+    }
+    /* Indicador de seleção na base */
+    .help-opt-body::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: var(--green-main);
+      border-radius: 2px;
+      margin-top: 12px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s ease;
+    }
+    .help-opt.selected .help-opt-body::after {
+      transform: scaleX(1);
+    }
+    /*  Passo 2  */
+    .p2-summary {
+      background: var(--green-pale);
+      border: 1.5px solid var(--green-border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .p2-summary-icon {
+      width: 36px; height: 36px;
+      background: var(--green-main);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+      flex-shrink: 0;
+    }
+    .p2-summary-label {
+      font-size: .72rem; font-weight: 700;
+      color: var(--green-main); text-transform: uppercase;
+      letter-spacing: .05em; margin: 0 0 4px;
+    }
+    .p2-summary-value {
+      font-size: .9rem; font-weight: 600;
+      color: #1a3312; margin: 0; line-height: 1.4;
+    }
+    /*  Campos  */
+    .form-field { margin-bottom: 20px; }
+    .form-field label {
+      display: block; font-size: .82rem; font-weight: 700;
+      color: #333; margin-bottom: 7px;
+    }
+    .form-field label span { color: #e53935; margin-left: 2px; }
+    .form-input {
+      width: 100%; padding: 13px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: .92rem;
+      font-family: var(--ff-body);
+      color: #222; background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--green-main);
+      box-shadow: 0 0 0 3px rgba(45,110,31,.12);
+    }
+    .form-input.error { border-color: #e53935; }
+    /*  Chips de disponibilidade  */
+    .avail-label-top {
+      font-size: .82rem; font-weight: 700;
+      color: #333; margin-bottom: 12px; display: block;
+    }
+    .avail-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .avail-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border: 2px solid #e5ede0;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: .83rem; font-weight: 600;
+      color: #555; background: #fff;
+      transition: all .18s;
+      user-select: none;
+    }
+    .avail-chip:hover { border-color: var(--green-main); color: var(--green-main); }
+    .avail-chip-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .5rem; color: transparent;
+      transition: all .18s;
+    }
+    .avail-chip.checked {
+      border-color: var(--green-main);
+      background: var(--green-pale);
+      color: var(--green-main);
+    }
+    .avail-chip.checked .avail-chip-dot {
+      background: var(--green-main);
+      border-color: var(--green-main);
+      color: #fff;
+    }
+    /*  Barra de ações  sticky no rodapé do card  */
+    .vfc-actions-bar {
+      display: flex; gap: 12px;
+      justify-content: flex-end;
+      padding: 16px 40px;
+      border-top: 1px solid #eef2eb;
+      background: #fff;
+      border-radius: 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+    }
+    .btn-vol-back {
+      padding: 13px 28px;
+      border: 2px solid #ddd; border-radius: 50px;
+      background: transparent;
+      font-size: .88rem; font-weight: 600;
+      color: #666; cursor: pointer;
+      font-family: var(--ff-body);
+      transition: all .2s;
+    }
+    .btn-vol-back:hover { border-color: #bbb; color: #333; }
+    .btn-vol-next {
+      padding: 13px 36px;
+      border: none; border-radius: 50px;
+      background: var(--green-main);
+      font-size: .92rem; font-weight: 700;
+      color: #fff; cursor: pointer;
+      font-family: var(--ff-body);
+      display: flex; align-items: center; gap: 10px;
+      transition: all .2s;
+      box-shadow: 0 4px 16px rgba(45,110,31,.30);
+    }
+    .btn-vol-next:hover {
+      background: #3a8a27;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(45,110,31,.40);
+    }
+    /*  Tela de sucesso  */
+    .vfc-success { text-align: center; padding: 20px 0 10px; }
+    .success-anim {
+      width: 90px; height: 90px;
+      background: var(--green-pale);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.6rem;
+      margin: 0 auto 24px;
+      animation: popIn .5s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-family: var(--ff-display); font-size: 1.8rem;
+      font-weight: 900; color: var(--green-main); margin: 0 0 10px;
+    }
+    .success-msg {
+      font-size: .95rem; color: #555;
+      line-height: 1.6; margin: 0 auto 28px; max-width: 440px;
+    }
+    .success-verse {
+      background: linear-gradient(135deg, #f0f8ec 0%, #e8f5e2 100%);
+      border-left: 4px solid var(--green-main);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 0 auto; max-width: 500px;
+    }
+    .success-verse p {
+      font-family: var(--ff-display); font-style: italic;
+      font-size: 1rem; color: #2a4a1e;
+      line-height: 1.7; margin: 0 0 8px;
+    }
+    .success-verse cite {
+      font-size: .78rem; font-weight: 700;
+      color: var(--green-main);
+      text-transform: uppercase; letter-spacing: .06em;
+      font-style: normal;
+    }
+    .success-confetti { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+    .success-back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 28px; padding: 12px 28px;
+      border: 2px solid var(--green-main); border-radius: 50px;
+      color: var(--green-main);
+      font-size: .88rem; font-weight: 700;
+      text-decoration: none; transition: all .2s;
+    }
+    .success-back-btn:hover { background: var(--green-main); color: #fff; }
+    /*  Erros  */
+    .field-error {
+      font-size: .75rem; color: #e53935;
+      margin-top: 5px; display: none;
+    }
+    .field-error.show { display: block; }
+    /*  Animações de passo  */
+    .step-panel { display: none; animation: fadeSlide .3s ease; }
+    .step-panel.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .step-panel.slide-back { animation: fadeSlideBack .3s ease; }
+    @keyframes fadeSlideBack {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    /*  Responsivo  */
+    @media (max-width: 600px) {
+      /* Página e body: fundo igual ao card — sem contraste, sem flutuar */
+      body { background: #ffffff; }
+      .vol-form-page {
+        padding: 0;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+
+      /* Card ocupa a tela inteira — form "fixo", não solto */
+      .vol-form-card {
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+        min-height: 100vh;
+      }
+
+      /* Header: descola do topo para ficar abaixo da navbar fixa (~56px) */
+      .vfc-header { padding: 72px 20px 18px; }
+      .vfc-header-icon { width: 42px; height: 42px; font-size: 1.2rem; margin-bottom: 10px; }
+      .vfc-header h1 { font-size: 1.25rem; }
+      .vfc-header p { font-size: .82rem; }
+
+      /* Progress: oculta labels, mantém bolhas */
+      .vfc-progress { padding: 0 20px; }
+      .vfc-step-label { display: none; }
+
+      /* Body: padding-bottom precisa limpar a barra de ações fixa (~70px) */
+      .vfc-body { padding: 20px 16px 90px; }
+
+      /* Grid 2×2 — todos os 4 cards visíveis ao mesmo tempo */
+      .help-options-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+      /* Imagem: 120px → 72px para caber na tela */
+      .help-opt-img { height: 72px; }
+
+      /* Corpo compacto */
+      .help-opt-body { padding: 10px 12px 10px; }
+      .help-opt-name { font-size: .80rem; margin-bottom: 4px; line-height: 1.3; }
+      .help-opt-desc {
+        font-size: .70rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .help-opt-body::after { margin-top: 8px; }
+
+      /* Badge de check menor */
+      .help-opt-check {
+        width: 24px; height: 24px;
+        top: 6px; right: 6px;
+        font-size: .62rem;
+      }
+
+      /* Barra de ações empilhada */
+      .vfc-actions-bar { padding: 12px 16px; flex-direction: column-reverse; gap: 8px; }
+      .btn-vol-next, .btn-vol-back { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader de transição entre páginas -->
+  <div id="loader" role="status" aria-label="Carregando">
+  <div class="loader-inner">
+    <div class="ldr-stage" aria-hidden="true">
+      <span class="ldr-halo"></span>
+      <span class="ldr-ring ldr-ring-1"></span>
+      <span class="ldr-ring ldr-ring-2"></span>
+      <span class="ldr-ring ldr-ring-3"></span>
+      <span class="ldr-orbit">
+        <span class="ldr-dot"></span>
+        <span class="ldr-dot"></span>
+        <span class="ldr-dot"></span>
+        <span class="ldr-dot"></span>
+      </span>
+      <img class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display='none'" />
+      <span class="ldr-scan"></span>
+    </div>
+    <p class="loader-text" aria-hidden="true">Ação Social Semear · Belém, PA</p>
+    <div class="loader-bar-wrap" aria-hidden="true"><div class="loader-bar"></div></div>
+  </div>
+</div>
+  <!-- Navbar -->
+  <nav id="nav">
+    <div class="container">
+      <a href="voluntario.html" class="nav-back">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+      </a>
+      <div class="nav-brand-text">
+        Semear <span>Ação Social</span>
+      </div>
+    </div>
+  </nav>
+  <div class="vol-form-page">
+    <div class="vol-form-card">
+      <!-- Cabeçalho -->
+      <div class="vfc-header">
+        <div class="vfc-header-icon">
+          <i class="fas fa-hands-helping"></i>
+        </div>
+        <h1>Quero ser Voluntário</h1>
+        <p>Preencha os campos abaixo e entraremos em contato em breve.</p>
+      </div>
+      <!-- Progresso -->
+      <div class="vfc-progress">
+        <div class="vfc-steps">
+          <div class="vfc-step-item">
+            <div class="vfc-step-bubble active" id="bubble-1">1</div>
+            <span class="vfc-step-label active" id="label-1">Como quer ajudar</span>
+          </div>
+          <div class="vfc-step-line" id="line-1"></div>
+          <div class="vfc-step-item">
+            <div class="vfc-step-bubble" id="bubble-2">2</div>
+            <span class="vfc-step-label" id="label-2">Seus dados</span>
+          </div>
+          <div class="vfc-step-line" id="line-2"></div>
+          <div class="vfc-step-item" style="flex:0;">
+            <div class="vfc-step-bubble" id="bubble-3"><i class="fas fa-check"></i></div>
+            <span class="vfc-step-label" id="label-3">Concluído</span>
+          </div>
+        </div>
+      </div>
+      <!-- Corpo -->
+      <div class="vfc-body">
+        <!-- PASSO 1 -->
+        <div class="step-panel active" id="step-1">
+          <h2 class="step-title">Como você quer ajudar?</h2>
+          <p class="step-subtitle">Selecione uma ou mais áreas  você pode marcar quantas quiser.</p>
+          <div class="help-options-grid">
+            <div class="help-opt" data-key="alimentos" onclick="toggleOpt(this)">
+              <div class="help-opt-check"><i class="fas fa-check"></i></div>
+              <div class="help-opt-img">
+                <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=320&fit=crop&auto=format" alt="Organização dos Alimentos" />
+              </div>
+              <div class="help-opt-body">
+                <p class="help-opt-name">Organização dos Alimentos</p>
+                <p class="help-opt-desc">Separação e organização de cestas básicas para distribuição</p>
+              </div>
+            </div>
+            <div class="help-opt" data-key="espiritual" onclick="toggleOpt(this)">
+              <div class="help-opt-check"><i class="fas fa-check"></i></div>
+              <div class="help-opt-img">
+                <img src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=320&fit=crop&auto=format" alt="Apoio Espiritual" />
+              </div>
+              <div class="help-opt-body">
+                <p class="help-opt-name">Apoio Espiritual</p>
+                <p class="help-opt-desc">Oração, aconselhamento e suporte emocional</p>
+              </div>
+            </div>
+            <div class="help-opt" data-key="transporte" onclick="toggleOpt(this)">
+              <div class="help-opt-check"><i class="fas fa-check"></i></div>
+              <div class="help-opt-img">
+                <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=320&fit=crop&auto=format" alt="Transporte" />
+              </div>
+              <div class="help-opt-body">
+                <p class="help-opt-name">Transporte</p>
+                <p class="help-opt-desc">Entrega e transporte de doações às famílias</p>
+              </div>
+            </div>
+            <div class="help-opt" data-key="coleta" onclick="toggleOpt(this)">
+              <div class="help-opt-check"><i class="fas fa-check"></i></div>
+              <div class="help-opt-img">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=320&fit=crop&auto=format" alt="Ajuda na Coleta de Alimentos" />
+              </div>
+              <div class="help-opt-body">
+                <p class="help-opt-name">Ajuda na Coleta de Alimentos</p>
+                <p class="help-opt-desc">Arrecadação de alimentos e recursos nas comunidades</p>
+              </div>
+            </div>
+          </div>
+          <p class="field-error" id="error-opt" style="margin-top:14px;">
+            Por favor, selecione pelo menos uma área de atuação.
+          </p>
+        </div>
+        <!-- PASSO 2 -->
+        <div class="step-panel" id="step-2">
+          <h2 class="step-title">Seus dados</h2>
+          <p class="step-subtitle">Preencha suas informações para entrarmos em contato.</p>
+          <div class="p2-summary">
+            <div class="p2-summary-icon"><i class="fas fa-check"></i></div>
+            <div>
+              <p class="p2-summary-label">Você quer ajudar com</p>
+              <p class="p2-summary-value" id="p2-chosen"></p>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="field-nome">Nome completo <span>*</span></label>
+            <input type="text" id="field-nome" class="form-input"
+                   placeholder="Ex: João da Silva" autocomplete="name" />
+            <p class="field-error" id="error-nome">Por favor, informe seu nome completo.</p>
+          </div>
+          <div class="form-field">
+            <label for="field-whats">WhatsApp <span>*</span></label>
+            <input type="tel" id="field-whats" class="form-input"
+                   placeholder="(00) 00000-0000" autocomplete="tel"
+                   maxlength="15" oninput="maskPhone(this)" />
+            <p class="field-error" id="error-whats">Por favor, informe um número de WhatsApp válido.</p>
+          </div>
+          <div class="form-field">
+            <span class="avail-label-top">
+              Qual é a sua disponibilidade? <span style="color:#e53935">*</span>
+              <span style="font-weight:400;color:#888;font-size:.76rem;margin-left:6px;">(pode marcar mais de uma)</span>
+            </span>
+            <div class="avail-grid">
+              <div class="avail-chip" data-val="manha">
+                <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span>
+                xR& Manhã
+              </div>
+              <div class="avail-chip" data-val="tarde">
+                <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span>
+                ܬ️ Tarde
+              </div>
+              <div class="avail-chip" data-val="noite">
+                <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span>
+                xR" Noite
+              </div>
+              <div class="avail-chip" data-val="fds">
+                <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span>
+                x& Fins de semana
+              </div>
+              <div class="avail-chip" data-val="qualquer">
+                <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span>
+                Qualquer horário
+              </div>
+            </div>
+            <p class="field-error" id="error-avail">Selecione pelo menos um horário disponível.</p>
+          </div>
+        </div>
+        <!-- SUCESSO -->
+        <div class="step-panel" id="step-success">
+          <div class="vfc-success">
+            <span class="success-confetti">x}0</span>
+            <div class="success-anim">x"</div>
+            <h2 class="success-title">Muito obrigado!</h2>
+            <p class="success-msg">
+              Sua inscrição foi recebida com sucesso,
+              <strong id="success-nome"></strong>!<br>
+              Nossa equipe entrará em contato com você em breve pelo WhatsApp.
+            </p>
+            <div class="success-verse">
+              <p>
+                "Porque tive fome, e vocês me deram de comer; tive sede,
+                e me deram de beber; fui estrangeiro, e me hospedaram;
+                precisei de roupas, e me vestiram."
+              </p>
+              <cite>Mateus 25:35</cite>
+            </div>
+            <a href="voluntario.html" class="success-back-btn">
+              <i class="fas fa-arrow-left"></i>
+              Voltar à página
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Barra de ações  fora do scroll, sempre visível -->
+      <div class="vfc-actions-bar" id="vfc-actions-bar">
+        <button class="btn-vol-back" id="btn-back" style="display:none" onclick="goStep1()">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+        <button class="btn-vol-next" id="btn-next" onclick="acaoAtual()">
+          Próximo passo
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/services/firebase.js" defer></script>
+  <!-- app.js: loader, navbar scroll, transição entre páginas -->
+  <script src="js/app.js" defer></script>
+  <script>
+    var pasoAtual = 1;
+    var nomesArea = {
+      alimentos:  'Organização dos Alimentos',
+      espiritual: 'Apoio Espiritual',
+      transporte: 'Transporte',
+      coleta:     'Ajuda na Coleta de Alimentos'
+    };
+    function atualizarBotoes(step) {
+      var btnBack = document.getElementById('btn-back');
+      var btnNext = document.getElementById('btn-next');
+      var bar     = document.getElementById('vfc-actions-bar');
+      if (step === 3) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = '';
+      btnBack.style.display = step > 1 ? '' : 'none';
+      if (step === 1) {
+        btnNext.innerHTML = 'Próximo passo <i class="fas fa-arrow-right"></i>';
+      } else {
+        btnNext.innerHTML = 'Enviar inscrição <i class="fas fa-paper-plane"></i>';
+      }
+    }
+    function acaoAtual() {
+      if (pasoAtual === 1) goStep2();
+      else if (pasoAtual === 2) enviar();
+    }
+    function toggleOpt(el) {
+      el.classList.toggle('selected');
+      document.getElementById('error-opt').classList.remove('show');
+    }
+    /*
+      Mapeamento entre o parâmetro ?tipo= da URL e o data-key do formulário.
+      Permite que os cards de voluntario.html pré-selecionem a área correta.
+    */
+    var TIPO_PARA_KEY = {
+      doacao:      'coleta',      /* Doação de Alimentos   Ajuda na Coleta */
+      trabalho:    'alimentos',   /* Trabalho Voluntário   Organização dos Alimentos */
+      intercessao: 'espiritual',  /* Apoio Espiritual      Apoio Espiritual */
+      logistica:   'transporte'   /* Apoio Logístico       Transporte */
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+      atualizarBotoes(1);
+      /*  Pré-seleção via ?tipo= na URL  */
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var tipo   = (params.get('tipo') || '').toLowerCase().trim();
+        if (tipo) {
+          var key = TIPO_PARA_KEY[tipo] || tipo; /* tenta o tipo direto se não houver mapeamento */
+          var optEl = document.querySelector('.help-opt[data-key="' + key + '"]');
+          if (optEl && !optEl.classList.contains('selected')) {
+            optEl.classList.add('selected');
+          }
+        }
+      } catch (e) { /* URLSearchParams não disponível  ignora */ }
+      document.querySelectorAll('.avail-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          this.classList.toggle('checked');
+          if (this.dataset.val === 'qualquer' && this.classList.contains('checked')) {
+            document.querySelectorAll('.avail-chip').forEach(function(c) { c.classList.add('checked'); });
+          }
+          document.getElementById('error-avail').classList.remove('show');
+        });
+      });
+    });
+    function maskPhone(input) {
+      var v = input.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 6)      v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+      else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+      else if (v.length > 0) v = '(' + v;
+      input.value = v;
+    }
+    function goStep2() {
+      var sel = [].slice.call(document.querySelectorAll('.help-opt.selected'));
+      if (sel.length === 0) {
+        document.getElementById('error-opt').classList.add('show');
+        return;
+      }
+      document.getElementById('p2-chosen').textContent =
+        sel.map(function(el) { return nomesArea[el.dataset.key]; }).join(' · ');
+      pasoAtual = 2;
+      setActive(2);
+      showPanel('step-2', false);
+      atualizarBotoes(2);
+      document.querySelector('.vfc-body').scrollTop = 0;
+    }
+    function goStep1() {
+      pasoAtual = 1;
+      setActive(1);
+      showPanel('step-1', true);
+      atualizarBotoes(1);
+      document.querySelector('.vfc-body').scrollTop = 0;
+    }
+    function enviar() {
+      var ok = true;
+      var nome = document.getElementById('field-nome').value.trim();
+      if (nome.length < 3) {
+        document.getElementById('field-nome').classList.add('error');
+        document.getElementById('error-nome').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('field-nome').classList.remove('error');
+        document.getElementById('error-nome').classList.remove('show');
+      }
+      var whats = document.getElementById('field-whats').value.replace(/\D/g,'');
+      if (whats.length < 10) {
+        document.getElementById('field-whats').classList.add('error');
+        document.getElementById('error-whats').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('field-whats').classList.remove('error');
+        document.getElementById('error-whats').classList.remove('show');
+      }
+      var avail = [].slice.call(document.querySelectorAll('.avail-chip.checked'));
+      if (avail.length === 0) {
+        document.getElementById('error-avail').classList.add('show');
+        ok = false;
+      } else {
+        document.getElementById('error-avail').classList.remove('show');
+      }
+      if (!ok) return;
+      document.getElementById('success-nome').textContent = nome.split(' ')[0];
+      pasoAtual = 3;
+      setActive(3);
+      showPanel('step-success', false);
+      atualizarBotoes(3);
+      document.querySelector('.vfc-body').scrollTop = 0;
+    }
+    function showPanel(id, back) {
+      document.querySelectorAll('.step-panel').forEach(function(p) { p.classList.remove('active','slide-back'); });
+      var panel = document.getElementById(id);
+      if (back) panel.classList.add('slide-back');
+      panel.classList.add('active');
+    }
+    function setActive(step) {
+      [1,2,3].forEach(function(n) {
+        var b = document.getElementById('bubble-' + n);
+        var l = document.getElementById('label-' + n);
+        b.classList.remove('active','done');
+        if (l) l.classList.remove('active','done');
+        if (n < step)      { b.classList.add('done');   if (l) l.classList.add('done'); }
+        else if (n===step) { b.classList.add('active'); if (l) l.classList.add('active'); }
+      });
+      [1,2].forEach(function(n) {
+        var line = document.getElementById('line-' + n);
+        n < step ? line.classList.add('done') : line.classList.remove('done');
+      });
+    }
+  </script>
+  <script>
+    /* Aplica fotos dos cards salvas no admin  com sync em tempo real */
+    (function() {
+      var PADRAO = {
+        card1: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=320&fit=crop&auto=format",
+        card2: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=320&fit=crop&auto=format",
+        card3: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=320&fit=crop&auto=format",
+        card4: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=320&fit=crop&auto=format"
+      };
+      var mapa = { card1:"alimentos", card2:"espiritual", card3:"transporte", card4:"coleta" };
+      function aplicarCards(cards) {
+        if (!cards) return;
+        Object.keys(mapa).forEach(function(key) {
+          var url = cards[key] || PADRAO[key];
+          var card = document.querySelector('.help-opt[data-key="' + mapa[key] + '"] .help-opt-img img');
+          if (card && url) card.src = url;
+        });
+      }
+      /*  1º: localStorage (instantâneo)  */
+      try { aplicarCards(JSON.parse(localStorage.getItem('doavida_vol_contrib') || '{}')); } catch(e) {}
+      /*  2º: Supabase  autoritativo, sincroniza entre dispositivos  */
+      function buscarCardsSupabase() {
+        if (!window.DoaVidaSync || typeof DoaVidaSync.getAllConfigs !== 'function') return;
+        DoaVidaSync.getAllConfigs().then(function(cfg) {
+          try {
+            if (cfg.doavida_vol_contrib) {
+              aplicarCards(JSON.parse(cfg.doavida_vol_contrib));
+              localStorage.setItem('doavida_vol_contrib', cfg.doavida_vol_contrib);
+            }
+          } catch(e) {}
+        }).catch(function(){});
+      }
+      if (window.DoaVidaSync) {
+        buscarCardsSupabase();
+      } else {
+        window.addEventListener('DoaVidaSyncPronto', buscarCardsSupabase, { once: true });
+        setTimeout(buscarCardsSupabase, 1000);
+      }
+      /*  3º: Sync entre abas (mesmo browser)  */
+      window.addEventListener('storage', function(ev) {
+        if (ev.key === 'doavida_vol_contrib') {
+          try { aplicarCards(JSON.parse(ev.newValue || '{}')); } catch(e) {}
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

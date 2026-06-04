@@ -1,0 +1,418 @@
+/* ══════════════════════════════════════════════════════════════════════
+   dona-assuncao.css — Estilos do Chatbot "Dona Assunção"
+   DoaVida · Ação Social Semear + Comunidade Evangélica Maanaim
+
+   Dona Assunção é uma avozinha simpática e acolhedora que conversa
+   com os visitantes sobre doações, voluntariado e a ação social.
+   Nunca fala sobre código, admin, dados ou doadores.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. BOTÃO FLUTUANTE (FAB) ────────────────────────────────────── */
+/* Botão redondo fixo no canto inferior direito */
+.dona-fab {
+  position: fixed;                 /* fixo na viewport */
+  bottom: 1.5rem;                  /* distância do fundo */
+  right: 1.5rem;                   /* distância da direita */
+  width: 72px;                     /* largura — ligeiramente maior para mostrar a avó */
+  height: 72px;                    /* altura */
+  border-radius: 50%;              /* formato circular */
+  background: #f5e9c8;             /* fundo amarelo-creme que combina com a ilustração */
+  border: 3px solid var(--gold, #c9a84c); /* borda dourada */
+  cursor: pointer;                 /* cursor de clique */
+  padding: 0;                      /* sem padding — imagem preenche o botão */
+  overflow: hidden;                /* recorta a imagem no círculo */
+  display: flex;                   /* para centralizar a imagem */
+  align-items: flex-end;           /* cola a figura na base do círculo */
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(201, 168, 76, 0.5); /* sombra dourada */
+  z-index: 7000;                   /* acima do conteúdo, abaixo do modal */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* transição suave */
+  animation: donaPulse 3s infinite; /* pulso para chamar atenção */
+}
+
+/* Imagem dentro do FAB */
+.dona-fab-img {
+  width: 110%;                     /* um pouco maior que o botão para cortar as bordas brancas */
+  height: 110%;
+  object-fit: contain;             /* mantém proporção */
+  object-position: center bottom;  /* exibe a parte inferior (corpo) encostado */
+  display: block;
+  pointer-events: none;            /* clique passa para o botão */
+}
+
+/* Hover no FAB: amplia e aumenta sombra */
+.dona-fab:hover {
+  transform: scale(1.08);         /* amplia suavemente */
+  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.7); /* sombra mais forte */
+}
+
+/* Animação de pulso suave */
+@keyframes donaPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(201, 168, 76, 0.4); }
+  50%      { box-shadow: 0 4px 24px rgba(201, 168, 76, 0.7); }
+}
+
+/* Esconde o FAB quando o chat está aberto */
+.dona-fab.hidden {
+  display: none;                   /* esconde completamente */
+}
+
+/* ─── 2. JANELA DO CHAT ───────────────────────────────────────────── */
+/* Container principal do chat */
+.dona-chat {
+  position: fixed;                 /* fixo na viewport */
+  bottom: 1.5rem;                  /* distância do fundo */
+  right: 1.5rem;                   /* distância da direita */
+  width: 360px;                    /* largura fixa */
+  max-height: 520px;               /* altura máxima */
+  background: #FEFBF4;             /* fundo creme quente — legível e acolhedor */
+  border: 1px solid var(--gold, #c9a84c); /* borda dourada */
+  border-radius: 16px;             /* cantos arredondados */
+  display: none;                   /* escondido por padrão */
+  flex-direction: column;          /* layout vertical */
+  z-index: 7001;                   /* acima do FAB */
+  /* sombra suave em camadas: profundidade sem peso visual */
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(201, 168, 76, 0.15);
+  animation: donaChatIn 0.3s ease; /* animação de entrada */
+  overflow: hidden;                /* esconde excedente */
+}
+
+/* Quando ativo, exibe como flex column */
+.dona-chat.active {
+  display: flex;                   /* ativa exibição */
+}
+
+/* Animação de entrada do chat */
+@keyframes donaChatIn {
+  from {
+    transform: translateY(20px) scale(0.9); /* começa menor e abaixo */
+    opacity: 0;                              /* invisível */
+  }
+  to {
+    transform: translateY(0) scale(1);       /* posição final */
+    opacity: 1;                              /* visível */
+  }
+}
+
+/* ─── 3. CABEÇALHO DO CHAT ────────────────────────────────────────── */
+/* Barra superior com avatar, nome e botão fechar */
+.dona-chat-header {
+  display: flex;                   /* layout horizontal */
+  align-items: center;             /* alinha verticalmente */
+  gap: 0.75rem;                    /* espaço entre elementos */
+  padding: 0.75rem 1rem;          /* espaçamento interno */
+  background: rgba(201, 168, 76, 0.18); /* fundo dourado mais visível no tema claro */
+  border-bottom: 1px solid rgba(201, 168, 76, 0.35); /* linha divisória mais definida */
+}
+
+/* Avatar da Dona Assunção (imagem circular no cabeçalho) */
+.dona-avatar {
+  width: 46px;                     /* largura */
+  height: 46px;                    /* altura */
+  border-radius: 50%;              /* circular */
+  background: #f5e9c8;             /* fundo creme combinando com a ilustração */
+  border: 2px solid var(--gold, #c9a84c); /* anel dourado */
+  overflow: hidden;                /* recorta no círculo */
+  display: flex;
+  align-items: flex-end;           /* cola a figura na base */
+  justify-content: center;
+  flex-shrink: 0;                  /* não encolhe */
+}
+
+/* Imagem dentro do avatar */
+.dona-avatar-img {
+  width: 115%;                     /* levemente maior para preencher bem */
+  height: 115%;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+  pointer-events: none;
+}
+
+/* Nome e status */
+.dona-info {
+  flex: 1;                         /* ocupa espaço disponível */
+}
+
+/* Nome "Dona Assunção" */
+.dona-info strong {
+  display: block;                  /* ocupa linha inteira */
+  color: #3d3523;                  /* marrom escuro quente — alto contraste no fundo creme */
+  font-size: 0.95rem;             /* tamanho */
+  font-family: 'Playfair Display', serif; /* fonte elegante */
+}
+
+/* Status "online" */
+.dona-info span {
+  font-size: 0.75rem;             /* texto pequeno */
+  color: #2d7a1f;                  /* verde escuro — contraste adequado no fundo claro */
+}
+
+/* Botão fechar (X) */
+.dona-close {
+  background: none;                /* sem fundo */
+  border: none;                    /* sem borda */
+  color: #5a4a2e;                  /* marrom médio — visível no fundo dourado claro */
+  font-size: 1.3rem;              /* tamanho */
+  line-height: 1;
+  cursor: pointer;                 /* cursor de clique */
+  padding: 0.3rem 0.5rem;         /* área clicável */
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Hover no fechar */
+.dona-close:hover {
+  color: var(--gold, #c9a84c);    /* dourado no hover */
+  background: rgba(201, 168, 76, 0.25);
+}
+
+/* ─── 4. ÁREA DE MENSAGENS ────────────────────────────────────────── */
+/* Container scrollável das mensagens */
+.dona-messages {
+  flex: 1;                         /* ocupa espaço disponível */
+  overflow-y: auto;                /* scroll vertical */
+  padding: 1rem;                   /* espaçamento interno */
+  display: flex;                   /* layout flex */
+  flex-direction: column;          /* empilha mensagens */
+  gap: 0.75rem;                    /* espaço entre mensagens */
+  min-height: 250px;               /* altura mínima */
+  max-height: 350px;               /* altura máxima */
+}
+
+/* ─── 5. BOLHAS DE MENSAGEM ───────────────────────────────────────── */
+/* Mensagem da Dona Assunção (lado esquerdo) */
+.dona-msg {
+  max-width: 85%;                  /* largura máxima */
+  padding: 0.75rem 1rem;          /* espaçamento interno */
+  border-radius: 12px 12px 12px 4px; /* cantos: arredondado exceto inferior-esq */
+  font-size: 0.9rem;              /* tamanho do texto */
+  line-height: 1.5;               /* altura de linha */
+  animation: msgIn 0.3s ease;     /* animação de entrada */
+}
+
+/* Mensagem da Dona (bot) */
+.dona-msg.bot {
+  background: rgba(201, 168, 76, 0.18); /* fundo dourado — visível no tema claro */
+  color: #3d3523;                  /* texto marrom escuro — WCAG AA contra fundo creme */
+  align-self: flex-start;         /* alinha à esquerda */
+  border: 1px solid rgba(201, 168, 76, 0.35); /* borda dourada mais definida */
+}
+
+/* Mensagem do usuário */
+.dona-msg.user {
+  background: var(--sage, #5a8a4a); /* fundo verde */
+  color: #fff;                     /* texto branco */
+  align-self: flex-end;            /* alinha à direita */
+  border-radius: 12px 12px 4px 12px; /* cantos: arredondado exceto inferior-dir */
+}
+
+/* Animação de entrada das mensagens */
+@keyframes msgIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Indicador de digitação (3 pontinhos) */
+.dona-typing {
+  display: flex;                   /* alinha pontinhos em linha */
+  gap: 4px;                        /* espaço entre pontos */
+  padding: 0.75rem 1rem;          /* espaçamento */
+  align-self: flex-start;         /* lado esquerdo */
+}
+
+/* Cada pontinho */
+.dona-typing span {
+  width: 8px;                      /* largura */
+  height: 8px;                     /* altura */
+  border-radius: 50%;              /* circular */
+  background: var(--gold, #c9a84c); /* cor dourada */
+  animation: typingDot 1.2s infinite; /* animação de pulso */
+}
+
+/* Atraso nos pontinhos (efeito onda) */
+.dona-typing span:nth-child(2) { animation-delay: 0.2s; }
+.dona-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+/* Animação dos pontinhos */
+@keyframes typingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1; transform: translateY(-4px); }
+}
+
+/* ─── 6. SUGESTÕES RÁPIDAS ────────────────────────────────────────── */
+/* Botões de sugestão (atalhos de perguntas comuns) */
+.dona-sugestoes {
+  display: flex;                   /* layout horizontal */
+  flex-wrap: wrap;                 /* quebra em várias linhas */
+  gap: 0.5rem;                     /* espaço entre botões */
+  padding: 0 1rem 0.75rem;        /* espaçamento */
+}
+
+/* Cada botão de sugestão */
+.dona-sug-btn {
+  background: rgba(201, 168, 76, 0.15); /* fundo dourado levemente mais opaco */
+  color: #5a3e0a;                  /* marrom escuro quente — contraste 4.5:1 no fundo creme */
+  border: 1px solid rgba(201, 168, 76, 0.4); /* borda dourada mais definida */
+  border-radius: 20px;             /* formato pílula */
+  padding: 0.35rem 0.75rem;       /* espaçamento interno */
+  font-size: 0.8rem;              /* texto pequeno */
+  cursor: pointer;                 /* cursor de clique */
+  transition: all 0.3s ease;       /* transição suave */
+  font-family: 'DM Sans', sans-serif; /* fonte do sistema */
+}
+
+/* Hover nos botões de sugestão */
+.dona-sug-btn:hover {
+  background: var(--gold, #c9a84c); /* fundo dourado sólido */
+  color: #1a1a17;                  /* texto muito escuro — alto contraste */
+}
+
+/* ─── 7. BARRA DE INPUT ───────────────────────────────────────────── */
+/* Área de digitação na parte inferior */
+.dona-input-bar {
+  display: flex;                   /* layout horizontal */
+  gap: 0.5rem;                     /* espaço entre input e botão */
+  padding: 0.75rem 1rem;          /* espaçamento interno */
+  border-top: 1px solid rgba(201, 168, 76, 0.3); /* linha divisória mais visível */
+  background: rgba(201, 168, 76, 0.1); /* fundo levemente dourado — separa do corpo */
+}
+
+/* Campo de texto */
+.dona-input {
+  flex: 1;                         /* ocupa espaço disponível */
+  background: #FFFFFF;             /* fundo branco — máximo contraste para digitação */
+  color: #3d3523;                  /* texto marrom escuro */
+  border: 1px solid rgba(201, 168, 76, 0.4); /* borda dourada sutil */
+  border-radius: 20px;             /* formato pílula */
+  padding: 0.5rem 1rem;           /* espaçamento interno */
+  font-size: 0.9rem;              /* tamanho do texto */
+  font-family: 'DM Sans', sans-serif; /* fonte do sistema */
+  outline: none;                   /* remove outline padrão */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* transição suave */
+}
+
+/* Foco no input */
+.dona-input:focus {
+  border-color: var(--gold, #c9a84c); /* borda dourada mais forte */
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); /* halo dourado suave */
+}
+
+/* Placeholder do input */
+.dona-input::placeholder {
+  color: #9a8a6a;                  /* bege médio — legível mas discreto */
+}
+
+/* Botão de enviar */
+.dona-send {
+  background: var(--gold, #c9a84c); /* fundo dourado */
+  color: var(--bg, #1a1a17);       /* ícone escuro */
+  border: none;                    /* sem borda */
+  border-radius: 50%;              /* circular */
+  width: 38px;                     /* largura fixa */
+  height: 38px;                    /* altura fixa */
+  cursor: pointer;                 /* cursor de clique */
+  display: flex;                   /* para centralizar */
+  align-items: center;             /* centraliza vertical */
+  justify-content: center;         /* centraliza horizontal */
+  font-size: 1rem;                 /* tamanho do ícone */
+  transition: transform 0.3s ease, background 0.3s ease; /* transição suave */
+  flex-shrink: 0;                  /* não encolhe */
+}
+
+/* Hover no enviar */
+.dona-send:hover {
+  transform: scale(1.1);          /* amplia 10% */
+  background: var(--sage2, #7dc063); /* verde no hover */
+}
+
+/* ─── 8. RESPONSIVIDADE ───────────────────────────────────────────── */
+
+/* Mobile: chat ocupa tela toda — gruda no fundo acima do teclado */
+@media (max-width: 480px) {
+  /* Em páginas normais (sem carrinho), o chat ocupa toda a largura
+     e cola no fundo — o browser já posiciona acima do teclado virtual */
+  body:not(.etapa1) .dona-chat {
+    width: auto;      /* auto + left:0 + right:0 = viewport sem scrollbar (evita overflow de 2px) */
+    right: 0;
+    left: 0;
+    bottom: 0;
+    border-radius: 20px 20px 0 0;  /* só cantos superiores arredondados */
+
+    /* dvh = dynamic viewport height — encolhe quando teclado abre */
+    max-height: 85dvh;
+    max-height: 85vh;              /* fallback para browsers sem dvh */
+  }
+
+  /* Área de mensagens: flex:1 para preencher o espaço disponível */
+  .dona-chat .dona-messages {
+    flex: 1;
+    min-height: 80px;
+    max-height: none;              /* sem max-height fixo — usa flex */
+    overflow-y: auto;
+  }
+
+  /* Barra de input: não encolhe e respeita safe area do notch */
+  .dona-chat .dona-input-bar {
+    padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
+    flex-shrink: 0;                /* sempre visível */
+  }
+
+  /* FAB menor no mobile */
+  .dona-fab {
+    width: 60px;
+    height: 60px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+/* Scroll suave nas mensagens (evita pulo visual ao receber nova mensagem) */
+.dona-messages {
+  scroll-behavior: smooth;
+}
+
+/* ─── 9. FORMULÁRIO DE DOAÇÃO — fora da barra de carrinho ────────── */
+/* Barra de carrinho fica na base, botão Continuar no canto DIREITO.
+   FAB vai para o canto ESQUERDO e ergue acima da barra. */
+body.etapa1 .dona-fab {
+  bottom: calc(70px + 1rem);
+  right: auto;
+  left: 1rem;
+}
+
+body.etapa1 .dona-chat {
+  bottom: calc(70px + 1rem);
+  right: auto;
+  left: 1rem;
+}
+
+@media (max-width: 480px) {
+  body.etapa1 .dona-fab {
+    bottom: calc(70px + 0.75rem);
+    left: 0.75rem;
+  }
+  body.etapa1 .dona-chat {
+    bottom: calc(70px + 0.75rem);
+    left: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+}
+
+/* Desktop (≥1024px): sidebar tem 280px à direita — FAB fica à esquerda dela */
+@media (min-width: 1024px) {
+  body.etapa1 .dona-fab {
+    bottom: 1.5rem;
+    left: auto;
+    right: calc(280px + 1.5rem);
+  }
+  body.etapa1 .dona-chat {
+    bottom: 1.5rem;
+    left: auto;
+    right: calc(280px + 1.5rem);
+  }
+}

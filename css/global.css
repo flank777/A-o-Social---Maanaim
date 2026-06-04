@@ -1,0 +1,2286 @@
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DoaVida — Plataforma de Doações de Alimentos                       ║
+  ║  Ação Social Semear + Comunidade Evangélica Maanaim — Belém, PA     ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ARQUIVO: css/global.css                                            ║
+  ║  FUNÇÃO:  Estilos globais compartilhados por TODAS as páginas       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  📚 O QUE É CSS?                                                    ║
+  ║                                                                      ║
+  ║  CSS = Cascading Style Sheets (Folhas de Estilo em Cascata)         ║
+  ║  É a "roupa" do HTML — define como os elementos aparecem.           ║
+  ║                                                                      ║
+  ║  FORMATO BÁSICO:                                                     ║
+  ║  seletor {                                                           ║
+  ║    propriedade: valor;   ← termina sempre com ponto e vírgula       ║
+  ║  }                                                                   ║
+  ║                                                                      ║
+  ║  TIPOS DE SELETORES:                                                 ║
+  ║  elemento   → h1, p, div (sem prefixo)                             ║
+  ║  .classe    → .btn, .container (prefixo ponto)                     ║
+  ║  #id        → #nav, #footer (prefixo cerquilha)                    ║
+  ║  a:hover    → estado ao passar o mouse (pseudo-classe)             ║
+  ║  a::before  → elemento virtual antes do conteúdo (pseudo-elemento) ║
+  ║                                                                      ║
+  ║  "CASCATA" significa que estilos mais específicos vencem            ║
+  ║  estilos menos específicos. Ex: #id vence .classe vence elemento.   ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 1 — VARIÁVEIS CSS (Custom Properties)
+   
+   📚 O QUE SÃO VARIÁVEIS CSS?
+   
+   Variáveis CSS armazenam valores que você usa em vários lugares.
+   Se precisar mudar uma cor, muda EM UM LUGAR e afeta todo o site!
+   
+   DEFINIÇÃO: --nome-variavel: valor;
+   USO:       color: var(--nome-variavel);
+   
+   O ":root" é o elemento raiz do HTML (equivale ao <html>).
+   Variáveis definidas aqui são acessíveis em TODO o CSS.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+
+  /* ── PALETA DE CORES ─────────────────────────────────────────────
+     
+     O DoaVida usa um tema ESCURO com dourado como cor de destaque.
+     
+     Hierarquia de fundos (do mais escuro para o mais claro):
+     --bg → --surface → --surface2
+     
+     Como se fossem camadas de profundidade na tela.
+  */
+
+  /* Fundo principal (a cor de fundo da página) */
+  --bg:       #faf9f5;
+  /* Branco levemente creme — acolhedor, não clínico */
+
+  /* Superfície (fundo de cards, painéis) */
+  --surface:  #ffffff;
+
+  /* Superfície secundária (hover, seções internas) */
+  --surface2: #f0ede5;
+
+  /* Verde-esperança — cor de destaque do projeto */
+  --gold:     #4a8a39;
+  /* Verde natural, remete a colheita, alimentos, vida */
+
+  /* Texto principal (escuro sobre fundo claro) */
+  --cream:    #1c1814;
+  /* Quase preto quente — confortável para leitura */
+
+  /* Texto secundário */
+  --text:     #3a3228;
+  /* Marrom escuro — hierarquia abaixo de --cream */
+
+  /* Texto terciário (labels, placeholders) */
+  --text2:    rgba(0, 0, 0, 0.50);
+
+  /* Borda (linhas divisórias) */
+  --border:   rgba(0, 0, 0, 0.10);
+
+  /* ── TIPOGRAFIA (FONTES) ─────────────────────────────────────────
+     
+     O projeto usa 3 famílias de fonte:
+     1. Display = títulos grandes e elegantes (Playfair Display)
+     2. Body = texto corrido legível (DM Sans)
+     3. Mono = código, números, tags (Space Mono)
+     
+     Essas fontes foram importadas no <head> de cada HTML via Google Fonts.
+  */
+
+  /* Fonte para títulos */
+  --ff-display: 'Playfair Display', Georgia, serif;
+  /*
+    'Playfair Display' = nossa fonte principal para títulos.
+    Georgia, serif = fontes de fallback caso não carregue.
+    "Fallback" = plano B — se a fonte principal falhar, usa a próxima.
+  */
+
+  /* Fonte para textos normais */
+  --ff-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  /*
+    'DM Sans' = fonte limpa e moderna.
+    system-ui = fonte padrão do sistema operacional (fallback).
+    -apple-system = especificamente para dispositivos Apple.
+    sans-serif = família genérica como último recurso.
+  */
+
+  /* Fonte monoespaçada (cada letra tem a mesma largura) */
+  --ff-mono: 'Space Mono', 'Courier New', monospace;
+  /*
+    Monoespaçada = ideal para números, códigos, labels técnicos.
+    Ex: "01 / 12 / 2025" fica perfeitamente alinhado.
+  */
+
+  /* ── TRANSIÇÕES ──────────────────────────────────────────────────
+     Valores padrão de velocidade para animações de hover.
+  */
+  --t:  0.2s ease;       /* Transição rápida (botões, links) */
+  --t2: 0.4s ease;       /* Transição média (cards, modais) */
+  --t3: 0.6s ease;       /* Transição longa (páginas, loaders) */
+
+  /* ── SOMBRAS ─────────────────────────────────────────────────────
+     Sombras pré-definidas para diferentes elevações.
+     Quanto maior a elevação, mais suave e espalhada a sombra.
+  */
+  --shadow-sm: 0 2px 8px  rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.14);
+
+  /* ── BORDER RADIUS ───────────────────────────────────────────────
+     Curvatura das bordas. Valores maiores = mais arredondado.
+  */
+  --radius-sm: 8px;    /* Pequeno: inputs, badges */
+  --radius-md: 12px;   /* Médio: cards compactos */
+  --radius-lg: 16px;   /* Grande: cards principais */
+  --radius-xl: 20px;   /* Extra: modais, cards de destaque */
+  --radius-full: 100px;/* Pílula: badges, botões redondos */
+
+  /* ── ALIASES CURTOS DE RADIUS (usados pelas páginas novas) ──────
+     Mesmos valores acima, nomes mais curtos para conveniência.
+  */
+  --r-sm:  6px;
+  --r-md:  12px;
+  --r-lg:  24px;
+  --r-xl:  48px;
+
+  /* ── CORES EXTRAS DO PROJETO ─────────────────────────────────────
+     Complementam a paleta principal definida acima.
+  */
+
+  /* Fundos adicionais */
+  --bg2:   #eeebe3;
+  --bg3:   #e5e1d8;
+
+  /* Texto apagado */
+  --muted: #8a7a60;
+
+  /* Verde-sage */
+  --sage:  #4a8a39;
+  --sage2: #67b050;
+
+  /* Sombras suaves para tema claro */
+  --shadow-sm:   0 2px 8px  rgba(0, 0, 0, 0.06);
+  --shadow-md:   0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-lg:   0 16px 48px rgba(0, 0, 0, 0.14);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 2 — RESET E BASE
+   
+   📚 O QUE É UM "RESET"?
+   
+   Cada navegador (Chrome, Firefox, Safari) tem seus próprios estilos
+   padrão para elementos HTML. Esses padrões são DIFERENTES entre
+   navegadores, causando inconsistências.
+   
+   O "reset" remove esses estilos padrão, dando um ponto de partida
+   limpo e igual em todos os navegadores.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  O seletor * (asterisco) seleciona TODOS os elementos da página.
+  *::before e *::after selecionam os pseudo-elementos de todos.
+  
+  box-sizing: border-box = MUITO IMPORTANTE!
+  Muda como o CSS calcula o tamanho dos elementos.
+  
+  SEM border-box: width: 200px + padding: 20px = 240px total (padding é extra)
+  COM border-box: width: 200px + padding: 20px = 200px total (padding é interno)
+  
+  Com border-box, o tamanho que você define é o tamanho FINAL.
+  Muito mais intuitivo e previsível.
+*/
+*, *::before, *::after {
+  box-sizing: border-box;        /* Inclui padding e borda no tamanho total */
+  margin:  0;                    /* Remove margens padrão */
+  padding: 0;                    /* Remove paddings padrão */
+  touch-action: manipulation;    /* Elimina o delay de 300ms de toque no iOS/Android;
+                                    desativa zoom duplo-toque mas mantém scroll e pinch-zoom */
+}
+
+/* Configuração base do HTML */
+html {
+  scroll-behavior: smooth; /* Rolagem suave ao clicar em links âncora (#secao) */
+  font-size: 16px;          /* Tamanho base: 1rem = 16px */
+  overflow-x: hidden;       /* Bloqueia scroll horizontal no nível raiz — body sozinho não basta */
+  /*
+    "rem" = relative to root em = relativo ao tamanho da fonte do :root.
+    Se o html tem font-size: 16px, então:
+    1rem  = 16px
+    1.5rem = 24px
+    0.875rem = 14px
+    
+    Usar rem em vez de px é melhor porque:
+    1. Respeita a preferência de acessibilidade do usuário
+    2. Escala proporcionalmente se o usuário aumenta o zoom do navegador
+  */
+}
+
+/* Configuração base do BODY */
+body {
+  background:   transparent;         /* Canvas (#wave-bg) provê o fundo */
+  color:        var(--text);         /* Cor do texto padrão */
+  font-family:  var(--ff-body);      /* DM Sans */
+  font-weight:  300;                  /* Peso leve (300 = light) */
+  line-height:  1.65;                /* Espaço entre linhas (65% maior que o texto) */
+  overflow-x:   hidden;              /* Sem scroll horizontal */
+  /*
+    overflow-x: hidden = esconde qualquer coisa que "vaze"
+    horizontalmente. Evita a barra de scroll horizontal.
+  */
+  -webkit-font-smoothing:  antialiased;  /* Suaviza fontes no Mac/iOS */
+  -moz-osx-font-smoothing: grayscale;    /* Suaviza fontes no Firefox/Mac */
+}
+
+/* Seções e estruturas acima do canvas de ondas (z-index:0) */
+section,
+footer,
+header,
+main,
+#nav {
+  position: relative;
+  z-index:  1;
+}
+
+/* Imagens: responsivas por padrão */
+img {
+  max-width: 100%; /* Nunca ultrapassa o container */
+  display: block;  /* Remove o espaço extra embaixo (inline gap) */
+  height: auto;    /* Mantém a proporção ao redimensionar */
+}
+
+/* Links: herda a cor do pai (não azul padrão) */
+a {
+  color: inherit;         /* Herda a cor do elemento pai */
+  text-decoration: none;  /* Remove o sublinhado padrão */
+  transition: color var(--t); /* Animação suave ao mudar de cor */
+}
+
+/* Botões: cursor de mãozinha e herda a fonte */
+button {
+  cursor:      pointer;  /* Cursor de mão ao passar o mouse */
+  font-family: inherit;  /* Herda a fonte do body (DM Sans) */
+}
+
+/* Listas: sem bolinhas/números */
+ul, ol {
+  list-style: none;
+}
+
+/* Textos em itálico, negrito, small — herda as fontes */
+em, strong, small {
+  font-family: inherit;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 3 — TEXTURA DE FUNDO (Grain/Noise)
+   
+   Um efeito de "granulado" muito sutil que dá textura à página,
+   evitando que o fundo pareça plano demais.
+   Visível apenas se olhar com atenção.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  body::before = um pseudo-elemento ANTES do conteúdo do body.
+  É como uma camada "fantasma" que fica acima do fundo.
+  
+  Usamos uma imagem SVG inline (data:image/svg+xml) para criar
+  um padrão de ruído (feTurbulence) sem precisar de arquivo externo.
+*/
+body::before {
+  content:        '';       /* Obrigatório para pseudo-elementos */
+  position:       fixed;    /* Fixo na tela — não rola com o conteúdo */
+  inset:          0;        /* Cobre toda a tela (top:0 right:0 bottom:0 left:0) */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;     /* Não captura cliques do mouse */
+  z-index:        9000;     /* Acima de tudo, mas abaixo dos modais */
+  opacity:        0.12;     /* Muito sutil no tema claro */
+}
+
+/* Padrão de ondas gerado via canvas em js/app.js (inicializarFundoOndas) */
+/* #wave-bg — canvas inserido como body.firstChild com z-index: -1 */
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 4 — CONTAINER
+   
+   O .container é uma caixa centralizada com largura máxima.
+   Garante que o conteúdo não se estenda demais em telas grandes.
+   
+   Estrutura típica de uso:
+   <section>
+     <div class="container">
+       <!-- conteúdo vai aqui -->
+     </div>
+   </section>
+   ══════════════════════════════════════════════════════════════════════ */
+
+.container {
+  max-width: 1200px;  /* Largura máxima de 1200px */
+  margin:    0 auto;  /* Centraliza horizontalmente (auto nas laterais) */
+  padding:   0 24px;  /* Margem interna nas laterais (evita colar nas bordas) */
+}
+
+/* Container mais estreito para formulários e textos */
+.container-narrow {
+  max-width: 720px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+/* Container mais largo para dashboards */
+.container-wide {
+  max-width: 1400px;
+  margin:    0 auto;
+  padding:   0 24px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 5 — TIPOGRAFIA (Textos e Títulos)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Rótulo pequeno acima de seções (como "Nossa Missão", "Alimentos") */
+.section-label {
+  font-family:    var(--ff-mono);
+  font-size:      0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  display:        flex;
+  align-items:    center;
+  gap:            8px;
+  margin-bottom:  16px;
+}
+
+/* Título grande de seção */
+.section-title {
+  font-family:  var(--ff-display);  /* Playfair Display */
+  font-size:    clamp(2rem, 5vw, 3.5rem);
+  /*
+    clamp(mínimo, preferido, máximo)
+    clamp(2rem, 5vw, 3.5rem):
+    - Mínimo:  2rem (nunca menor que isso)
+    - Preferido: 5vw (5% da largura da janela)
+    - Máximo: 3.5rem (nunca maior que isso)
+    
+    Em uma tela de 1280px: 5% = 64px ≈ 4rem → limitado a 3.5rem
+    Em um celular de 375px: 5% ≈ 18px ≈ 1.1rem → limitado a 2rem
+    
+    Isso faz o título crescer e encolher proporcionalmente.
+    SEM precisar de media queries!
+  */
+  font-weight: 900;
+  line-height: 1.1;
+  color:       var(--cream);
+}
+
+/* Texto em itálico dourado dentro dos títulos */
+.section-title em {
+  font-style: italic;
+  color:      var(--gold);
+}
+
+/* Subtítulo de seção */
+.section-subtitle {
+  font-size:   1.05rem;
+  color:       var(--text2);
+  line-height: 1.7;
+  max-width:   580px;
+}
+
+/* Linha decorativa dourada */
+.divider {
+  display: none !important;
+  width: 0;
+  height: 0;
+  margin: 0 !important;
+}
+
+/* Texto visível apenas para leitores de tela (acessibilidade) */
+.sr-only {
+  position:   absolute;
+  width:      1px;
+  height:     1px;
+  padding:    0;
+  margin:     -1px;
+  overflow:   hidden;
+  clip:       rect(0, 0, 0, 0);
+  white-space:nowrap;
+  border:     0;
+  /*
+    Este truque esconde o elemento visualmente mas
+    mantém acessível para leitores de tela.
+    "clip: rect(0,0,0,0)" = recorta o elemento para 0x0 pixels.
+  */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 6 — BOTÕES
+   
+   📚 SISTEMA DE BOTÕES:
+   
+   Todo botão tem a classe base ".btn" MAIS uma variante:
+   .btn.btn-primary  = botão principal (dourado)
+   .btn.btn-outline  = botão secundário (borda)
+   .btn.btn-ghost    = botão sem fundo
+   
+   E um modificador de tamanho:
+   .btn.btn-sm   = pequeno
+   .btn          = médio (padrão)
+   .btn.btn-lg   = grande
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Classe base: estilos comuns a TODOS os botões */
+.btn {
+  /* Layout interno: ícone + texto lado a lado */
+  display:        inline-flex;
+  align-items:    center;
+  justify-content:center;
+  gap:            8px;           /* Espaço entre ícone e texto */
+
+  /* Espaçamento interno */
+  padding:        12px 24px;
+
+  /* Tipografia */
+  font-size:      0.875rem;     /* 14px */
+  font-weight:    500;
+  font-family:    inherit;
+  letter-spacing: 0.02em;
+
+  /* Visual */
+  border-radius:  10px;
+  border:         1.5px solid transparent; /* Borda invisível por padrão */
+  cursor:         pointer;
+
+  /* Animação suave em todas as propriedades */
+  transition:     all 0.2s ease;
+
+  /* Evita que o texto quebre em duas linhas */
+  white-space:    nowrap;
+  text-decoration:none;
+
+  /* Remove a aparência padrão do OS para botões */
+  appearance:     none;
+  -webkit-appearance: none;
+}
+
+/* Estado de foco (navegação por teclado) */
+.btn:focus-visible {
+  /*
+    :focus-visible = aparece SOMENTE quando o botão
+    recebe foco pelo teclado (Tab), não pelo mouse.
+    Melhor experiência para acessibilidade.
+  */
+  outline:        2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Estado desativado */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity:        0.5;
+  cursor:         not-allowed; /* Cursor de "proibido" */
+  pointer-events: none;        /* Não aceita cliques */
+}
+
+/* ── Variante: Botão Primário (Dourado) ─────────────────────────── */
+.btn-primary {
+  background:  var(--gold);         /* Fundo dourado */
+  color:       #1a1600;             /* Texto escuro sobre dourado */
+  border-color:var(--gold);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background:  #f5d76e;            /* Dourado mais claro ao hover */
+  border-color:#f5d76e;
+  box-shadow:  0 4px 20px rgba(232, 201, 106, 0.35); /* Brilho dourado */
+  transform:   translateY(-1px);   /* Sobe 1px — efeito de "elevação" */
+}
+
+.btn-primary:active {
+  /* :active = botão sendo pressionado */
+  transform:   translateY(0);     /* Volta para o lugar */
+  box-shadow:  none;
+}
+
+/* ── Variante: Botão Outline (Borda) ───────────────────────────── */
+.btn-outline {
+  background:  transparent;
+  color:       var(--text2);
+  border-color:var(--border);
+}
+
+.btn-outline:hover {
+  border-color:rgba(232, 201, 106, 0.5);
+  color:       var(--cream);
+  background:  rgba(232, 201, 106, 0.05);
+}
+
+/* ── Variante: Botão Ghost (Sem Fundo) ─────────────────────────── */
+.btn-ghost {
+  background:  transparent;
+  border-color:transparent;
+  color:       var(--text2);
+}
+
+.btn-ghost:hover {
+  color:       var(--cream);
+  background:  rgba(0, 0, 0, 0.05);
+}
+
+/* ── Variante: Botão de Perigo (Vermelho) ──────────────────────── */
+.btn-danger {
+  background:  rgba(229, 90, 90, 0.1);
+  color:       #e55a5a;
+  border-color:rgba(229, 90, 90, 0.3);
+}
+
+.btn-danger:hover {
+  background:  rgba(229, 90, 90, 0.2);
+  border-color:#e55a5a;
+}
+
+/* ── Tamanhos dos Botões ────────────────────────────────────────── */
+
+/* Pequeno */
+.btn-sm {
+  padding:     8px 16px;
+  font-size:   0.78rem;
+  border-radius:8px;
+  gap:         6px;
+}
+
+/* Grande */
+.btn-lg {
+  padding:     16px 32px;
+  font-size:   1rem;
+  border-radius:12px;
+  gap:         10px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 6B — ANIMAÇÕES & EFEITOS NOS BOTÕES
+   Ripple no clique, shimmer sweep no hover, elevação e press.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Ripple — elemento criado por JS no clique */
+@keyframes btnRipple {
+  to { transform: scale(4); opacity: 0; }
+}
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0);
+  animation: btnRipple 0.55s ease-out forwards;
+}
+
+/* Base: todos os .btn ganham position+overflow para ripple/shimmer */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+              background 0.2s ease, border-color 0.2s ease;
+}
+
+/* Shimmer sweep — btn-primary */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.btn-primary:hover::before { left: 140%; }
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(232,201,106,0.55), 0 2px 8px rgba(0,0,0,0.10);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 8px rgba(232,201,106,0.25);
+}
+
+/* btn-outline — elevação + box-shadow */
+.btn-outline:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(232,201,106,0.22);
+}
+.btn-outline:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 7 — NAVBAR (Menu de Navegação)
+   
+   A navbar fica FIXA no topo da tela (position: fixed).
+   Quando o usuário rola a página, o JavaScript adiciona a classe
+   "scrolled" que adiciona um fundo escuro semitransparente.
+   ══════════════════════════════════════════════════════════════════════ */
+
+#nav {
+  position:   fixed;     /* Fica no lugar mesmo ao rolar */
+  top:        0;
+  left:       0;
+  right:      0;
+  z-index:    100;        /* Acima do conteúdo da página */
+  padding:    20px 0;
+  transition: background var(--t2), padding var(--t2); /* Anima ao rolar */
+}
+
+/* Estado ao rolar a página (JS adiciona esta classe) */
+#nav.scrolled {
+  background:     rgba(240, 248, 255, 0.95);
+  backdrop-filter:blur(16px);
+  /*
+    backdrop-filter: blur(16px) = aplica um desfoque no conteúdo
+    ATRÁS do elemento. Cria o famoso efeito "glassmorphism" (vidro).
+    Suportado na maioria dos navegadores modernos.
+  */
+  padding:        12px 0;                  /* Encolhe ao rolar */
+  border-bottom:  1px solid var(--border); /* Linha divisória sutil */
+}
+
+/* Container interno da navbar */
+#nav .container {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             16px;
+}
+
+/* ── Logo ─────────────────────────────────────────────────────── */
+
+.nav-logo {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  text-decoration: none;
+  flex-shrink: 0; /* Não encolhe se não houver espaço */
+}
+
+/* Ícone circular da logo */
+.nav-logo-icon {
+  width:           36px;
+  height:          36px;
+  background:      rgba(232, 201, 106, 0.15);
+  border:          1px solid rgba(232, 201, 106, 0.3);
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           var(--gold);
+  font-size:       0.9rem;
+  transition:      all var(--t);
+}
+
+.nav-logo:hover .nav-logo-icon {
+  background:  rgba(232, 201, 106, 0.25);
+  transform:   rotate(10deg); /* Leve rotação ao hover */
+}
+
+/* Texto da logo: "Doa" + "Vida" */
+.nav-logo-text {
+  font-family:  var(--ff-display);
+  font-size:    1.3rem;
+  font-weight:  700;
+  color:        var(--cream);
+  letter-spacing: 0.01em;
+}
+
+.nav-logo-text strong {
+  color:       var(--gold);
+  font-weight: 900;
+}
+
+/* ── Links de Navegação (desktop) ───────────────────────────── */
+
+.nav-links {
+  display:     flex;
+  align-items: center;
+  gap:         32px;
+  list-style:  none;
+}
+
+.nav-links a {
+  font-size:   0.85rem;
+  color:       var(--text2);
+  transition:  color var(--t);
+  position:    relative;
+}
+
+/* Linha decorativa embaixo do link ao hover */
+.nav-links a::after {
+  content:    '';
+  position:   absolute;
+  bottom:     -4px;
+  left:       0;
+  width:      0%;          /* Começa sem largura */
+  height:     1.5px;
+  background: var(--gold);
+  transition: width var(--t); /* Anima de 0 a 100% */
+}
+
+.nav-links a:hover {
+  color: var(--gold);
+}
+
+.nav-links a:hover::after {
+  width: 100%; /* Linha se expande ao hover */
+}
+
+/* Link ativo (página atual) */
+.nav-links a[aria-current="page"] {
+  color: var(--gold);
+}
+
+.nav-links a[aria-current="page"]::after {
+  width: 100%;
+}
+
+/* ── Área de CTA da Navbar ──────────────────────────────────── */
+
+.nav-cta {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  flex-shrink: 0;
+}
+
+/* ── Botão Hamburguer (Mobile) ──────────────────────────────── */
+
+.hamburger {
+  display:        none;      /* Oculto no desktop */
+  flex-direction: column;
+  gap:            5px;
+  background:     none;
+  border:         none;
+  padding:        6px;
+  cursor:         pointer;
+  border-radius:  6px;
+  transition:     background var(--t);
+}
+
+.hamburger:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* Cada traço do ícone hamburguer */
+.hamburger span {
+  display:        block;
+  width:          22px;
+  height:         2px;
+  background:     var(--cream);
+  border-radius:  2px;
+  transition:     all 0.3s ease; /* Anima para o X */
+}
+
+/* Animação: hamburguer → X quando aberto */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+  /* Sobe 7px e gira 45° → forma a parte superior do X */
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0; /* Traço do meio desaparece */
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+  /* Desce 7px e gira -45° → parte inferior do X */
+}
+
+/* ── Drawer (Menu Mobile) ───────────────────────────────────── */
+
+/*
+  O "drawer" é o menu mobile que aparece ao clicar no hamburguer.
+  Fica escondido por padrão (display: none).
+  O JS adiciona a classe "open" para mostrá-lo.
+*/
+.nav-drawer {
+  display:        none;     /* Escondido por padrão */
+  position:       fixed;
+  top:            64px;     /* Logo abaixo da navbar */
+  left:           0;
+  right:          0;
+  bottom:         0;        /* Cobre até o final da tela */
+  background:     rgba(240, 248, 255, 0.99);
+  backdrop-filter:blur(20px);
+  border-bottom:  1px solid var(--border);
+  padding:        20px 24px 24px;
+  flex-direction: column;
+  gap:            8px;
+  z-index:        99;       /* Abaixo da navbar (z-index: 100) */
+  overflow-y:     auto;     /* Scroll se tiver muitos itens */
+}
+
+/* Quando aberto: muda display para flex */
+.nav-drawer.open {
+  display: flex;
+}
+
+/* Link dentro do drawer mobile */
+.nav-drawer-link {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  color:       var(--text);
+  padding:     14px 0;
+  font-size:   1rem;
+  border-bottom: 1px solid var(--border);
+  transition:  color var(--t);
+}
+
+.nav-drawer-link:last-of-type {
+  border-bottom: none;
+}
+
+.nav-drawer-link:hover {
+  color: var(--gold);
+}
+
+.nav-drawer-link i {
+  width:    20px;
+  color:    var(--text2);
+  font-size:0.9rem;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 8 — FOOTER (Rodapé)
+   ══════════════════════════════════════════════════════════════════════ */
+
+#footer {
+  background:  #2d6e1f;        /* Verde — fundo escuro do rodapé */
+  border-top:  none;
+  padding:     60px 0 32px;
+  margin-top:  auto;
+  /* Redefine variáveis CSS para texto branco dentro do footer */
+  --text2:     rgba(255, 255, 255, 0.65);
+  --cream:     #ffffff;
+  --border:    rgba(255, 255, 255, 0.15);
+  --gold:      rgba(255, 255, 255, 0.90);
+}
+
+/* Grid de 3 colunas no desktop */
+.footer-grid {
+  display:               grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  /* 
+    2fr 1fr 1fr = a primeira coluna é 2x maior que as outras.
+    Total = 4 partes: coluna 1 = 2/4 = 50%, colunas 2 e 3 = 1/4 = 25% cada.
+  */
+  gap:         48px;
+  padding-bottom: 48px;
+  border-bottom:  1px solid var(--border);
+}
+
+/* Coluna do footer */
+.footer-col {}
+
+/* Logo no footer (mesmos estilos da navbar) */
+.footer-logo {
+  margin-bottom: 16px;
+}
+
+/* Descrição da organização */
+.footer-desc {
+  font-size:   0.875rem;
+  color:       var(--text2);
+  line-height: 1.7;
+  max-width:   280px;
+}
+
+/* Título das colunas */
+.footer-heading {
+  font-family:    var(--ff-mono);
+  font-size:      0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  margin-bottom:  20px;
+}
+
+/* Lista de links do footer */
+.footer-links {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+  list-style:     none;
+}
+
+.footer-links li {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  font-size:   0.875rem;
+}
+
+.footer-links a {
+  color:      var(--text2);
+  transition: color var(--t);
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+}
+
+.footer-links i {
+  color:      var(--text2);
+  width:      16px;
+  font-size:  0.9rem;
+  flex-shrink:0;
+}
+
+/* Linha de créditos no rodapé */
+.footer-bottom {
+  display:         flex;
+  justify-content: center;
+  align-items:     center;
+  flex-direction:  column;
+  padding-top:     28px;
+  flex-wrap:       wrap;
+  gap:             12px;
+  text-align:      center;
+}
+
+.footer-copy,
+.footer-credit {
+  font-size: 0.78rem;
+  color:     var(--text2);
+}
+
+.footer-social {
+  display:         flex;
+  flex-direction:  row;
+  justify-content: center;
+  align-items:     center;
+  gap:             14px;
+  flex-wrap:       wrap;
+  list-style:      none;
+  margin:          0;
+  padding:         0;
+  width:           100%;
+}
+
+.footer-social a {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             7px;
+  color:           var(--text2);
+  font-family:     var(--ff-mono);
+  font-size:       0.68rem;
+  letter-spacing:  0.08em;
+  text-transform:  uppercase;
+  transition:      color var(--t), transform var(--t);
+}
+
+.footer-social a:hover {
+  color:     var(--gold);
+  transform: translateY(-1px);
+}
+
+.footer-social i {
+  font-size: 0.95rem;
+}
+
+.footer-social-youtube {
+  color: #ff0033 !important;
+}
+
+.footer-social-instagram {
+  color: #e4405f !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   FOOTER — LOGOS DAS ORGANIZAÇÕES
+   Usadas no footer do index.html: Semear + Maanaim lado a lado.
+   Conforme imagem 3 do projeto.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Container das logos das organizações.
+  Exibido abaixo do logo DoaVida na coluna 1 do rodapé.
+*/
+.footer-orgs {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  margin-top:  18px;
+  flex-wrap:   wrap;
+}
+
+/*
+  Item individual (ícone + nome + função).
+  Ex: ícone verde 🌱 + "Ação Social Semear" + "Coordenação e Logística"
+*/
+.footer-org-item {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+}
+
+/*
+  Círculo com ícone da organização.
+  Verde para Semear, dourado para Maanaim.
+*/
+.footer-org-icon {
+  width:           28px;
+  height:          28px;
+  border-radius:   50%;
+  background:      rgba(89, 153, 72, 0.12);
+  border:          1px solid rgba(89, 153, 72, 0.25);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       0.72rem;
+  color:           #7dc063;    /* verde folha */
+  flex-shrink:     0;
+}
+
+/* Variante dourada para a Comunidade Maanaim */
+.footer-org-icon.church {
+  background:  rgba(232, 201, 106, 0.08);
+  border-color: rgba(232, 201, 106, 0.2);
+  color:        var(--gold);
+}
+
+/* Textos do item de organização */
+.footer-org-info {
+  display:        flex;
+  flex-direction: column;
+  gap:            1px;
+}
+
+.footer-org-name {
+  font-size:   0.75rem;
+  font-weight: 600;
+  color:       var(--text2);
+  line-height: 1.2;
+}
+
+.footer-org-role {
+  font-family:    var(--ff-mono);
+  font-size:      0.58rem;
+  letter-spacing: 0.05em;
+  color:          var(--muted, #888876);
+  text-transform: uppercase;
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 9 — LOADER (Tela de Carregamento)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Overlay claro que cobre toda a tela */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #F4F8FB;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+/* Mobile: fade-out mais rápido para não somar demora ao carregamento */
+@media (max-width: 768px) {
+  #loader { transition: opacity 0.3s ease, visibility 0.3s ease; }
+}
+
+#loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Stage: container de todos os elementos animados ── */
+.ldr-stage {
+  position: relative;
+  width: 120px;
+  height: 164px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+/* Halo de fundo (brilho verde difuso) */
+.ldr-halo {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(90,138,74,0.14) 0%, transparent 65%);
+  animation: ldrHalo 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Anéis e partículas removidos a pedido */
+.ldr-ring, .ldr-orbit, .ldr-dot { display: none; }
+
+/* ── Logo central ── */
+.loader-logo-img {
+  width: 88px;
+  height: 132px;
+  border-radius: 14px;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.12),
+    0 0 0 2px rgba(90,138,74,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  animation: ldrBreath 3s ease-in-out infinite;
+}
+
+/* Linha de scan removida a pedido */
+.ldr-scan { display: none; }
+
+/* ── Texto abaixo ── */
+.loader-text {
+  font-family: var(--ff-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5A8A4A;
+  margin-bottom: 18px;
+  animation: ldrTextFade 2.5s ease-in-out infinite;
+}
+
+/* ── Barra de progresso ── */
+.loader-bar-wrap {
+  width: 160px;
+  height: 2px;
+  background: rgba(90,138,74,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(90,138,74,0.9), #e8c96a, rgba(90,138,74,0.9));
+  background-size: 200% 100%;
+  animation: ldrBarFill 1.6s ease forwards, ldrBarShimmer 1.8s linear 0.8s infinite;
+}
+
+/* ══ Keyframes ══ */
+@keyframes ldrSpin    { to { transform: rotate(360deg); } }
+@keyframes ldrSpinRev { to { transform: rotate(-360deg); } }
+
+@keyframes ldrPulseRing {
+  0%, 100% { transform: scale(1);    opacity: 0.5; }
+  50%       { transform: scale(1.06); opacity: 1;   }
+}
+@keyframes ldrBreath {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+@keyframes ldrHalo {
+  0%, 100% { transform: translate(-50%,-50%) scale(1);   opacity: 0.6; }
+  50%       { transform: translate(-50%,-50%) scale(1.25); opacity: 1;   }
+}
+@keyframes ldrScanSwipe {
+  0%   { top: -2px;              opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: calc(100% + 2px);  opacity: 0; }
+}
+@keyframes ldrTextFade {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.85; }
+}
+@keyframes ldrBarFill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+@keyframes ldrBarShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 10 — TOAST (Notificações Temporárias)
+   
+   📚 O QUE É UM TOAST?
+   
+   "Toast" = torrada (sobe e aparece como uma torradeira).
+   É uma pequena notificação que aparece no canto da tela
+   por alguns segundos e desaparece sozinha.
+   
+   Ex: "✅ Doação registrada!" ou "❌ Campo obrigatório"
+   ══════════════════════════════════════════════════════════════════════ */
+
+.toast {
+  position:   fixed;
+  bottom:     24px;
+  right:      24px;
+  z-index:    9999; /* Acima de TUDO */
+
+  /* Visual */
+  background: var(--surface2);
+  border:     1px solid var(--border);
+  border-radius: 12px;
+  padding:    14px 20px;
+  font-size:  0.875rem;
+  color:      var(--cream);
+  max-width:  360px;
+  box-shadow: var(--shadow-lg);
+
+  /* Sombra */
+  backdrop-filter: blur(12px);
+
+  /* Estado inicial: invisível e deslocado */
+  opacity:   0;
+  transform: translateY(20px) scale(0.95);
+
+  /* Animação de entrada/saída */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  /* Não aparece para leitores de tela quando escondido */
+  pointer-events: none;
+}
+
+/* Estado visível (JS adiciona esta classe) */
+.toast.visible {
+  opacity:        1;
+  transform:      translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Variantes de cor */
+.toast.success { border-left: 3px solid #4CAF50; }
+.toast.error   { border-left: 3px solid #e55a5a; }
+.toast.info    { border-left: 3px solid var(--gold); }
+.toast.warning { border-left: 3px solid #FF9800; }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 11 — SKELETONS (Estados de Carregamento)
+   
+   📚 O QUE SÃO SKELETONS?
+   
+   "Skeleton" = esqueleto.
+   São placeholders animados que mostram a estrutura de um elemento
+   ENQUANTO os dados ainda estão carregando.
+   
+   Melhor do que apenas uma tela em branco ou spinner,
+   porque o usuário já vê onde o conteúdo vai aparecer.
+   
+   Ex: YouTube usa skeletons antes dos thumbnails carregarem.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Elementos marcados como skeleton ficam "pulsando" */
+.skeleton {
+  pointer-events: none; /* Não interativo */
+}
+
+/* Linhas de texto skeleton */
+.skeleton-line {
+  border-radius: 4px;
+  background:    var(--surface2);
+  /* 
+    Animação de pulso: o brilho percorre o elemento da esquerda para a direita.
+    Cria a ilusão de "carregamento em andamento".
+  */
+  animation:     skeletonPulse 1.5s ease-in-out infinite;
+}
+
+/* Variantes de tamanho */
+.skeleton-title { height: 20px; width: 70%; margin-bottom: 8px; }
+.skeleton-short { height: 14px; width: 40%; }
+.skeleton-bar   { height: 6px;  width: 100%; margin-top: 12px; }
+.skeleton-img   {
+  height:    180px;
+  background:var(--surface2);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+  /* Alterna entre opaco e transparente, criando o efeito de pulso */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 12 — BOTÃO VOLTAR AO TOPO
+   ══════════════════════════════════════════════════════════════════════ */
+
+.btn-back-top {
+  position:        fixed;
+  bottom:          80px;    /* Acima do toast */
+  right:           24px;
+  width:           44px;
+  height:          44px;
+  border-radius:   50%;     /* Circular */
+  background:      var(--surface);
+  border:          1px solid var(--border);
+  color:           var(--text2);
+  font-size:       0.9rem;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  z-index:         500;
+  transition:      all var(--t);
+
+  /* Escondido por padrão */
+  opacity:         0;
+  visibility:      hidden;
+  transform:       translateY(10px);
+}
+
+/* Visível quando JS adiciona a classe (após rolar) */
+.btn-back-top.visible {
+  opacity:    1;
+  visibility: visible;
+  transform:  translateY(0);
+}
+
+.btn-back-top:hover {
+  border-color:var(--gold);
+  color:       var(--gold);
+  background:  rgba(232,201,106,0.08);
+  transform:   translateY(-2px);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 13 — UTILITÁRIOS
+   
+   Pequenas classes reutilizáveis para casos específicos.
+   Filosofia: uma classe = uma responsabilidade.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Trunca texto com reticências */
+.truncate {
+  white-space:  nowrap;
+  overflow:     hidden;
+  text-overflow:ellipsis; /* Adiciona "..." ao truncar */
+}
+
+/* Espaçamentos */
+.mt-auto { margin-top:    auto; }
+.mb-0    { margin-bottom: 0;    }
+
+/* Texto */
+.text-gold   { color: var(--gold);  }
+.text-cream  { color: var(--cream); }
+.text-muted  { color: var(--text2); }
+.text-center { text-align: center;  }
+.text-right  { text-align: right;   }
+
+/* Pesos de fonte */
+.fw-300 { font-weight: 300; }
+.fw-400 { font-weight: 400; }
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.fw-900 { font-weight: 900; }
+
+/* Display */
+.d-none  { display: none;  }
+.d-block { display: block; }
+.d-flex  { display: flex;  }
+.d-grid  { display: grid;  }
+
+/* Flex utilitários */
+.flex-center {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+.flex-between {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+}
+
+/* Larguras */
+.w-full  { width: 100%; }
+.w-auto  { width: auto; }
+
+/* Bordas */
+.rounded-full { border-radius: var(--radius-full); }
+.rounded-lg   { border-radius: var(--radius-lg);   }
+
+/* Superfície de card genérica */
+.surface-card {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding:       24px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 14 — SCROLLBAR CUSTOMIZADA
+   
+   Personaliza a barra de scroll nos navegadores baseados em Chromium
+   (Chrome, Edge, Brave, Opera).
+   Firefox usa "scrollbar-width" e "scrollbar-color".
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Largura da scrollbar */
+::-webkit-scrollbar {
+  width:  8px;   /* Scrollbar vertical */
+  height: 8px;   /* Scrollbar horizontal */
+}
+
+/* O trilho (fundo) da scrollbar */
+::-webkit-scrollbar-track {
+  background:    var(--bg);
+  border-radius: 100px;
+}
+
+/* O "polegar" (a parte que se arrasta) */
+::-webkit-scrollbar-thumb {
+  background:    var(--border);
+  border-radius: 100px;
+  border:        2px solid var(--bg); /* Gap entre o polegar e a borda */
+}
+
+/* Polegar ao passar o mouse */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 201, 106, 0.3);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 15 — SELEÇÃO DE TEXTO
+   Personaliza a cor ao selecionar texto com o mouse.
+   ══════════════════════════════════════════════════════════════════════ */
+
+::selection {
+  background: rgba(232, 201, 106, 0.25); /* Dourado semitransparente */
+  color:      var(--cream);
+}
+
+::-moz-selection { /* Firefox */
+  background: rgba(232, 201, 106, 0.25);
+  color:      var(--cream);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 16 — RESPONSIVIDADE (Media Queries)
+   
+   📚 O QUE SÃO MEDIA QUERIES?
+   
+   Media queries aplicam estilos CSS CONDICIONALMENTE,
+   dependendo das características do dispositivo.
+   
+   Formato:
+   @media (condicao) { ... }
+
+   Condições comuns:
+   max-width: 768px  = telas com até 768px (tablets e celulares)
+   max-width: 480px  = telas com até 480px (celulares pequenos)
+   min-width: 1024px = telas com mínimo 1024px (desktops)
+   prefers-color-scheme: dark = modo escuro do sistema
+
+   Mobile First = estilos base para mobile, media queries ajustam para maiores.
+   Desktop First = base para desktop, media queries ajustam para menores.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Tablets (até 1024px) ────────────────────────────────────── */
+@media (max-width: 1024px) {
+
+  /* Esconde os links de navegação do desktop */
+  .nav-links {
+    display: none;
+  }
+
+  /* Esconde o CTA da navbar (exceto em telas maiores) */
+  .nav-cta {
+    display: none;
+  }
+
+  /* Mostra o botão hamburguer */
+  .hamburger {
+    display: flex;
+  }
+
+  /* Footer: 2 colunas */
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  /* A primeira coluna do footer ocupa as 2 colunas */
+  .footer-col:first-child {
+    grid-column: 1 / -1;
+    /* 1 / -1 = da coluna 1 até a última coluna */
+  }
+}
+
+/* ── Celulares (até 768px) ───────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Reduz o espaçamento padrão do container */
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding: 0 16px; /* Menos espaço nas laterais */
+  }
+
+  #footer {
+    padding: 36px 0 22px;
+  }
+
+  /* Footer mobile: mantém a organização em linhas como no desktop */
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px 18px;
+    align-items: start;
+    padding-bottom: 24px;
+  }
+
+  .footer-col:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .footer-col {
+    min-width: 0;
+  }
+
+  .footer-social-col {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+
+  .footer-heading {
+    margin-bottom: 10px;
+    font-size: 0.64rem;
+  }
+
+  .footer-social-col .footer-heading {
+    text-align: center;
+  }
+
+  .footer-links {
+    gap: 8px;
+  }
+
+  .footer-links li {
+    align-items: flex-start;
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  /* Linha de créditos centralizada */
+  .footer-bottom {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+
+  /* Redes sociais: centralizadas no mobile */
+  .footer-social-col {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+  .footer-social {
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 32px !important;
+  }
+
+  .footer-copy,
+  .footer-credit {
+    flex: 0 1 auto;
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  /* Toast centralizado embaixo */
+  .toast {
+    right:    16px;
+    left:     16px;
+    bottom:   16px;
+    max-width:none; /* Ocupa a largura toda */
+  }
+
+  /* Botão de voltar ao topo fica mais baixo */
+  .btn-back-top {
+    bottom: 72px;
+    right:  16px;
+  }
+}
+
+/* ── Celulares pequenos (até 480px) ─────────────────────────── */
+@media (max-width: 480px) {
+
+  /* Título menor */
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  /* Navbar com menos padding */
+  #nav {
+    padding: 14px 0;
+  }
+
+  #nav.scrolled {
+    padding: 10px 0;
+  }
+}
+
+/* ── Acessibilidade: sem animações (preferência do usuário) ──── */
+@media (prefers-reduced-motion: reduce) {
+  /*
+    Alguns usuários têm sensibilidade a animações (ex: epilepsia).
+    Este media query desativa animações se o SO estiver configurado assim.
+    É uma boa prática de acessibilidade.
+  */
+  *,
+  *::before,
+  *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+    scroll-behavior:      auto !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   FIM DO global.css
+   
+   RESUMO DO QUE ESTE ARQUIVO FAZ:
+   ✅ Variáveis CSS (cores, fontes, sombras, raios)
+   ✅ Reset cross-browser
+   ✅ Tipografia base (rem, line-height, smoothing)
+   ✅ Textura de fundo (grain effect)
+   ✅ Sistema de containers responsivos
+   ✅ Componentes de tipografia (labels, títulos, subtítulos)
+   ✅ Sistema de botões (primary, outline, ghost, danger, sm, lg)
+   ✅ Navbar fixa com efeito scroll e hamburguer
+   ✅ Footer em grid responsivo
+   ✅ Loader com barra animada
+   ✅ Toast com 4 variantes (success, error, info, warning)
+   ✅ Skeletons animados
+   ✅ Botão "voltar ao topo"
+   ✅ Scrollbar customizada
+   ✅ Seleção de texto dourada
+   ✅ Utilitários CSS
+   ✅ Responsividade completa (1024 / 768 / 480px)
+   ✅ Acessibilidade (prefers-reduced-motion)
+   ══════════════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 17 — MODAL (Janela Flutuante)
+
+   Componente reutilizado em admin.html e demais páginas.
+   Estrutura esperada:
+     <div class="modal-overlay" id="modal-X">
+       <div class="modal-box">
+         <div class="modal-header">…</div>
+         <div>…conteúdo…</div>
+         <div class="modal-footer">…</div>
+       </div>
+     </div>
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Fundo escuro semitransparente */
+.modal-overlay {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index:         500;
+  display:         none;
+  align-items:     center;
+  justify-content: center;
+  padding:         24px;
+}
+
+/* Aberto: muda display para flex */
+.modal-overlay.open {
+  display: flex;
+}
+
+/* O card de conteúdo do modal */
+.modal-box {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding:       36px;
+  max-width:     540px;
+  width:         100%;
+  position:      relative;
+  max-height:    90vh;
+  overflow-y:    auto;
+  animation:     modalIn 0.35s ease both;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Cabeçalho: título + botão fechar */
+.modal-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   24px;
+}
+
+.modal-title {
+  font-family: var(--ff-display);
+  font-size:   1.3rem;
+  font-weight: 700;
+  color:       var(--cream);
+}
+
+/* Botão ✕ de fechar */
+.modal-close {
+  width:           32px;
+  height:          32px;
+  border-radius:   50%;
+  background:      var(--surface2);
+  border:          1px solid var(--border);
+  color:           var(--text2);
+  cursor:          pointer;
+  font-size:       0.9rem;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      color var(--t), background var(--t);
+}
+
+.modal-close:hover {
+  color:       var(--cream);
+  background:  var(--bg3);
+}
+
+/* Rodapé com botões de ação */
+.modal-footer {
+  display:        flex;
+  justify-content:flex-end;
+  gap:            10px;
+  margin-top:     24px;
+  padding-top:    20px;
+  border-top:     1px solid var(--border);
+}
+
+/* Campos dentro do modal */
+.modal-form-group { margin-bottom: 18px; }
+
+.modal-label {
+  display:        block;
+  font-size:      0.8rem;
+  font-weight:    500;
+  color:          var(--text2);
+  margin-bottom:  7px;
+  letter-spacing: 0.04em;
+}
+
+.modal-input,
+.modal-select,
+.modal-textarea {
+  width:       100%;
+  padding:     12px 14px;
+  background:  var(--bg);
+  border:      1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  color:       var(--cream);
+  font-size:   0.9rem;
+  font-family: inherit;
+  transition:  border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance:  none;
+  -webkit-appearance: none;
+}
+
+.modal-input:focus,
+.modal-select:focus,
+.modal-textarea:focus {
+  outline:      none;
+  border-color: var(--gold);
+  box-shadow:   0 0 0 3px rgba(89, 153, 72, 0.12);
+}
+
+.modal-input::placeholder,
+.modal-textarea::placeholder {
+  color:   var(--text2);
+  opacity: 0.5;
+}
+
+.modal-select {
+  cursor:                  pointer;
+  background-image:        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8c96a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:       no-repeat;
+  background-position:     right 14px center;
+  padding-right:           40px;
+}
+
+.modal-select option {
+  background: var(--surface);
+  color:      var(--cream);
+}
+
+.modal-textarea {
+  resize:     vertical;
+  min-height: 80px;
+}
+
+/* Linha com dois campos lado a lado */
+.modal-row {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   14px;
+}
+
+@media (max-width: 480px) {
+  .modal-row { grid-template-columns: 1fr; }
+  .modal-box { padding: 24px 18px; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 18 — EMPTY STATE (Estado Vazio)
+
+   Aparece quando uma listagem não tem dados.
+   Ex: "Nenhuma doação ainda."
+   ══════════════════════════════════════════════════════════════════════ */
+
+.empty-state {
+  text-align: center;
+  padding:    60px 24px;
+  color:      var(--text2);
+}
+
+.empty-state i {
+  font-size:     2.5rem;
+  display:       block;
+  margin-bottom: 16px;
+  opacity:       0.35;
+}
+
+.empty-state p {
+  margin-bottom: 20px;
+  font-size:     0.9rem;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 19 — NAV DRAWER LINKS (atalho direto)
+
+   Nas páginas novas (form, dashboard, admin) o drawer usa <a> direto,
+   sem a classe .nav-drawer-link. Este bloco garante que fique estiloso.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.nav-drawer a {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  color:         var(--text);
+  padding:       13px 0;
+  font-size:     1rem;
+  border-bottom: 1px solid var(--border);
+  transition:    color var(--t);
+}
+
+.nav-drawer a:last-child {
+  border-bottom: none;
+}
+
+.nav-drawer a:hover {
+  color: var(--gold);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 20 — MODAL DE RECIBO (DoaVida)
+
+   Estilos do modal de confirmação de doação aberto pelo index.html
+   quando o usuário retorna com ?doacao=ok.
+   ══════════════════════════════════════════════════════════════════════ */
+
+#modal-recibo .modal-box {
+  max-width:  480px;
+}
+
+/* Cabeçalho do recibo */
+.recibo-header {
+  text-align:    center;
+  margin-bottom: 24px;
+}
+
+.recibo-check {
+  width:           72px;
+  height:          72px;
+  border-radius:   50%;
+  background:      rgba(89, 153, 72, 0.12);
+  border:          2px solid rgba(89, 153, 72, 0.35);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       2rem;
+  color:           var(--sage2);
+  margin:          0 auto 16px;
+  animation:       reciboCheck 0.5s ease both;
+}
+
+@keyframes reciboCheck {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1);  opacity: 1; }
+}
+
+.recibo-titulo {
+  font-family: var(--ff-display);
+  font-size:   1.6rem;
+  font-weight: 900;
+  color:       var(--cream);
+}
+
+.recibo-titulo em {
+  font-style: italic;
+  color:      var(--gold);
+}
+
+.recibo-subtitulo {
+  font-size:   0.88rem;
+  color:       var(--text2);
+  margin-top:  8px;
+  line-height: 1.6;
+}
+
+/* Corpo do recibo */
+.recibo-body {
+  background:    var(--bg);
+  border:        1px solid var(--border);
+  border-radius: var(--r-md);
+  padding:       20px;
+  margin:        20px 0;
+}
+
+.recibo-body-header {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  margin-bottom:   16px;
+  padding-bottom:  14px;
+  border-bottom:   1px solid var(--border);
+}
+
+.recibo-body-icon {
+  width:           34px;
+  height:          34px;
+  border-radius:   50%;
+  background:      rgba(89, 153, 72, 0.1);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       0.85rem;
+  color:           var(--gold);
+  flex-shrink:     0;
+}
+
+.recibo-body-label {
+  font-family:    var(--ff-mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  display:        block;
+}
+
+.recibo-body-protocolo {
+  font-size:   0.72rem;
+  color:       var(--text2);
+}
+
+.recibo-row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         9px 0;
+  border-bottom:   1px solid var(--border);
+  font-size:       0.87rem;
+}
+
+.recibo-row:last-child {
+  border-bottom: none;
+}
+
+.recibo-row-label {
+  color: var(--text2);
+}
+
+.recibo-row-value {
+  color:       var(--cream);
+  font-weight: 500;
+}
+
+.recibo-row-value.hl {
+  color:            var(--gold);
+  font-family:      var(--ff-mono);
+  font-size:        0.9rem;
+}
+
+/* Ações do recibo */
+.recibo-actions {
+  display:         flex;
+  gap:             10px;
+  justify-content: center;
+  flex-wrap:       wrap;
+}
+
+.recibo-actions .btn {
+  flex:      1;
+  min-width: 130px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   FIM DAS ADIÇÕES — global.css v2.0
+   
+   NOVAS ADIÇÕES NESTA VERSÃO:
+   ✅ Variáveis --r-sm/md/lg/xl (aliases curtos de border-radius)
+   ✅ Variáveis --bg2, --bg3 (fundos adicionais)
+   ✅ Variável --muted (texto muito discreto)
+   ✅ Variáveis --sage, --sage2 (verde-esperança do projeto)
+   ✅ Variável --shadow-card (sombra padrão de cards)
+   ✅ Correção: .section-label sem display duplicado
+   ✅ Sistema de modal completo (overlay, box, header, footer, campos)
+   ✅ .empty-state para listas sem dados
+   ✅ .nav-drawer a estilos para drawers sem .nav-drawer-link
+   ✅ #modal-recibo + classes .recibo-* para o modal de confirmação
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════
+   INTERATIVIDADE GLOBAL — §5
+   Hover, scale, sombra, feedback de clique, transições suaves (~300ms)
+   Aplicado a todos os elementos interativos do sistema inteiro.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Cards interativos ───────────────────────────────────────────── */
+/* Todos os cards ganham efeito de elevação ao hover */
+.stat-card,
+.food-card,
+.delivery-card,
+.kpi-card,
+.benefit-card,
+.vol-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* transição suave em 3 propriedades */
+}
+
+/* Hover nos cards: sobe, amplia e ganha sombra dourada */
+.stat-card:hover,
+.food-card:hover,
+.delivery-card:hover,
+.kpi-card:hover,
+.benefit-card:hover,
+.vol-card:hover {
+  transform: translateY(-4px) scale(1.02); /* sobe 4px e amplia 2% */
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.15); /* sombra dourada suave */
+  border-color: var(--gold, #c9a84c); /* borda dourada aparece */
+}
+
+/* ─── Botões com feedback ─────────────────────────────────────────── */
+/* Todos os botões ganham transição suave */
+.btn,
+.receipt-act-btn,
+.admin-tab-btn,
+.layout-btn,
+.hamburger {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease; /* múltiplas transições */
+}
+
+/* Hover nos botões: sobe levemente */
+.btn:hover,
+.receipt-act-btn:hover,
+.admin-tab-btn:hover {
+  transform: translateY(-2px); /* sobe 2px */
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.2); /* sombra sutil */
+}
+
+/* Click (active) nos botões: desce e encolhe */
+.btn:active,
+.receipt-act-btn:active,
+.admin-tab-btn:active,
+.layout-btn:active {
+  transform: translateY(0) scale(0.97); /* desce e encolhe 3% — feedback tátil */
+}
+
+/* ─── Links interativos ───────────────────────────────────────────── */
+/* Links do nav e footer ganham transição de cor */
+.nav-links a,
+.nav-drawer-link,
+.footer-links a {
+  transition: color 0.3s ease, transform 0.3s ease; /* transição suave */
+}
+
+/* Hover nos links: cor dourada e move para direita */
+.nav-links a:hover,
+.footer-links a:hover {
+  color: var(--gold, #c9a84c); /* cor dourada */
+  transform: translateX(3px); /* desloca 3px para direita */
+}
+
+/* ─── Imagens com zoom ────────────────────────────────────────────── */
+/* Imagens em cards e galeria ganham zoom suave */
+.food-card img,
+.gallery-item img {
+  transition: transform 0.3s ease; /* transição do zoom */
+}
+
+/* Hover: zoom sutil na imagem */
+.food-card:hover img {
+  transform: scale(1.05); /* amplia 5% */
+}
+
+/* ─── Inputs com foco elegante ────────────────────────────────────── */
+/* Todos os campos de formulário ganham ring verde no foco */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none; /* remove outline padrão */
+  border-color: var(--sage, #5a8a4a); /* borda verde esperança */
+  box-shadow: 0 0 0 3px rgba(90, 138, 74, 0.25); /* ring verde translúcido */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* transição suave */
+}
+
+/* ─── Seleção de texto ────────────────────────────────────────────── */
+/* Texto selecionado ganha tom verde do projeto */
+::selection {
+  background: rgba(90, 138, 74, 0.3); /* fundo verde translúcido */
+  color: var(--cream, #f5f0e8); /* texto claro */
+}
+
+/* ─── Scrollbar customizada (WebKit) ──────────────────────────────── */
+/* Scrollbar fina e elegante no Chrome/Edge/Safari */
+::-webkit-scrollbar {
+  width: 8px; /* largura da scrollbar */
+}
+::-webkit-scrollbar-track {
+  background: var(--bg, #1a1a17); /* trilha escura */
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border, rgba(255,255,255,0.1)); /* polegar sutil */
+  border-radius: 4px; /* cantos arredondados */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold, #c9a84c); /* polegar dourado no hover */
+}
+
+/* ─── Responsividade da interatividade ────────────────────────────── */
+/* Tablet: reduz intensidade dos efeitos */
+@media (max-width: 768px) {
+  .stat-card:hover,
+  .food-card:hover,
+  .delivery-card:hover,
+  .kpi-card:hover {
+    transform: translateY(-2px) scale(1.01); /* efeito mais sutil */
+  }
+}
+
+/* Mobile: desativa hover (telas touch não têm hover real) */
+@media (max-width: 480px) {
+  .stat-card:hover,
+  .food-card:hover,
+  .delivery-card:hover,
+  .kpi-card:hover,
+  .benefit-card:hover,
+  .vol-card:hover {
+    transform: none; /* sem transformação */
+    box-shadow: var(--shadow-card, 0 4px 32px rgba(0,0,0,.5)); /* mantém sombra padrão */
+  }
+  .btn:hover,
+  .receipt-act-btn:hover {
+    transform: none; /* sem transformação */
+  }
+}
+
+/* Isolar o Mobile: Correção global do Footer */
+@media (max-width: 768px) {
+  .footer-brand-row {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: left;
+    gap: 10px !important;
+  }
+  .footer-brand-sep {
+    display: none !important;
+  }
+  .footer-brand-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .footer-brand-img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .footer-brand-texts strong {
+    font-size: 0.65rem !important;
+  }
+  .footer-brand-texts span {
+    font-size: 0.5rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .footer-grid {
+    gap: 18px 12px;
+  }
+
+  .footer-heading {
+    font-size: 0.6rem;
+  }
+
+  .footer-links li {
+    font-size: 0.74rem;
+  }
+
+  .footer-copy,
+  .footer-credit {
+    font-size: 0.68rem;
+  }
+}

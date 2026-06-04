@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Preview · Super Admin</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    html, body { margin: 0; padding: 0; background: #faf9f5; color: #1c1814; font-family: 'DM Sans', system-ui, sans-serif; }
+    .sap-empty { display: grid; place-items: center; min-height: 100vh; padding: 24px; text-align: center; color: #555; }
+    .sap-empty i { font-size: 28px; margin-bottom: 8px; color: #4a8a39; }
+    .sap-banner { position: sticky; top: 0; z-index: 5; background: #fff8e0; border-bottom: 1px solid #e9d68a; color: #856008; padding: 8px 14px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+    .sap-banner strong { color: #564000; }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Banner mostrado apenas em modo draft -->
+  <div id="sap-banner" class="sap-banner" hidden>
+    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+    <span><strong>Modo rascunho.</strong> Esta visualização inclui mudanças não publicadas.</span>
+  </div>
+
+  <main id="sap-mount" data-sa-page="">
+    <div class="sap-empty">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <div>Carregando preview…</div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/services/supabase.js"></script>
+  <script>
+    (function () {
+      function getQS() {
+        var qs = (location.search || '').replace(/^\?/, '');
+        var out = {};
+        qs.split('&').forEach(function (kv) {
+          if (!kv) return;
+          var p = kv.split('=');
+          out[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || '');
+        });
+        return out;
+      }
+      var p = getQS();
+      var slug = p.page || 'index';
+      var mode = p.mode === 'draft' ? 'draft' : 'published';
+      var mount = document.getElementById('sap-mount');
+      mount.setAttribute('data-sa-page', slug);
+      // O site-content.js lê o querystring `sa_mode` — então repassamos:
+      if (mode === 'draft' && location.search.indexOf('sa_mode') < 0) {
+        var sep = location.search.indexOf('?') >= 0 ? '&' : '?';
+        history.replaceState(null, '', location.pathname + location.search + sep + 'sa_mode=draft');
+      }
+      if (mode === 'draft') {
+        var b = document.getElementById('sap-banner');
+        if (b) b.hidden = false;
+      }
+    })();
+  </script>
+  <script src="js/site-content.js"></script>
+
+  <script>
+    // Mensagem de "vazio" quando o renderizador não encontrar nada
+    setTimeout(function () {
+      var mount = document.getElementById('sap-mount');
+      if (!mount.getAttribute('data-sa-rendered')) {
+        var slug = mount.getAttribute('data-sa-page');
+        mount.innerHTML =
+          '<div class="sap-empty">' +
+            '<i class="fa-regular fa-folder-open"></i>' +
+            '<div style="max-width:520px"><strong>Nada para mostrar ainda em "' + slug + '".</strong><br/>' +
+            'Adicione seções e cards (e publique) no painel do Super Admin para que apareçam aqui.</div>' +
+          '</div>';
+      }
+    }, 4000);
+  </script>
+</body>
+</html>

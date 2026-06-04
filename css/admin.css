@@ -1,0 +1,3673 @@
+/* ══════════════════════════════════════════════════════════════════════
+   TEMA ESCURO — RESTAURADO PARA O ADMIN
+   global.css usa tema claro (páginas públicas).
+   Este bloco sobrescreve as variáveis de volta ao tema escuro
+   exclusivamente para o painel administrativo.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg:          #0d0d0b;
+  --surface:     #141412;
+  --surface2:    #1c1c19;
+  --cream:       #f5f0e8;
+  --text:        #c8c4b8;
+  --text2:       rgba(255, 255, 255, 0.50);
+  --border:      rgba(255, 255, 255, 0.08);
+  --bg2:         #141410;
+  --bg3:         #1c1c17;
+  --muted:       #888876;
+  --shadow-sm:   0 2px 8px  rgba(0, 0, 0, 0.30);
+  --shadow-md:   0 8px 24px rgba(0, 0, 0, 0.40);
+  --shadow-lg:   0 16px 48px rgba(0, 0, 0, 0.50);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.50);
+}
+
+/* Navbar scrolled e drawer no admin ficam escuros */
+#nav.scrolled {
+  background: rgba(13, 13, 11, 0.93) !important;
+}
+.nav-drawer {
+  background: rgba(13, 13, 11, 0.99) !important;
+}
+
+/* Grain mais intenso no admin */
+body::before {
+  opacity: 0.35 !important;
+}
+
+/* Wave canvas (js/app.js) é ignorado no admin via detecção de admin.css */
+
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DoaVida — css/admin.css                                            ║
+  ║  Estilos específicos do painel administrativo (admin.html)          ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  📚 NOTA PARA INICIANTES:                                           ║
+  ║                                                                      ║
+  ║  Este arquivo complementa global.css.                               ║
+  ║  Aqui ficam apenas os estilos do admin que NÃO existem              ║
+  ║  em nenhuma outra página do projeto.                                ║
+  ║                                                                      ║
+  ║  Princípio: cada arquivo CSS tem sua responsabilidade.              ║
+  ║  Isso facilita encontrar e corrigir estilos específicos.            ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  DoaVida — css/admin.css  v4.0                                      ║
+  ║  Estilos exclusivos do painel administrativo                         ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  DEPENDE DE: css/global.css (carregado antes deste)                 ║
+  ║                                                                      ║
+  ║  NOVIDADES v4.0:                                                     ║
+  ║  ✅ Seção 20 — Log do WhatsApp: layout atualizado (.log-item-header, ║
+  ║     .log-tipo, .log-para, .log-preview)                             ║
+  ║  ✅ Seção 21 — Aba Tarefas: estilos responsivos                     ║
+  ║  ✅ Responsividade das novas seções em 768px e 480px                ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 1 — VARIÁVEIS ESPECÍFICAS DO ADMIN
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Cores dos status das doações */
+  --status-pending: #ffc107; /* Amarelo: pendente */
+  --status-confirmed: #4caf50; /* Verde:   confirmado */
+  --status-delivered: #2196f3; /* Azul:    entregue */
+  --status-cancelled: #e55a5a; /* Vermelho:cancelado */
+
+  /* Altura da navbar + header do admin */
+  --admin-header-height: 140px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 2 — TELA DE LOGIN
+   ══════════════════════════════════════════════════════════════════════ */
+
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+#login-screen.hidden {
+  display: none;
+}
+
+/* Card central do formulário de login */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  text-align: center;
+  animation: loginCardEnter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes loginCardEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Ícone de cadeado */
+.login-icon {
+  width: 68px;
+  height: 68px;
+  background: rgba(232, 201, 106, 0.1);
+  border: 1px solid rgba(232, 201, 106, 0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  color: var(--gold);
+  margin: 0 auto 24px;
+  transition: all 0.3s ease;
+}
+
+.login-card:hover .login-icon {
+  background: rgba(232, 201, 106, 0.18);
+  box-shadow: 0 0 0 6px rgba(232, 201, 106, 0.08);
+}
+
+.login-title {
+  font-family: var(--ff-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--cream);
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+/* Container do input de senha */
+.login-input-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--cream);
+  font-size: 1rem;
+  font-family: inherit;
+  text-align: center;
+  letter-spacing: 0.25em; /* Espaça os pontos da senha */
+  transition: all 0.2s ease;
+}
+
+/* Quando focado, reseta o letter-spacing (para ver melhor) */
+.login-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 201, 106, 0.15);
+  letter-spacing: 0.15em;
+}
+
+.login-input::placeholder {
+  letter-spacing: 0; /* Placeholder sem espaçamento extra */
+  color: var(--text2);
+  opacity: 0.5;
+}
+
+/* Botão de olho (mostrar/ocultar senha) */
+.login-eye-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.login-eye-btn:hover {
+  color: var(--gold);
+  background: rgba(232, 201, 106, 0.1);
+}
+
+/* Mensagem de erro */
+.login-error {
+  display: none;
+  padding: 10px 14px;
+  background: rgba(229, 90, 90, 0.08);
+  border: 1px solid rgba(229, 90, 90, 0.2);
+  border-radius: 8px;
+  color: var(--status-cancelled);
+  font-size: 0.82rem;
+  margin-bottom: 14px;
+  text-align: left;
+  animation: fadeInDown 0.2s ease both;
+}
+
+.login-error.visible {
+  display: block;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-hint {
+  margin-top: 16px;
+  font-size: 0.72rem;
+  color: var(--text2);
+  opacity: 0.55;
+}
+
+.login-hint code {
+  font-family: var(--ff-mono);
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--gold);
+}
+
+/* Animação de shake no card quando a senha está errada */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-8px);
+  }
+  35% {
+    transform: translateX(8px);
+  }
+  55% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 3 — PAINEL ADMIN (APÓS LOGIN)
+   ══════════════════════════════════════════════════════════════════════ */
+
+#admin-panel {
+  display: none;
+  min-height: 100vh;
+  padding-top: 72px; /* Navbar */
+}
+
+#admin-panel.visible {
+  display: block;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 4 — HEADER DO ADMIN (com abas)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.admin-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 0 0;
+  position: sticky;
+  top: 72px; /* Logo abaixo da navbar */
+  z-index: 50;
+  /*
+    z-index: 50 = acima do conteúdo (z ~1),
+    abaixo da navbar (z-index: 100).
+  */
+}
+
+.admin-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* Informações do usuário logado */
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-avatar {
+  width: 38px;
+  height: 38px;
+  background: rgba(232, 201, 106, 0.12);
+  border: 1px solid rgba(232, 201, 106, 0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
+.admin-user-name {
+  font-weight: 600;
+  color: var(--cream);
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+.admin-user-role {
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  color: var(--text2);
+  letter-spacing: 0.08em;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 5 — SISTEMA DE ABAS (TABS)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.admin-tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding-bottom: 0;
+  /* Scroll horizontal suave em iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Esconde a barra de scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.admin-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Cada botão de aba */
+.admin-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 18px;
+  background: none;
+  border: none;
+  /* Borda inferior: invisível (placeholder para a ativa) */
+  border-bottom: 2px solid transparent;
+  color: var(--text2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  /* Texto não quebra em duas linhas */
+  flex-shrink: 0;
+}
+
+.admin-tab-btn:hover {
+  color: var(--cream);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px 8px 0 0;
+}
+
+/* ABA ATIVA */
+.admin-tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* Badge de contagem */
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(232, 201, 106, 0.12);
+  color: var(--gold);
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-family: var(--ff-mono);
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.admin-tab-btn.active .tab-badge {
+  background: rgba(232, 201, 106, 0.2);
+}
+
+/* Painéis de conteúdo */
+.admin-content {
+  padding: 28px 0 80px;
+}
+
+.admin-tab-panel {
+  display: none;
+  animation: panelEnter 0.22s ease both;
+}
+
+.admin-tab-panel.active {
+  display: block;
+}
+
+@keyframes panelEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 6 — CARDS DE ESTATÍSTICA
+   ══════════════════════════════════════════════════════════════════════ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Ícone decorativo de fundo */
+.stat-card-bg-icon {
+  position: absolute;
+  right: -8px;
+  bottom: -12px;
+  font-size: 5rem;
+  opacity: 0.05;
+  pointer-events: none;
+  line-height: 1;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.stat-card:hover .stat-card-bg-icon {
+  opacity: 0.09;
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.stat-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.stat-card-number {
+  font-family: var(--ff-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.stat-card-label {
+  font-size: 0.72rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Variantes de cor */
+.stat-card.gold .stat-card-icon {
+  background: rgba(232, 201, 106, 0.12);
+  color: var(--gold);
+}
+.stat-card.green .stat-card-icon {
+  background: rgba(76, 175, 80, 0.12);
+  color: #4caf50;
+}
+.stat-card.blue .stat-card-icon {
+  background: rgba(33, 150, 243, 0.12);
+  color: #2196f3;
+}
+.stat-card.red .stat-card-icon {
+  background: rgba(229, 90, 90, 0.12);
+  color: #e55a5a;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 7 — TABELAS ADMINISTRATIVAS
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Container com scroll horizontal */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+  /* Scrollbar discreta */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.table-wrap::-webkit-scrollbar {
+  height: 4px;
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 100px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 600px;
+}
+
+/* Cabeçalho */
+.admin-table thead {
+  background: var(--surface2);
+  position: sticky; /* Cabeçalho fixo ao rolar a tabela */
+  top: 0;
+  z-index: 1;
+}
+
+.admin-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-weight: 400;
+  /*
+    font-weight: 400 = normal para cabeçalhos de tabela com fonte mono.
+    Parece mais elegante do que negrito neste contexto.
+  */
+}
+
+/* Células de dados */
+.admin-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+/* Última linha sem borda */
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover na linha */
+.admin-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* Botões de ação dentro da tabela */
+.table-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Botão de ícone (editar, excluir) */
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(232, 201, 106, 0.08);
+}
+
+.btn-icon.danger:hover {
+  border-color: var(--status-cancelled);
+  color: var(--status-cancelled);
+  background: rgba(229, 90, 90, 0.08);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 8 — BADGES DE STATUS
+   ══════════════════════════════════════════════════════════════════════ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-family: var(--ff-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Cores dos badges de status */
+.badge-pending {
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--status-pending);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.badge-confirmed {
+  background: rgba(76, 175, 80, 0.12);
+  color: var(--status-confirmed);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.badge-delivered {
+  background: rgba(33, 150, 243, 0.12);
+  color: var(--status-delivered);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.badge-cancelled {
+  background: rgba(229, 90, 90, 0.12);
+  color: var(--status-cancelled);
+  border: 1px solid rgba(229, 90, 90, 0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 9 — CAMPO DE BUSCA
+   ══════════════════════════════════════════════════════════════════════ */
+
+.search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search-wrap > i {
+  position: absolute;
+  left: 13px;
+  color: var(--text2);
+  font-size: 0.75rem;
+  pointer-events: none; /* Não bloqueia cliques no input */
+  z-index: 1;
+}
+
+.search-input {
+  padding: 9px 14px 9px 36px; /* Espaço para o ícone à esquerda */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--cream);
+  font-size: 0.82rem;
+  font-family: inherit;
+  width: 220px;
+  transition: all 0.2s ease;
+  appearance: none;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 201, 106, 0.1);
+  width: 260px; /* Expande levemente ao focar */
+}
+
+.search-input::placeholder {
+  color: var(--text2);
+  opacity: 0.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 10 — BARRA DE SEÇÃO
+   Cabeçalho de cada seção dentro de uma aba.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.section-bar-title {
+  font-family: var(--ff-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-bar-title i {
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+.section-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 11 — CARDS DE ALIMENTOS NO ADMIN
+   ══════════════════════════════════════════════════════════════════════ */
+
+.foods-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.food-admin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.food-admin-img {
+  height: 110px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.food-admin-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botões de ação sobrepostos na imagem */
+.food-admin-img-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+}
+
+.food-admin-card:hover .food-admin-img-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.food-admin-body {
+  padding: 14px 16px;
+}
+
+.food-admin-name {
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.food-admin-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 0.72rem;
+  color: var(--text2);
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.food-admin-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.food-admin-progress {
+  height: 4px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.food-admin-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #f5d76e);
+  border-radius: 100px;
+  transition: width 0.8s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 12 — MODAIS
+   ══════════════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  /*
+    backdrop-filter no overlay = desfoca o conteúdo ao fundo.
+    Cria um efeito visual mais elegante quando o modal está aberto.
+  */
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.93) translateY(10px);
+  transition: transform 0.25s ease;
+  position: relative;
+
+  /* Scrollbar discreta dentro do modal */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.modal-overlay.open .modal-box {
+  transform: scale(1) translateY(0);
+}
+
+.modal-box::-webkit-scrollbar {
+  width: 4px;
+}
+.modal-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-box::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 100px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: var(--ff-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.modal-close:hover {
+  border-color: var(--status-cancelled);
+  color: var(--status-cancelled);
+  background: rgba(229, 90, 90, 0.08);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  /* Sempre visível no fundo do modal sem precisar rolar */
+  position: sticky;
+  bottom: -28px; /* cancela o padding-bottom da modal-box */
+  margin-left: -28px;
+  margin-right: -28px;
+  padding-left: 28px;
+  padding-right: 28px;
+  padding-bottom: 20px;
+  background: var(--surface);
+  z-index: 2;
+}
+
+/* Campos dentro de modais */
+.modal-form-group {
+  margin-bottom: 18px;
+}
+
+.modal-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 7px;
+  letter-spacing: 0.04em;
+}
+
+.modal-input,
+.modal-select,
+.modal-textarea {
+  width: 100%;
+  padding: 11px 15px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  color: var(--cream);
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  appearance: none;
+}
+
+.modal-input:focus,
+.modal-select:focus,
+.modal-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 201, 106, 0.12);
+}
+
+.modal-input::placeholder,
+.modal-textarea::placeholder {
+  color: var(--text2);
+  opacity: 0.45;
+}
+
+.modal-select {
+  cursor: pointer;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23e8c96a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.modal-select option {
+  background: var(--surface2);
+  color: var(--cream);
+}
+
+.modal-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+/* Grid de 2 colunas nos modais */
+.modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 13 — GALERIA NO ADMIN
+   ══════════════════════════════════════════════════════════════════════ */
+
+.gallery-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.gallery-admin-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.gallery-admin-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-admin-item:hover img {
+  transform: scale(1.07);
+}
+
+.gallery-admin-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  backdrop-filter: blur(2px);
+}
+
+.gallery-admin-item:hover .gallery-admin-overlay {
+  opacity: 1;
+}
+
+.gallery-visibility {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--ff-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.gallery-visibility.pub {
+  background: rgba(76, 175, 80, 0.88);
+  color: white;
+}
+.gallery-visibility.priv {
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--text2);
+}
+
+/* Área de upload drag & drop */
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+  border-color: var(--gold);
+  background: rgba(232, 201, 106, 0.04);
+}
+
+.upload-area-icon {
+  font-size: 2rem;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+
+.upload-area-text {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.upload-input {
+  display: none; /* Input de arquivo invisível */
+}
+
+/* Preview das fotos antes de enviar */
+.upload-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.upload-preview-item {
+  aspect-ratio: 1;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.upload-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 14 — CONFIGURAÇÕES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.config-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 18px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.config-card-title {
+  font-family: var(--ff-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.config-card-title i {
+  color: var(--gold);
+  font-size: 0.95rem;
+}
+
+.config-card-desc {
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 18px;
+  line-height: 1.55;
+}
+
+/*
+  .config-label = rótulo dos campos da seção de configurações.
+  Estilo semelhante ao .modal-label, mas específico para a aba Config.
+*/
+.config-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+/*
+  .config-hint = texto de ajuda abaixo de um campo de configuração.
+  Tom suave (text2) e fonte menor para indicar que é informação secundária.
+*/
+.config-hint {
+  font-size: 0.75rem;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 15 — LOG DE WHATSAPP
+   ══════════════════════════════════════════════════════════════════════ */
+
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 0.8rem;
+  transition: border-color 0.15s ease;
+}
+
+.log-item:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.log-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.log-status-dot.sent {
+  background: var(--status-confirmed);
+}
+.log-status-dot.simulated {
+  background: var(--status-pending);
+}
+.log-status-dot.error {
+  background: var(--status-cancelled);
+}
+
+/*
+  Subclasses do .log-item usadas pelo admin.js v4.0.
+  renderWALogs() gera HTML com estas classes para estruturar
+  cada entrada do histórico de mensagens.
+*/
+
+/*
+  .log-item-header = linha principal do log.
+  Exibe tipo, número de destino, status e data numa mesma fila.
+  flex-wrap: wrap garante que em telas pequenas os itens quebrem linha.
+*/
+.log-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%; /* ocupa toda a largura do .log-item */
+}
+
+/*
+  .log-tipo = categoria da mensagem (ex: "notificacao_doacao", "manual").
+  Usa fonte mono para alinhamento visual com os outros campos.
+*/
+.log-tipo {
+  font-family: var(--ff-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 100px; /* pílula */
+  padding: 2px 8px;
+  flex-shrink: 0; /* não encolhe mesmo com pouco espaço */
+}
+
+/*
+  .log-para = número de destino da mensagem (ex: "+55 91 9999-9999").
+  color: var(--cream) para destacar do tipo cinza.
+*/
+.log-para {
+  font-size: 0.8rem;
+  color: var(--cream);
+  font-weight: 500;
+  flex: 1; /* cresce para ocupar o espaço disponível */
+  min-width: 0; /* permite truncar se necessário */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+  .log-preview = trecho da mensagem enviada.
+  Exibido abaixo da linha de cabeçalho do log.
+  Itálico e mais sutil para indicar que é conteúdo secundário.
+*/
+.log-preview {
+  font-size: 0.75rem;
+  color: var(--text2);
+  font-style: italic;
+  line-height: 1.45;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 4px;
+  width: 100%; /* ocupa linha inteira abaixo do header */
+  /*
+    white-space: nowrap cortaria o texto — não queremos isso no preview.
+    overflow-wrap: anywhere permite quebrar em qualquer ponto se necessário.
+  */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* mostra no máximo 2 linhas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 16 — ESTADO VAZIO
+   ══════════════════════════════════════════════════════════════════════ */
+
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text2);
+}
+
+.empty-state > i {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 14px;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+  /*
+    Animação de "flutuar" — o ícone sobe e desce suavemente.
+    Torna a tela de vazio mais animada e menos estática.
+  */
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  max-width: 280px;
+  margin: 0 auto 18px;
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 17 — ANIMAÇÕES GLOBAIS DO ADMIN
+   ══════════════════════════════════════════════════════════════════════ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 18 — ESTILOS DE IMPRESSÃO
+   
+   Quando o admin clica em "Imprimir" (window.print()),
+   estes estilos são aplicados para gerar um relatório limpo.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  /* Esconde elementos de interface */
+  #nav,
+  .admin-header,
+  .admin-tabs,
+  .btn,
+  .modal-overlay,
+  #loader,
+  .toast,
+  .btn-back-top,
+  #logout-btn {
+    display: none !important;
+  }
+
+  /* Fundo branco para impressão (economiza tinta) */
+  body,
+  #admin-panel {
+    background: white !important;
+    color: #333 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Mostra todos os painéis para imprimir */
+  .admin-tab-panel {
+    display: block !important;
+    margin-bottom: 24px;
+  }
+
+  /* Bordas mais escuras para impressão */
+  .stat-card,
+  .table-wrap,
+  .config-card {
+    border: 1px solid #ccc !important;
+    background: white !important;
+  }
+
+  /* Texto escuro para impressão */
+  .stat-card-number,
+  .section-bar-title,
+  .config-card-title {
+    color: #333 !important;
+  }
+
+  /* Não corta elementos entre páginas */
+  .stat-card,
+  .admin-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Adiciona o endereço da URL no rodapé de impressão */
+  @page {
+    margin: 20mm;
+    @bottom-center {
+      content: "DoaVida — Relatório Administrativo";
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 20 — ABA TAREFAS (novo em v4.0)
+
+   Estilos da aba de gestão de tarefas atribuídas a voluntários.
+   Os cards são gerados dinamicamente por _montarCardTarefa() em admin.js.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Container da lista de tarefas.
+  Usa flex para empilhar os cards verticalmente com espaço entre eles.
+  id="tarefas-lista" no admin.html.
+*/
+#tarefas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* espaçamento entre cada card de tarefa */
+}
+
+/*
+  Card de tarefa individual.
+  Gerado pelo JavaScript com estilos inline para a cor da borda esquerda
+  (baseada no status). Este seletor define apenas o hover e transição.
+
+  A borda colorida à esquerda é aplicada pelo JS como:
+  border-left: 3px solid <cor do status>
+*/
+#tarefas-lista > div {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#tarefas-lista > div:hover {
+  /*
+    No hover, ilumina levemente o card.
+    box-shadow adiciona um brilho sutil no fundo.
+  */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  /*
+    !important é necessário aqui pois o JS define border-color inline.
+    O !important do CSS externo sobrescreve o estilo inline no hover.
+  */
+}
+
+/*
+  Container do resumo por status (mini-painel clicável).
+  id="tarefas-resumo" no admin.html.
+  O conteúdo é gerado por _renderResumoTarefas() em admin.js.
+*/
+#tarefas-resumo {
+  margin-bottom: 20px;
+}
+
+/*
+  Cards dentro do #tarefas-resumo.
+  Os estilos de layout são inline (gerados pelo JS),
+  mas o cursor e hover são globais aqui.
+*/
+#tarefas-resumo > div > div {
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+#tarefas-resumo > div > div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+#tarefas-resumo > div > div:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/*
+  Estilos do select de responsável dentro do modal de tarefa.
+  O select de responsável tem suas opções carregadas dinamicamente pelo JS.
+  Quando vazio, mostra o placeholder em tom mais suave.
+*/
+#tarefa-responsavel-id option:first-child {
+  color: var(--text2);
+  /*
+    A primeira opção é "Não atribuído" — mais suave que as demais.
+    Isso é uma dica visual para o admin saber que precisa selecionar alguém.
+  */
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 19 — RESPONSIVIDADE DO ADMIN (Mobile First)
+
+   ARQUITETURA:
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ Este arquivo (admin.css) é a FONTE DE VERDADE para estilos de   │
+   │ COMPONENTES do admin: cards, modais, tabelas, abas, busca, etc. │
+   │                                                                  │
+   │ admin.html inline <style> cuida apenas do LAYOUT DE PÁGINA:     │
+   │ admin-header-top, admin-panel, posicionamento geral.            │
+   └─────────────────────────────────────────────────────────────────┘
+
+   BREAKPOINTS (do maior para o menor):
+   ┌──────────┬────────────────────────────────────────────────────┐
+   │  900px   │ Tablet paisagem — ajustes sutis de layout          │
+   │  768px   │ Tablet retrato / celular grande — reformulação     │
+   │  600px   │ Celular médio — compactação                        │
+   │  480px   │ Celular padrão (iPhone SE, Moto G, etc.)          │
+   │  360px   │ Celular muito pequeno (Galaxy A, etc.)             │
+   └──────────┴────────────────────────────────────────────────────┘
+
+   PRINCÍPIOS:
+   • Touch targets mínimos de 44px (WCAG 2.5.5)
+   • Sem overflow horizontal em nenhum breakpoint
+   • Ações com hover transformadas em "sempre visíveis" no touch
+   • Fontes nunca abaixo de 12px (legibilidade)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Tablet paisagem / Laptop pequeno (≤ 900px) ─────────────────── */
+@media (max-width: 900px) {
+  /*
+    Stats: 2 colunas em tablet.
+    minmax(0,1fr) substitui o minmax(200px,1fr) do base
+    para evitar overflow em telas estreitas.
+  */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  /* Section bar: reduz gap mas ainda horizontal */
+  .section-bar {
+    gap: 12px;
+  }
+}
+
+/* ─── Tablet retrato / Celular grande (≤ 768px) ──────────────────── */
+@media (max-width: 768px) {
+  /* ── ABAS ──────────────────────────────────────────────────────── */
+
+  /*
+    Botões de aba: padding menor mas mínimo de 44px de altura
+    para garantir area de toque (WCAG 2.5.5).
+  */
+  .admin-tab-btn {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    min-height: 44px;
+  }
+
+  /* ── SECTION BAR ───────────────────────────────────────────────── */
+
+  /*
+    Em mobile a barra título+ações empilha verticalmente.
+    Ações tomam 100% da largura para os controles terem mais espaço.
+  */
+  .section-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .section-bar-title {
+    font-size: 1.05rem;
+  }
+
+  .section-bar-actions {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ── CAMPO DE BUSCA ────────────────────────────────────────────── */
+
+  /*
+    Em desktop o search-input tem width fixa de 220px.
+    No mobile deve ocupar 100% da linha para não estoura.
+  */
+  .search-wrap {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%; /* sobrescreve a largura fixa de 220px */
+  }
+
+  /* Impede que o :focus expanda além da tela */
+  .search-input:focus {
+    width: 100%;
+  }
+
+  /* ── CARDS DE ESTATÍSTICA ──────────────────────────────────────── */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* Número ligeiramente menor para caber bem em 2 colunas */
+  .stat-card-number {
+    font-size: 1.7rem;
+  }
+
+  .stat-card {
+    padding: 18px 16px;
+  }
+
+  /* Ícone decorativo de fundo menor para não sobrepor o conteúdo */
+  .stat-card-bg-icon {
+    font-size: 3.5rem;
+  }
+
+  /* ── TABELAS ───────────────────────────────────────────────────── */
+
+  /*
+    Em touch, scroll horizontal fluido.
+    A tabela já tem min-width: 600px — isso garante que
+    os dados nunca fiquem comprimidos, apenas roláveis.
+  */
+  .table-wrap {
+    -webkit-overflow-scrolling: touch;
+    /* Barra de scroll mais visível no mobile para indicar que é rolável */
+    scrollbar-width: auto;
+  }
+
+  /* Botões de ação: área de toque maior */
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+  }
+
+  /* Ações lado a lado com quebra de linha se necessário */
+  .table-actions {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  /* ── MODAIS ────────────────────────────────────────────────────── */
+
+  /*
+    No mobile, modal aparece como "bottom sheet" (vem de baixo).
+    Menos padding ao redor + borda superior arredondada.
+  */
+  .modal-overlay {
+    padding: 10px 10px 0; /* remove padding do fundo */
+    align-items: flex-end; /* empurra o modal para baixo */
+  }
+
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0; /* cantos apenas no topo */
+    padding: 22px 18px 28px; /* padding extra no fundo (safe area) */
+  }
+
+  /* Título do modal menor para caber melhor */
+  .modal-title {
+    font-size: 1.15rem;
+  }
+
+  /*
+    Botões do footer do modal: coluna invertida para o botão
+    principal (confirmar) ficar no topo — mais fácil de alcançar.
+  */
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+
+  /* Grid de 2 colunas nos modais vira 1 coluna */
+  .modal-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* ── CARD DE ALIMENTOS ─────────────────────────────────────────── */
+
+  /* 2 colunas em tablet — 1 coluna em 480px */
+  .foods-admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /*
+    Em touch, ações sobrepostas à foto ficam sempre visíveis
+    (não há "hover" real em dispositivos touch).
+  */
+  .food-admin-img-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── GALERIA ───────────────────────────────────────────────────── */
+
+  /* Itens menores: 3 por linha em tablet */
+  .gallery-admin-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  /*
+    Overlay da galeria: sempre visível em touch
+    (transparência reduzida para não tampar a imagem).
+  */
+  .gallery-admin-overlay {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── CONFIGURAÇÕES ─────────────────────────────────────────────── */
+  .config-card {
+    padding: 20px 16px;
+  }
+
+  /* ── WHATSAPP LOG ──────────────────────────────────────────────── */
+
+  /*
+    Header do log vira coluna para evitar overflow em telas estreitas.
+  */
+  .log-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Número do destinatário: permite quebra de linha */
+  .log-para {
+    white-space: normal;
+    overflow: visible;
+  }
+
+  /* ── TAREFAS ───────────────────────────────────────────────────── */
+  #tarefas-lista > div {
+    padding: 14px; /* menos padding lateral em tablet */
+  }
+}
+
+/* ─── Celular médio (≤ 600px) ────────────────────────────────────── */
+@media (max-width: 600px) {
+  /*
+    Stats: ainda 2 colunas em 600px — OK para esta largura.
+    O número e label cabem bem com 2 por linha.
+  */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* ── LOGIN ──────────────────────────────────────────────────────── */
+
+  /*
+    Card de login: padding reduzido para phones de 600px.
+    Ainda elegante, mas sem desperdiçar espaço vertical.
+  */
+  .login-card {
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
+
+  /* Título menor */
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  /* ── ALIMENTOS ─────────────────────────────────────────────────── */
+  .foods-admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* ── GALERIA ───────────────────────────────────────────────────── */
+  .gallery-admin-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+/* ─── Celular padrão (≤ 480px) ───────────────────────────────────── */
+@media (max-width: 480px) {
+  /* ── ABAS ──────────────────────────────────────────────────────── */
+
+  /*
+    Abas quebram em várias linhas (flex-wrap) para garantir que
+    TODAS fiquem visíveis sem precisar de scroll horizontal — o
+    scroll horizontal estava escondendo abas como "Galeria".
+  */
+  .admin-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 4px;
+  }
+
+  .admin-tab-btn {
+    padding: 8px 10px;
+    font-size: 0.68rem;
+    gap: 4px;
+    min-height: 44px; /* touch target mínimo */
+    flex: 1 1 auto;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  /* Esconde o label de texto, mantém ícone + badge (quando o label está em span) */
+  .admin-tab-btn span:not(.tab-badge) {
+    display: none;
+  }
+
+  /* Badge menor quando não há texto */
+  .tab-badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.58rem;
+  }
+
+  /* ── CARDS DE ESTATÍSTICA ──────────────────────────────────────── */
+
+  /*
+    2 colunas ainda funciona em 480px — cards compactos.
+    Só vai para 1 coluna em 360px (ver abaixo).
+  */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+  }
+
+  .stat-card-number {
+    font-size: 1.45rem;
+  }
+
+  .stat-card-label {
+    font-size: 0.66rem;
+  }
+
+  /* Ícone decorativo não cabe mais — esconde */
+  .stat-card-bg-icon {
+    display: none;
+  }
+
+  /* ── SECTION BAR ───────────────────────────────────────────────── */
+  .section-bar-title {
+    font-size: 0.95rem;
+  }
+
+  /* Botões de ação menores mas ainda tocáveis */
+  .section-bar-actions .btn {
+    font-size: 0.78rem;
+    padding: 9px 12px;
+  }
+
+  /* ── ALIMENTOS ─────────────────────────────────────────────────── */
+
+  /*
+    1 coluna em celular pequeno — cards têm espaço para
+    mostrar nome, quantidade e barra de progresso confortavelmente.
+  */
+  .foods-admin-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Altura da imagem maior em 1 coluna (melhora apresentação) */
+  .food-admin-img {
+    height: 140px;
+  }
+
+  /* ── GALERIA ───────────────────────────────────────────────────── */
+
+  /* 2 colunas em celular pequeno */
+  .gallery-admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* ── MODAIS ────────────────────────────────────────────────────── */
+  .modal-box {
+    max-height: 90vh;
+    padding: 18px 16px 24px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .modal-title {
+    font-size: 1.05rem;
+  }
+
+  /* Campos de formulário: fonte mínima 16px para evitar zoom no iOS */
+  .modal-input,
+  .modal-select,
+  .modal-textarea {
+    font-size: 16px; /* previne zoom automático do iOS */
+  }
+
+  /* ── LOGIN ──────────────────────────────────────────────────────── */
+  .login-card {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .login-title {
+    font-size: 1.4rem;
+  }
+
+  /* Input de senha: fonte 16px previne zoom no iOS */
+  .login-input {
+    font-size: 16px;
+    padding: 12px 44px 12px 18px;
+  }
+
+  /* ── CONFIGURAÇÕES ─────────────────────────────────────────────── */
+  .config-card {
+    padding: 16px 14px;
+  }
+
+  .config-card-title {
+    font-size: 0.95rem;
+  }
+
+  /* ── UPLOAD DRAG & DROP ─────────────────────────────────────────── */
+  .upload-area {
+    padding: 20px 16px;
+  }
+
+  /* ── BOTÕES DE AÇÃO NA TABELA ───────────────────────────────────── */
+  .btn-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* ── WHATSAPP LOG ──────────────────────────────────────────────── */
+  .log-item {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  /* ── TAREFAS ───────────────────────────────────────────────────── */
+  #tarefas-lista > div {
+    padding: 12px;
+  }
+
+  /* Botões de ação do card de tarefa: menores mas tocáveis */
+  #tarefas-lista .btn {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    min-height: 38px; /* touch target */
+  }
+
+  /* Cards de resumo de tarefas: mínimo de tamanho */
+  #tarefas-resumo > div {
+    gap: 8px;
+  }
+
+  #tarefas-resumo > div > div {
+    min-width: 60px !important; /* sobrescreve inline do JS */
+    padding: 10px 12px !important;
+  }
+
+  /* ── BADGE ─────────────────────────────────────────────────────── */
+
+  /* Badge de status: texto menor em telas comprimidas */
+  .badge {
+    font-size: 0.62rem;
+    padding: 2px 7px;
+  }
+}
+
+/* ─── Celular muito pequeno (≤ 360px) ────────────────────────────── */
+@media (max-width: 360px) {
+  /*
+    Stats: 1 coluna nos aparelhos mais pequenos.
+    Cada card ocupa a tela inteira — melhor legibilidade.
+  */
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Número do stat: tamanho generoso porque tem mais espaço */
+  .stat-card-number {
+    font-size: 1.8rem;
+  }
+
+  /* ── LOGIN ──────────────────────────────────────────────────────── */
+  .login-card {
+    padding: 20px 14px;
+    border-radius: 12px;
+  }
+
+  /* ── ABAS ──────────────────────────────────────────────────────── */
+
+  /* Padding mínimo das abas */
+  .admin-tab-btn {
+    padding: 7px 8px;
+  }
+
+  /* Badge de contagem: esconde para dar mais espaço */
+  .tab-badge {
+    display: none;
+  }
+
+  /* ── GALERIA ───────────────────────────────────────────────────── */
+
+  /* 2 colunas pequenas ainda funcionam em 360px */
+  .gallery-admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  /* ── MODAIS ────────────────────────────────────────────────────── */
+  .modal-overlay {
+    padding: 0; /* ocupa borda a borda */
+  }
+
+  .modal-box {
+    border-radius: 14px 14px 0 0;
+    padding: 16px 14px 20px;
+  }
+
+  /* ── CONFIGURAÇÕES ─────────────────────────────────────────────── */
+  .config-card {
+    padding: 14px 12px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 22 — MODAL DETALHES DA DOAÇÃO (Ficha Completa)
+
+   Abre ao clicar em qualquer linha da tabela de doações.
+   Exibe as informações em formato de ficha estruturada.
+
+   COMPORTAMENTO POR DISPOSITIVO:
+   ┌────────────┬──────────────────────────────────────────────────────┐
+   │  Desktop   │ Modal centralizado padrão (max-width: 480px)        │
+   │  Mobile    │ Full-screen drawer (ocupa 100% da tela)             │
+   └────────────┴──────────────────────────────────────────────────────┘
+
+   HIERARQUIA VISUAL:
+   • .detalhe-label = rótulo pequeno, discreto (ex: "DOADOR")
+   • .detalhe-valor = valor principal, grande e bold (ex: "João Silva")
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Ficha: container de todos os campos ─────────────────────────── */
+.detalhe-ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* campos separados por border-bottom */
+}
+
+/* ── Campo individual: label + valor em coluna ───────────────────── */
+.detalhe-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Último campo sem borda inferior */
+.detalhe-campo:last-child {
+  border-bottom: none;
+}
+
+/* ── Rótulo do campo (ex: "DOADOR", "TELEFONE") ──────────────────── */
+.detalhe-label {
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detalhe-label i {
+  color: var(--gold); /* ícone em dourado */
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+/* ── Valor do campo (nome, telefone, etc.) ───────────────────────── */
+.detalhe-valor {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1.4;
+  word-break: break-word; /* evita overflow em telefones longos */
+}
+
+/* ── Link de telefone dentro do valor ───────────────────────────── */
+.detalhe-valor a {
+  color: var(--gold);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.detalhe-valor a:hover {
+  opacity: 0.8;
+}
+
+/* ── Duplo: dois campos lado a lado (Alimento + Quantidade) ─────── */
+.detalhe-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 colunas iguais */
+  gap: 0;
+}
+
+.detalhe-duplo .detalhe-campo {
+  border-bottom: 1px solid var(--border);
+  padding-right: 12px;
+}
+
+.detalhe-duplo .detalhe-campo:last-child {
+  border-bottom: 1px solid var(--border); /* duplo mantém borda */
+  padding-right: 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--border); /* separador entre os dois */
+}
+
+/* ── Campo de observações: texto com quebra de linha ─────────────── */
+.detalhe-obs-texto {
+  font-size: 0.875rem;
+  font-weight: 400; /* menos bold que outros valores */
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap; /* mantém quebras de linha do texto */
+}
+
+/* ── Badge de status dentro da ficha ────────────────────────────── */
+.detalhe-valor .badge {
+  font-size: 0.78rem; /* ligeiramente maior que nas tabelas */
+  padding: 4px 12px;
+}
+
+/* ─── LAYOUT MOBILE: Full-Screen Drawer ─────────────────────────── */
+@media (max-width: 768px) {
+  /*
+    No mobile, o modal de detalhes ocupa a tela INTEIRA.
+    Isso garante que o usuário veja todas as informações
+    sem precisar rolar e sem o conteúdo ser cortado.
+  */
+  .modal-detalhe-overlay {
+    align-items: flex-end; /* ancora o drawer no fundo */
+    padding: 0; /* sem margem — borda a borda */
+  }
+
+  .modal-detalhe-box {
+    width: 100%;
+    max-width: 100%;
+    max-height: 96vh; /* quase tela toda, deixa 4vh de overlay visível */
+    border-radius: 20px 20px 0 0; /* arredondado só no topo */
+    padding: 24px 20px 32px; /* padding extra no fundo (safe area) */
+
+    /* Animação: sobe do fundo */
+    animation: drawerSlideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  @keyframes drawerSlideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Campos: mais espaço entre eles para toque */
+  .detalhe-campo {
+    padding: 16px 0;
+  }
+
+  /* Valor maior no mobile para leitura fácil */
+  .detalhe-valor {
+    font-size: 1.05rem;
+  }
+
+  /* Duplo: ainda lado a lado (funciona bem em mobile) */
+  .detalhe-duplo {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Rodapé: botões em coluna no mobile */
+  .modal-detalhe-box .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-detalhe-box .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-detalhe-box {
+    max-height: 98vh; /* quase tela toda em celulares pequenos */
+    padding: 20px 16px 28px;
+  }
+
+  /* Em telas muito pequenas, duplo vira coluna */
+  .detalhe-duplo {
+    grid-template-columns: 1fr;
+  }
+
+  .detalhe-duplo .detalhe-campo:last-child {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--border); /* separador horizontal */
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 23 — CARDS MOBILE DE DOAÇÕES
+
+   PROBLEMA RESOLVIDO:
+   A tabela de doações exigia scroll horizontal no mobile, tornando
+   difícil ler colunas como Contato, Entrega, Ações. Isso é comum em
+   tabelas largas (8 colunas) em telas de 360–480px.
+
+   SOLUÇÃO:
+   No mobile (≤ 768px), a tabela fica oculta via CSS e os containers
+   #donations-cards-mobile / #recent-donations-cards são exibidos.
+   Esses containers são preenchidos por admin.js com cards verticais.
+
+   ARQUITETURA:
+   ┌───────────────────────────────────────────────────────────────┐
+   │ Desktop (> 768px): tabela visível | cards ocultos             │
+   │ Mobile  (≤ 768px): tabela oculta  | cards visíveis            │
+   └───────────────────────────────────────────────────────────────┘
+
+   CLASSES:
+   • .donations-mobile-list  → container da lista de cards (flex col)
+   • .doacao-card-mob        → card individual clicável
+   • .card-mob-header        → nome + badge de status
+   • .card-mob-row           → linha label + valor
+   • .card-mob-duplo         → alimento + quantidade lado a lado
+   • .card-mob-label         → rótulo em fonte mono uppercase
+   • .card-mob-valor         → valor em destaque
+   • .card-mob-link          → link de WhatsApp
+   • .card-mob-obs           → observações em itálico
+   • .card-mob-action-hint   → indicador "Ver detalhes →"
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Desktop: tabela visível, container de cards oculto ─────────── */
+.donations-mobile-list {
+  /*
+    Oculto por padrão (desktop usa a tabela).
+    O @media abaixo ativa quando necessário.
+  */
+  display: none;
+}
+
+/* ── Mobile (≤ 768px): ativa cards, oculta tabela ───────────────── */
+@media (max-width: 768px) {
+  /*
+    Oculta as tabelas de doações nas duas abas que as usam.
+    O seletor é específico para não afetar outras tabelas do admin.
+  */
+  #tab-donations .table-wrap,
+  #tab-overview .table-wrap,
+  #tab-families .table-wrap,
+  #tab-voluntarios .table-wrap,
+  #tab-oracoes .table-wrap {
+    display: none;
+  }
+
+  /*
+    Ativa o container de cards — flex-column com gap entre cada card.
+  */
+  .donations-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* espaçamento entre os cards */
+    margin-bottom: 8px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   COMPONENTES DOS CARDS
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Card individual ─────────────────────────────────────────────── */
+.doacao-card-mob {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden; /* garante que nada ultrapasse o card */
+  word-break: break-word; /* evita overflow de textos longos */
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Feedback visual ao tocar */
+.doacao-card-mob:active {
+  transform: scale(0.985);
+  border-color: rgba(89, 153, 72, 0.45); /* verde Semear */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Acessibilidade: foco visível via teclado */
+.doacao-card-mob:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── Cabeçalho: nome do doador + badge de status ─────────────────── */
+.card-mob-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/*
+  Nome do doador: fonte display, bold, destaque visual.
+  flex: 1 + min-width: 0 garantem truncamento correto.
+*/
+.card-mob-nome {
+  font-family: var(--ff-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Badge de status: não encolhe */
+.card-mob-status {
+  flex-shrink: 0;
+}
+
+/* ── Linha de campo: label + valor ──────────────────────────────── */
+.card-mob-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Remove borda da última linha visível */
+.card-mob-row:last-of-type {
+  border-bottom: none;
+}
+
+/* ── Rótulo (ex: "TELEFONE", "ALIMENTO") ────────────────────────── */
+.card-mob-label {
+  font-family: var(--ff-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap; /* não quebra o label em duas linhas */
+  flex-shrink: 0;
+  padding-top: 2px; /* alinha verticalmente com o valor */
+}
+
+.card-mob-label i {
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+/* ── Valor do campo ──────────────────────────────────────────────── */
+.card-mob-valor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cream);
+  text-align: right;
+  line-height: 1.4;
+  word-break: break-word; /* quebra telefones ou textos longos */
+}
+
+/* ── Link de WhatsApp (telefone) ─────────────────────────────────── */
+.card-mob-link {
+  color: var(--gold);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: opacity 0.15s ease;
+}
+
+.card-mob-link:hover,
+.card-mob-link:active {
+  opacity: 0.8;
+}
+
+.card-mob-link i {
+  font-size: 1rem; /* ícone WhatsApp levemente maior */
+  color: #25d366; /* verde oficial do WhatsApp */
+}
+
+/* ── Duplo: alimento | quantidade ───────────────────────────────── */
+/*
+  Dois campos lado a lado usando CSS grid 1fr 1fr.
+  Separados por uma borda vertical central.
+*/
+.card-mob-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px; /* gap entre colunas = borda visual */
+  background: rgba(255, 255, 255, 0.04); /* cor da "borda" grid */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin: 10px 0;
+  overflow: hidden; /* arredondamento funciona */
+}
+
+/* Cada célula do duplo */
+.card-mob-duplo > div {
+  background: var(--surface2);
+  padding: 11px 10px;
+}
+
+/* Rótulo dentro do duplo */
+.card-mob-duplo .card-mob-label {
+  margin-bottom: 4px;
+  white-space: normal; /* permite quebrar no duplo se necessário */
+}
+
+/* Valor dentro do duplo: alinha à esquerda (não à direita) */
+.card-mob-duplo .card-mob-valor {
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+/* ── Observações (campo longo, itálico) ─────────────────────────── */
+.card-mob-obs {
+  font-size: 0.82rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text);
+  text-align: left; /* sobrescreve o text-align:right do .card-mob-valor */
+  line-height: 1.5;
+}
+
+/* ── Indicador de ação ("Ver detalhes →") ───────────────────────── */
+/*
+  Dica visual discreta no canto inferior direito do card.
+  Indica ao usuário que o card é clicável.
+*/
+.card-mob-action-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-family: var(--ff-mono);
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  opacity: 0.45;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  justify-content: flex-end; /* alinha à direita */
+  transition: opacity 0.15s ease;
+}
+
+.doacao-card-mob:active .card-mob-action-hint {
+  opacity: 0.9;
+}
+
+.card-mob-action-hint i {
+  font-size: 0.6rem;
+}
+
+/* ── Ajustes para celular muito pequeno (≤ 360px) ───────────────── */
+@media (max-width: 360px) {
+  /* Card menor */
+  .doacao-card-mob {
+    padding: 14px 12px 12px;
+    border-radius: 12px;
+  }
+
+  /* Nome do doador menor */
+  .card-mob-nome {
+    font-size: 0.9rem;
+  }
+
+  /* Duplo: 1 coluna em telas muito pequenas */
+  .card-mob-duplo {
+    grid-template-columns: 1fr;
+  }
+
+  .card-mob-duplo > div:first-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 24 — BOTÕES DE AÇÃO NOS CARDS MOBILE
+   (Famílias, Voluntários, Oração)
+
+   Os cards de Doações usam hint de clique (Ver detalhes →).
+   Os cards das demais seções exibem botões de ação inline,
+   organizados em grade responsiva (1–2 colunas).
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Container de ações no rodapé do card ────────────────────────── */
+.card-mob-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Botão individual de ação ────────────────────────────────────── */
+.card-mob-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 auto; /* cresce para preencher linha       */
+  min-width: 120px; /* evita botões muito estreitos      */
+  min-height: 40px; /* toque confortável (WCAG)          */
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--cream);
+  font-family: var(--ff-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.card-mob-btn:active {
+  background: rgba(255, 255, 255, 0.09);
+  opacity: 0.85;
+}
+
+/* Variante destrutiva (Excluir) */
+.card-mob-btn.danger {
+  color: #e57373;
+  border-color: rgba(229, 115, 115, 0.3);
+  background: rgba(229, 115, 115, 0.06);
+}
+
+.card-mob-btn.danger:active {
+  background: rgba(229, 115, 115, 0.14);
+}
+
+/* Ícone dentro do botão */
+.card-mob-btn i {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+/* Em telas muito pequenas: botões em coluna */
+@media (max-width: 360px) {
+  .card-mob-btn {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO — SISTEMA DE CESTAS BÁSICAS
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Grid de cards de resumo ──────────────────────────────────────── */
+.cestas-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 1100px) { .cestas-stat-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px)  { .cestas-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px)  { .cestas-stat-grid { grid-template-columns: 1fr; } }
+
+/* ── Card de estatística ──────────────────────────────────────────── */
+.cesta-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.cesta-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.cesta-stat-card.cesta-card-ok    { border-color: rgba(76,175,80,0.35);  background: rgba(76,175,80,0.04); }
+.cesta-stat-card.cesta-card-warn  { border-color: rgba(255,193,7,0.35);  background: rgba(255,193,7,0.04); }
+.cesta-stat-card.cesta-card-zero  { border-color: rgba(229,90,90,0.35);  background: rgba(229,90,90,0.04); }
+
+.cesta-stat-icon { font-size: 1.4rem; color: var(--gold); margin-bottom: 2px; }
+.cesta-stat-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--cream);
+  line-height: 1;
+  font-family: var(--ff-display);
+}
+.cesta-stat-limitante-nome { font-size: 1rem; line-height: 1.3; }
+.cesta-stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2); font-weight: 600; }
+.cesta-stat-sub   { font-size: 0.68rem; color: var(--text2); opacity: 0.75; line-height: 1.3; }
+
+/* ── Layout duas colunas ──────────────────────────────────────────── */
+.cestas-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+@media (max-width: 900px) { .cestas-columns { grid-template-columns: 1fr; } }
+
+.cestas-col { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Header de seção interna ──────────────────────────────────────── */
+.cestas-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cestas-section-title {
+  font-family: var(--ff-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.cestas-section-title i { color: var(--gold); font-size: 0.9em; }
+
+/* ── Config: lista de itens da cesta ──────────────────────────────── */
+.cestas-config-lista { display: flex; flex-direction: column; gap: 10px; }
+
+.cestas-config-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  color: var(--text2);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.cesta-config-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  animation: fadeInUp 0.35s ease both;
+}
+.cesta-config-item:hover {
+  border-color: rgba(232,201,106,0.3);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.cesta-config-item-emoji { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
+
+.cesta-config-item-info { flex: 1; min-width: 0; }
+.cesta-config-item-nome { font-size: 0.95rem; font-weight: 700; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cesta-config-item-qtd  { font-size: 0.75rem; color: var(--gold); margin-top: 2px; }
+.cesta-config-item-pct  { font-size: 0.7rem; color: var(--text2); margin-top: 4px; }
+
+.cesta-config-item-pbar {
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 100px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.cesta-config-item-pbar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s ease;
+}
+
+.cesta-config-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ── Estoque por item ─────────────────────────────────────────────── */
+.cestas-estoque-lista { display: flex; flex-direction: column; gap: 12px; }
+
+.cesta-estoque-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text2);
+  font-size: 0.82rem;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
+
+.cesta-estoque-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  animation: fadeInUp 0.35s ease both;
+  transition: border-color 0.18s ease;
+}
+.cesta-estoque-item.cesta-estoque-limitante {
+  border-color: rgba(255,193,7,0.4);
+  background: rgba(255,193,7,0.03);
+}
+
+.cesta-estoque-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.cesta-estoque-nome { font-size: 0.9rem; font-weight: 700; color: var(--cream); display: flex; align-items: center; gap: 6px; }
+.cesta-estoque-cestas { font-size: 0.85rem; font-weight: 700; color: var(--gold); white-space: nowrap; }
+
+.cesta-badge-limitante {
+  display: inline-block;
+  font-size: 0.62rem;
+  background: rgba(255,193,7,0.15);
+  color: #ffc107;
+  border: 1px solid rgba(255,193,7,0.3);
+  border-radius: 100px;
+  padding: 2px 8px;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.cesta-estoque-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+@media (max-width: 600px) { .cesta-estoque-stats { grid-template-columns: repeat(2, 1fr); } }
+
+.cesta-estoque-stat { display: flex; flex-direction: column; gap: 2px; }
+.cesta-estoque-stat label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2); }
+.cesta-estoque-stat strong { font-size: 0.85rem; font-weight: 700; color: var(--cream); }
+
+.cesta-estoque-pbar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.cesta-estoque-pbar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s ease;
+}
+.cesta-estoque-falta { font-size: 0.72rem; color: var(--text2); }
+.cesta-estoque-falta strong { color: #e57373; }
+
+/* ── Histórico: tabela desktop ────────────────────────────────────── */
+.cestas-historico-count { font-size: 0.78rem; color: var(--text2); }
+.cestas-historico-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--text2);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.cestas-historico-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+@media (max-width: 768px) { .cestas-historico-table-wrap { display: none; } }
+
+.cestas-historico-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+.cestas-historico-table thead tr {
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.cestas-historico-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cestas-historico-table td {
+  padding: 12px 16px;
+  color: var(--cream);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.cestas-historico-table tbody tr:last-child td { border-bottom: none; }
+.cestas-historico-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+.cestas-hist-data { display: block; font-weight: 600; }
+.cestas-hist-hora { display: block; font-size: 0.75rem; color: var(--text2); }
+.cestas-hist-qtd  { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+.cestas-hist-itens {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text2);
+  font-size: 0.78rem;
+}
+
+/* ── Histórico: cards mobile ──────────────────────────────────────── */
+.cestas-historico-mobile { display: none; flex-direction: column; gap: 12px; }
+@media (max-width: 768px) { .cestas-historico-mobile { display: flex; } }
+
+.cesta-hist-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  animation: fadeInUp 0.35s ease both;
+}
+.cesta-hist-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.cesta-hist-card-qtd  { font-size: 1rem; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 6px; }
+.cesta-hist-card-data { font-size: 0.72rem; color: var(--text2); }
+.cesta-hist-card-obs  { font-size: 0.8rem; color: var(--text2); margin-bottom: 4px; }
+.cesta-hist-card-kg   { font-size: 0.75rem; color: var(--text2); }
+
+/* ── Modal: Forming preview ───────────────────────────────────────── */
+.cesta-formar-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--cream);
+  padding: 8px 0;
+}
+.cesta-formar-warn { color: #ffc107; }
+
+.cesta-forming-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cesta-forming-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--cream);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.cesta-forming-row:last-of-type { border-bottom: none; }
+.cesta-forming-total {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text2);
+  font-style: italic;
+}
+
+/* ── Alimentos: badge cesta ───────────────────────────────────────── */
+.alimento-cesta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin-top: 4px;
+}
+.alimento-cesta-badge.na-cesta {
+  background: rgba(232,201,106,0.12);
+  color: var(--gold);
+  border: 1px solid rgba(232,201,106,0.3);
+}
+.alimento-cesta-badge.fora-cesta {
+  background: rgba(255,255,255,0.05);
+  color: var(--text2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ── Banner: Setup de tabelas ─────────────────────────────────────── */
+.cestas-setup-banner {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: rgba(255,193,7,0.05);
+  border: 1px solid rgba(255,193,7,0.3);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 28px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.cestas-setup-icon {
+  font-size: 2rem;
+  color: #ffc107;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cestas-setup-body { flex: 1; min-width: 0; }
+
+.cestas-setup-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+
+.cestas-setup-desc {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.cestas-setup-desc strong { color: var(--cream); }
+
+.cestas-setup-sql-wrap {
+  position: relative;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cestas-setup-sql {
+  font-family: var(--ff-mono, monospace);
+  font-size: 0.72rem;
+  color: #81c784;
+  padding: 14px 16px;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.6;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.cestas-setup-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+}
+
+@media (max-width: 600px) {
+  .cestas-setup-banner { flex-direction: column; gap: 12px; }
+  .cestas-setup-icon   { font-size: 1.5rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 26 — MODAL DE ALIMENTO REDESENHADO (Seções + Info Cesta)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Seções do modal */
+.food-modal-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.food-modal-section-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Grade da seção de cesta */
+.food-modal-section-cesta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .food-modal-section-cesta { grid-template-columns: 1fr; }
+}
+
+/* Prévia calculada inline (ex: "= 20 unidades") */
+.food-modal-cesta-preview {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: var(--gold);
+  background: rgba(232,201,106,0.08);
+  border: 1px solid rgba(232,201,106,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Painel de informações dinâmico */
+.food-modal-cesta-info {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.food-modal-cesta-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.food-modal-cesta-info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.food-modal-cesta-info-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.food-modal-cesta-info-value {
+  font-size: 0.82rem;
+  color: var(--cream);
+  line-height: 1.5;
+}
+
+/* Passos do cálculo */
+.food-modal-calculo-step {
+  font-size: 0.8rem;
+  color: var(--text2);
+  padding: 2px 0;
+}
+.food-modal-calculo-step strong { color: var(--cream); }
+
+/* Barra de progresso da meta */
+.food-modal-meta-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  min-width: 80px;
+}
+.food-modal-meta-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #f0a500);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Badge de item limitante */
+.badge-limitante {
+  display: inline-block;
+  font-size: 0.68rem;
+  background: rgba(229,90,90,0.2);
+  color: #e55a5a;
+  border: 1px solid rgba(229,90,90,0.35);
+  border-radius: 6px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+/* Alerta de meta atingida no campo */
+.food-meta-alerta {
+  display: none;
+  font-size: 0.75rem;
+  color: #e55a5a;
+  background: rgba(229,90,90,0.1);
+  border: 1px solid rgba(229,90,90,0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-top: 6px;
+}
+
+/* Texto de dica abaixo dos campos */
+.modal-hint {
+  font-size: 0.73rem;
+  color: var(--text2);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ── Responsividade do painel de info ── */
+@media (max-width: 480px) {
+  .food-modal-cesta-info { padding: 12px; gap: 10px; }
+  .food-modal-cesta-info-label { font-size: 0.68rem; }
+  .food-modal-cesta-info-value { font-size: 0.78rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 27 — HOVER EFFECTS & ANIMATIONS (área interna do admin)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+@keyframes adminPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(232,201,106,0.35); }
+  70%  { box-shadow: 0 0 0 8px rgba(232,201,106,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,201,106,0); }
+}
+@keyframes adminBounceIn {
+  0%   { transform: scale(0.94); opacity: 0; }
+  60%  { transform: scale(1.03); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@keyframes adminSlideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Cards de stat (visão geral) ── */
+.stat-card {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+  cursor: default;
+}
+.stat-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  border-color: rgba(232,201,106,0.45);
+}
+.stat-card:hover .stat-card-bg-icon {
+  transform: scale(1.15) rotate(-8deg);
+  opacity: 0.18;
+}
+.stat-card-bg-icon {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* ── Cards de stat de cestas ── */
+.cesta-stat-card {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+}
+.cesta-stat-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  border-color: rgba(232,201,106,0.35);
+}
+
+/* ── Cards de alimento (grid admin) ── */
+.food-admin-card {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+}
+.food-admin-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  border-color: rgba(232,201,106,0.5);
+}
+.food-admin-card:hover .food-admin-img {
+  transform: scale(1.08);
+}
+.food-admin-img {
+  transition: transform 0.35s ease;
+}
+
+/* ── Cards de doação mobile ── */
+.doacao-card-mob {
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+}
+.doacao-card-mob:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+  border-color: rgba(232,201,106,0.3);
+}
+
+/* ── Cards de configuração (galeria / WA / settings) ── */
+.config-card {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+}
+.config-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+  border-color: rgba(232,201,106,0.3);
+}
+
+/* ── Cards de métrica (dashboard) ── */
+.metric-card {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease;
+}
+.metric-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+}
+
+/* ── Itens da galeria ── */
+.gallery-admin-item {
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease;
+}
+.gallery-admin-item:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.3);
+}
+.gallery-admin-item:hover img {
+  transform: scale(1.06);
+}
+.gallery-admin-item img {
+  transition: transform 0.35s ease;
+}
+
+/* ── Log de WhatsApp ── */
+.log-item {
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+}
+.log-item:hover {
+  transform: translateY(-3px) translateX(3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border-color: rgba(232,201,106,0.3);
+}
+
+/* ── Itens de estoque da cesta ── */
+.cesta-estoque-item {
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+}
+.cesta-estoque-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  border-color: rgba(232,201,106,0.35);
+}
+
+/* ── Linhas do histórico de cestas ── */
+.cesta-historico-row {
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cesta-historico-row:hover {
+  background: rgba(232,201,106,0.05) !important;
+  transform: translateX(4px);
+}
+
+/* ── Botões de ícone (editar / excluir) ── */
+.btn-icon {
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1),
+              background 0.18s ease,
+              color 0.18s ease,
+              box-shadow 0.18s ease;
+}
+.btn-icon:hover {
+  transform: scale(1.25) rotate(-5deg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.btn-icon.danger:hover {
+  transform: scale(1.25) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(229,90,90,0.3);
+}
+
+/* ── Botões primários ── */
+.btn-primary {
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.18s ease,
+              filter 0.18s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(232,201,106,0.4);
+  filter: brightness(1.08);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ── Botões outline ── */
+.btn-outline {
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1),
+              border-color 0.18s ease,
+              color 0.18s ease;
+}
+.btn-outline:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── Botões da barra de abas ── */
+.tab-btn {
+  transition: color 0.18s ease, border-color 0.18s ease,
+              transform 0.18s cubic-bezier(.34,1.56,.64,1);
+}
+.tab-btn:hover:not(.active) {
+  transform: translateY(-2px);
+  color: var(--cream);
+}
+
+/* ── Inputs / selects — glow dourado no foco ── */
+.modal-input,
+.modal-select,
+.modal-textarea {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.modal-input:focus,
+.modal-select:focus,
+.modal-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232,201,106,0.18);
+  outline: none;
+}
+
+/* ── Seções do modal de alimento ── */
+.food-modal-section {
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.food-modal-section:hover {
+  border-color: rgba(232,201,106,0.22);
+  background: rgba(255,255,255,0.05);
+}
+
+/* ── Badge de status ── */
+.status-badge {
+  transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), filter 0.18s ease;
+}
+.status-badge:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* ── Pulse no botão de formar cesta ── */
+#btn-formar-cesta:not(:disabled) {
+  animation: adminPulse 2.5s infinite;
+}
+#btn-formar-cesta:hover:not(:disabled) {
+  animation: none;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 24px rgba(232,201,106,0.45);
+}
+
+/* ── Entrada animada dos cards ── */
+.stat-card,
+.food-admin-card,
+.doacao-card-mob,
+.cesta-stat-card,
+.config-card,
+.metric-card {
+  animation: adminSlideUp 0.35s ease both;
+}
+
+/* ── Botão WhatsApp (verde oficial) ── */
+.btn-wa {
+  background: #25d366;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  font-family: var(--ff-body);
+}
+.btn-wa:hover {
+  background: #1ebe5d;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* ── Transição suave ao trocar de aba ── */
+.tab-panel.active {
+  animation: adminSlideUp 0.3s ease both;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 28 — COMPROVANTE DE ENTREGA DE CESTA (famílias)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.comprovante-body {
+  padding: 4px 0;
+}
+
+.comp-recibo {
+  background: #fdfaf4;
+  border-radius: 10px;
+  padding: 18px 20px;
+  border: 1px solid rgba(0,0,0,0.07);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Cabeçalho da organização */
+.comp-org {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.comp-org-icon {
+  color: var(--gold, #c9a227);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+.comp-org-nome {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #1a1612;
+}
+.comp-org-sub {
+  font-size: 0.63rem;
+  color: #8a7a60;
+  letter-spacing: 0.04em;
+}
+
+/* Divisor pontilhado */
+.comp-divisor {
+  border: none;
+  border-top: 1px dashed rgba(0,0,0,0.18);
+  margin: 10px 0;
+}
+
+/* Bloco de seção (dados, alimentos, entrega) */
+.comp-bloco {
+  margin: 4px 0;
+}
+.comp-bloco-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7a6030;
+  margin-bottom: 7px;
+}
+
+/* Linha label + valor */
+.comp-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 5px 0;
+  font-size: 0.83rem;
+}
+.comp-label {
+  color: #8a7a60;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+}
+.comp-val {
+  font-weight: 600;
+  color: #1a1612;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Cabeçalho da tabela de alimentos */
+.comp-itens-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #aaa;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 5px;
+  margin-bottom: 4px;
+}
+
+/* Badge de status colorido */
+.comp-status-badge {
+  display: inline-block;
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 2px 12px;
+  border-radius: 100px;
+  color: #fff;
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,422 @@
+/* ══════════════════════════════════════════════════════════════════════
+   gallery.css — Estilos exclusivos da página de Galeria (/gallery.html)
+   DoaVida · Ação Social Semear + Comunidade Evangélica Maanaim
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. HEADER DA GALERIA ─────────────────────────────────────────── */
+/* Cabeçalho com título e subtítulo centralizado */
+.gallery-header {
+  text-align: center;              /* centraliza textos */
+  padding: 3rem 1rem 1.5rem;      /* espaçamento interno generoso */
+  max-width: 700px;                /* limita largura para leitura confortável */
+  margin: 0 auto;                  /* centraliza horizontalmente */
+}
+
+/* Título principal da galeria */
+.gallery-header h1 {
+  font-family: 'Playfair Display', serif; /* fonte elegante serifada */
+  font-size: 2.4rem;              /* tamanho grande */
+  color: var(--cream, #f5f0e8);   /* cor creme do sistema */
+  margin-bottom: 0.5rem;          /* espaço abaixo */
+}
+
+/* Subtítulo descritivo */
+.gallery-header p {
+  font-family: 'DM Sans', sans-serif; /* fonte limpa sans-serif */
+  font-size: 1.05rem;             /* tamanho legível */
+  color: var(--muted, #8a8578);   /* cor discreta */
+  line-height: 1.6;               /* altura de linha confortável */
+}
+
+/* ─── 2. CONTROLES DE LAYOUT ──────────────────────────────────────── */
+/* Barra com botões para alternar entre grid / masonry / hero */
+.gallery-controls {
+  display: flex;                   /* alinha botões em linha */
+  justify-content: center;        /* centraliza */
+  gap: 0.75rem;                   /* espaço entre botões */
+  padding: 0.5rem 1rem 1.5rem;   /* espaçamento interno */
+  flex-wrap: wrap;                 /* quebra em telas pequenas */
+}
+
+/* Cada botão de layout */
+.layout-btn {
+  background: var(--bg2, #2a2a25); /* fundo escuro suave */
+  color: var(--text2, #d4cfc5);    /* texto claro */
+  border: 1px solid var(--gold, #c9a84c); /* borda dourada sutil */
+  border-radius: var(--r-md, 8px); /* cantos arredondados */
+  padding: 0.5rem 1.2rem;         /* espaçamento interno */
+  font-size: 0.9rem;              /* tamanho de texto */
+  cursor: pointer;                 /* cursor de clique */
+  transition: all 0.3s ease;       /* transição suave */
+  font-family: 'DM Sans', sans-serif; /* fonte do sistema */
+}
+
+/* Botão ativo — indica layout selecionado */
+.layout-btn.active {
+  background: var(--gold, #c9a84c); /* fundo dourado */
+  color: var(--bg, #1a1a17);       /* texto escuro */
+  font-weight: 600;                /* negrito */
+  border-color: var(--gold, #c9a84c); /* borda dourada */
+}
+
+/* Hover no botão de layout */
+.layout-btn:hover {
+  transform: translateY(-2px);     /* sobe levemente */
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.25); /* sombra dourada */
+}
+
+/* ─── 3. CONTAINER DA GALERIA ─────────────────────────────────────── */
+/* Container principal que recebe os itens via JS */
+.gallery-container {
+  padding: 0 1.5rem 3rem;         /* espaçamento lateral e inferior */
+  max-width: 1200px;               /* largura máxima */
+  margin: 0 auto;                  /* centraliza */
+  min-height: 300px;               /* altura mínima para evitar colapso */
+}
+
+/* ─── 4. LAYOUT GRID (padrão) ─────────────────────────────────────── */
+/* Grade CSS com 3 colunas que se adaptam automaticamente */
+.gallery-grid {
+  display: grid;                   /* ativa CSS Grid */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* colunas flexíveis */
+  gap: 1.2rem;                     /* espaço entre itens */
+}
+
+/* ─── 5. LAYOUT MASONRY ───────────────────────────────────────────── */
+/* Masonry via CSS Columns (funciona sem JS extra) */
+.gallery-masonry {
+  column-count: 3;                 /* 3 colunas */
+  column-gap: 1.2rem;             /* espaço entre colunas */
+}
+
+/* Cada item no masonry não pode ser quebrado */
+.gallery-masonry .gallery-item {
+  break-inside: avoid;             /* evita quebra de item entre colunas */
+  margin-bottom: 1.2rem;          /* espaço abaixo de cada item */
+}
+
+/* ─── 6. LAYOUT HERO ──────────────────────────────────────────────── */
+/* Hero: primeiro item grande, restante em grid menor */
+.gallery-hero {
+  display: grid;                   /* ativa CSS Grid */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* colunas flexíveis */
+  gap: 1.2rem;                     /* espaço entre itens */
+}
+
+/* Primeiro item no hero ocupa 2 colunas e 2 linhas */
+.gallery-hero .gallery-item:first-child {
+  grid-column: span 2;            /* ocupa 2 colunas */
+  grid-row: span 2;               /* ocupa 2 linhas */
+}
+
+/* ─── 7. ITEM DA GALERIA ─────────────────────────────────────────── */
+/* Card individual de cada foto/vídeo */
+.gallery-item {
+  position: relative;              /* para posicionar overlay */
+  border-radius: var(--r-md, 8px); /* cantos arredondados */
+  overflow: hidden;                /* esconde conteúdo excedente */
+  cursor: pointer;                 /* cursor de clique */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* transições suaves */
+  border: 1px solid transparent;   /* borda invisível (para transição) */
+  background: var(--bg2, #2a2a25); /* fundo enquanto carrega */
+}
+
+/* Hover no item — efeito interativo */
+.gallery-item:hover {
+  transform: scale(1.03);         /* amplia levemente */
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.2); /* sombra dourada */
+  border-color: var(--gold, #c9a84c); /* borda dourada aparece */
+}
+
+/* Imagem dentro do item */
+.gallery-item img {
+  width: 100%;                     /* ocupa toda a largura */
+  height: 100%;                    /* ocupa toda a altura */
+  object-fit: cover;               /* recorta mantendo proporção */
+  display: block;                  /* remove espaço fantasma do inline */
+  min-height: 200px;               /* altura mínima */
+  transition: transform 0.3s ease; /* transição do zoom */
+}
+
+/* Zoom na imagem ao hover */
+.gallery-item:hover img {
+  transform: scale(1.05);         /* zoom sutil na imagem */
+}
+
+/* Overlay com gradiente escuro no hover */
+.gallery-item-overlay {
+  position: absolute;              /* posicionado sobre a imagem */
+  bottom: 0;                       /* alinhado ao fundo */
+  left: 0;
+  right: 0;
+  padding: 1rem;                   /* espaçamento interno */
+  background: linear-gradient(transparent, rgba(26, 26, 23, 0.85)); /* gradiente transparente → escuro */
+  color: var(--cream, #f5f0e8);    /* texto claro */
+  opacity: 0;                      /* invisível por padrão */
+  transition: opacity 0.3s ease;   /* transição suave */
+}
+
+/* Mostra overlay no hover */
+.gallery-item:hover .gallery-item-overlay {
+  opacity: 1;                      /* torna visível */
+}
+
+/* Título do item no overlay */
+.gallery-item-overlay h3 {
+  font-family: 'Playfair Display', serif; /* fonte elegante */
+  font-size: 1.1rem;              /* tamanho do título */
+  margin-bottom: 0.25rem;         /* espaço abaixo */
+}
+
+/* Descrição do item no overlay */
+.gallery-item-overlay p {
+  font-size: 0.85rem;             /* texto menor */
+  color: var(--muted, #8a8578);   /* cor discreta */
+  line-height: 1.4;               /* altura de linha */
+}
+
+/* Badge de vídeo (ícone play) */
+.gallery-item-badge {
+  position: absolute;              /* posicionado no canto */
+  top: 0.75rem;                    /* distância do topo */
+  right: 0.75rem;                  /* distância da direita */
+  background: rgba(201, 168, 76, 0.9); /* fundo dourado translúcido */
+  color: var(--bg, #1a1a17);       /* ícone escuro */
+  width: 32px;                     /* largura fixa */
+  height: 32px;                    /* altura fixa */
+  border-radius: 50%;              /* formato circular */
+  display: flex;                   /* para centralizar ícone */
+  align-items: center;             /* centraliza verticalmente */
+  justify-content: center;         /* centraliza horizontalmente */
+  font-size: 0.85rem;             /* tamanho do ícone */
+}
+
+/* ─── 8. MODAL DA GALERIA ─────────────────────────────────────────── */
+/* Overlay escuro que cobre toda a tela */
+.gallery-modal-overlay {
+  position: fixed;                 /* fixo na viewport */
+  top: 0; left: 0; right: 0; bottom: 0; /* ocupa tudo */
+  background: rgba(26, 26, 23, 0.92); /* fundo quase opaco */
+  backdrop-filter: blur(6px);      /* desfoque no fundo */
+  -webkit-backdrop-filter: blur(6px); /* Safari */
+  z-index: 9000;                   /* acima de tudo */
+  display: none;                   /* escondido por padrão */
+  align-items: center;             /* centraliza verticalmente */
+  justify-content: center;         /* centraliza horizontalmente */
+  padding: 2rem;                   /* espaçamento */
+  animation: fadeIn 0.3s ease;     /* animação de entrada */
+}
+
+/* Quando ativo, usa flex para exibir */
+.gallery-modal-overlay.active {
+  display: flex;                   /* ativa exibição */
+}
+
+/* Caixa principal do modal */
+.gallery-modal-box {
+  background: var(--surface);
+  border: 1px solid var(--gold, #c9a84c); /* borda dourada */
+  border-radius: var(--r-lg, 12px); /* cantos arredondados */
+  max-width: 800px;                /* largura máxima */
+  width: 100%;                     /* ocupa todo o espaço disponível */
+  max-height: 90vh;                /* altura máxima 90% da tela */
+  overflow-y: auto;                /* scroll se necessário */
+  animation: modalSlideIn 0.3s ease; /* animação de entrada */
+}
+
+/* Animação de entrada do modal */
+@keyframes modalSlideIn {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Animação de fade in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Área da mídia (imagem ou vídeo) */
+.gallery-modal-media {
+  width: 100%;                     /* ocupa toda a largura */
+  max-height: 500px;               /* altura máxima */
+  overflow: hidden;                /* esconde excedente */
+  border-radius: var(--r-lg, 12px) var(--r-lg, 12px) 0 0; /* cantos só em cima */
+}
+
+/* Imagem/vídeo dentro do modal */
+.gallery-modal-media img,
+.gallery-modal-media video {
+  width: 100%;                     /* ocupa toda a largura */
+  height: 100%;                    /* ocupa toda a altura */
+  object-fit: contain;             /* mostra completa sem recortar */
+  display: block;                  /* remove espaço fantasma */
+  background: #000;                /* fundo preto para imagens menores */
+}
+
+/* Conteúdo textual do modal (título, descrição, etc.) */
+.gallery-modal-content {
+  padding: 1.5rem;                 /* espaçamento interno */
+}
+
+/* Título no modal */
+.gallery-modal-content h2 {
+  font-family: 'Playfair Display', serif; /* fonte elegante */
+  font-size: 1.6rem;              /* tamanho do título */
+  color: var(--cream, #f5f0e8);   /* cor creme */
+  margin-bottom: 0.5rem;          /* espaço abaixo */
+}
+
+/* Contexto (ex: "Campanha Natal 2024") */
+.gallery-modal-context {
+  font-size: 0.9rem;              /* tamanho discreto */
+  color: var(--gold, #c9a84c);    /* cor dourada */
+  margin-bottom: 0.75rem;         /* espaço abaixo */
+  font-style: italic;             /* itálico para destaque */
+}
+
+/* Descrição no modal */
+.gallery-modal-description {
+  font-size: 1rem;                 /* tamanho padrão */
+  color: var(--text2, #d4cfc5);    /* cor do texto secundário */
+  line-height: 1.7;               /* altura de linha confortável */
+  margin-bottom: 0.75rem;         /* espaço abaixo */
+}
+
+/* Data no modal */
+.gallery-modal-date {
+  font-size: 0.85rem;             /* tamanho menor */
+  color: var(--muted, #8a8578);   /* cor discreta */
+}
+
+/* Botão de fechar o modal */
+.gallery-modal-close {
+  position: absolute;              /* posicionado no canto */
+  top: 1rem;                       /* distância do topo */
+  right: 1rem;                     /* distância da direita */
+  background: rgba(26, 26, 23, 0.8); /* fundo semi-transparente */
+  color: var(--cream, #f5f0e8);    /* ícone claro */
+  border: 1px solid var(--gold, #c9a84c); /* borda dourada */
+  width: 40px;                     /* largura fixa */
+  height: 40px;                    /* altura fixa */
+  border-radius: 50%;              /* circular */
+  font-size: 1.2rem;              /* tamanho do X */
+  cursor: pointer;                 /* cursor de clique */
+  display: flex;                   /* para centralizar */
+  align-items: center;             /* centraliza vertical */
+  justify-content: center;         /* centraliza horizontal */
+  transition: all 0.3s ease;       /* transição suave */
+  z-index: 9001;                   /* acima do overlay */
+}
+
+/* Hover no botão de fechar */
+.gallery-modal-close:hover {
+  background: var(--gold, #c9a84c); /* fundo dourado */
+  color: var(--bg, #1a1a17);       /* ícone escuro */
+  transform: rotate(90deg);        /* rotação elegante */
+}
+
+/* ─── 9. ESTADO VAZIO ─────────────────────────────────────────────── */
+/* Mensagem quando não há itens na galeria */
+.gallery-empty {
+  text-align: center;              /* centraliza */
+  padding: 4rem 1rem;             /* espaçamento generoso */
+  display: none;                   /* escondido por padrão */
+}
+
+/* Quando ativo */
+.gallery-empty.active {
+  display: block;                  /* mostra */
+}
+
+/* Ícone do estado vazio */
+.gallery-empty i {
+  font-size: 3rem;                 /* ícone grande */
+  color: var(--gold, #c9a84c);     /* cor dourada */
+  margin-bottom: 1rem;            /* espaço abaixo */
+}
+
+/* Título do estado vazio */
+.gallery-empty h3 {
+  font-family: 'Playfair Display', serif; /* fonte elegante */
+  font-size: 1.4rem;              /* tamanho */
+  color: var(--cream, #f5f0e8);   /* cor creme */
+  margin-bottom: 0.5rem;          /* espaço abaixo */
+}
+
+/* Subtítulo do estado vazio */
+.gallery-empty p {
+  color: var(--muted, #8a8578);   /* cor discreta */
+  font-size: 0.95rem;             /* tamanho */
+}
+
+/* ─── 10. SKELETON LOADING ────────────────────────────────────────── */
+/* Placeholder animado enquanto carrega */
+.gallery-skeleton {
+  background: var(--bg2, #2a2a25); /* fundo escuro */
+  border-radius: var(--r-md, 8px); /* cantos arredondados */
+  min-height: 200px;               /* altura mínima */
+  animation: shimmer 1.5s infinite; /* animação de brilho */
+}
+
+/* Animação de brilho (shimmer) */
+@keyframes shimmer {
+  0%   { opacity: 0.5; }           /* começa opaco */
+  50%  { opacity: 0.8; }           /* fica mais claro */
+  100% { opacity: 0.5; }           /* volta ao opaco */
+}
+
+/* ─── 11. RESPONSIVIDADE ──────────────────────────────────────────── */
+
+/* Tablet: 2 colunas no masonry */
+@media (max-width: 768px) {
+  .gallery-masonry {
+    column-count: 2;               /* reduz para 2 colunas */
+  }
+  .gallery-hero .gallery-item:first-child {
+    grid-column: span 1;           /* hero ocupa só 1 coluna */
+    grid-row: span 1;              /* hero ocupa só 1 linha */
+  }
+  .gallery-header h1 {
+    font-size: 1.8rem;             /* título menor */
+  }
+  .gallery-modal-box {
+    max-width: 95%;                /* quase tela toda */
+  }
+}
+
+/* Mobile: 1 coluna, modal fullscreen */
+@media (max-width: 480px) {
+  .gallery-masonry {
+    column-count: 1;               /* coluna única */
+  }
+  .gallery-grid {
+    grid-template-columns: 1fr;    /* coluna única */
+  }
+  .gallery-header h1 {
+    font-size: 1.5rem;             /* título menor ainda */
+  }
+  .gallery-header p {
+    font-size: 0.9rem;             /* subtítulo menor */
+  }
+  .gallery-controls {
+    gap: 0.5rem;                   /* menos espaço entre botões */
+  }
+  .layout-btn {
+    padding: 0.4rem 0.8rem;       /* botões menores */
+    font-size: 0.8rem;            /* texto menor */
+  }
+  /* Modal ocupa tela toda no mobile */
+  .gallery-modal-overlay {
+    padding: 0;                    /* sem espaçamento */
+  }
+  .gallery-modal-box {
+    max-width: 100%;               /* tela toda */
+    max-height: 100vh;             /* altura total */
+    border-radius: 0;              /* sem cantos arredondados */
+  }
+  .gallery-modal-media {
+    border-radius: 0;              /* sem cantos */
+    max-height: 300px;             /* limita altura da mídia */
+  }
+}
