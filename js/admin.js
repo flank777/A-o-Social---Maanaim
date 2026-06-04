@@ -141,24 +141,50 @@ document.addEventListener("DOMContentLoaded", function () {
    ══════════════════════════════════════════════════════════════════════ */
 
 function _adminTraduzErro(codigo) {
-  var c = String(codigo || '').toUpperCase();
-  if (c === 'INVALID_CREDENTIALS') return 'Senha incorreta. Tente novamente.';
-  if (c === 'NOT_ALLOWED')         return 'Você não tem permissão para acessar esta área.';
-  if (c === 'FIREBASE_OFFLINE')    return 'Serviço indisponível. Verifique sua conexão.';
+  var m = String(codigo || '').toLowerCase();
+  if (m.indexOf('invalid-credential') >= 0 || m.indexOf('wrong-password') >= 0 || m.indexOf('invalid-email') >= 0)
+    return 'E-mail ou senha inválidos. Verifique e tente novamente.';
+  if (m.indexOf('user-not-found') >= 0)
+    return 'Usuário não encontrado. Verifique o e-mail.';
+  if (m.indexOf('too-many-requests') >= 0)
+    return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+  if (m.indexOf('network-request-failed') >= 0 || m.indexOf('offline') >= 0)
+    return 'Sem conexão com a internet. Verifique sua rede.';
+  if (m.indexOf('not_allowed') >= 0 || m.indexOf('not allowed') >= 0)
+    return 'Você não tem permissão para acessar esta área.';
   return 'Não foi possível validar suas credenciais. Tente novamente.';
 }
 
-/* Verifica sessão local (8h) ao carregar — abre o painel direto se válida */
+/* Verifica sessão Firebase ao carregar — abre o painel direto se autenticado */
 async function _adminVerificarSessaoAtiva() {
-  try {
-    if (typeof DoaVidaAPI !== 'undefined' && DoaVidaAPI.verificarSessao()) {
-      abrirPainel();
-    }
-  } catch (e) { /* sessão inválida — permanece na tela de login */ }
+  /* Firebase Auth restaura a sessão automaticamente ao recarregar a página.
+     Aguardamos o evento onAuthStateChanged para saber o estado real. */
+  if (typeof DoaVidaSync !== 'undefined' && DoaVidaSync.onAuthChange) {
+    DoaVidaSync.onAuthChange(function (user) {
+      if (user) {
+        var panel = document.getElementById('admin-panel');
+        /* Só abre automaticamente se o painel ainda não estiver visível */
+        if (!panel || !panel.classList.contains('visible')) {
+          abrirPainel();
+        }
+      }
+    });
+  }
 }
 
-/* Stub mantido para compatibilidade com chamadas legadas no código */
-function _adminWatchAuth() {}
+/* Escuta mudanças de sessão (logout em outra aba) */
+function _adminWatchAuth() {
+  if (typeof DoaVidaSync !== 'undefined' && DoaVidaSync.onAuthChange) {
+    DoaVidaSync.onAuthChange(function (user) {
+      if (!user) {
+        var panel = document.getElementById('admin-panel');
+        if (panel && panel.classList.contains('visible')) {
+          location.reload();
+        }
+      }
+    });
+  }
+}
 
 /*
   Intercepta cliques em qualquer link que leve de volta ao site público
@@ -174,8 +200,11 @@ function _adminConfigurarSaidaParaSite() {
     if (!panel || !panel.classList.contains('visible')) return;
 
     e.preventDefault();
-    if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.encerrarSessao();
-    window.location.href = 'index.html';
+    DoaVidaSync.logout().then(function () {
+      window.location.href = 'index.html';
+    }).catch(function () {
+      window.location.href = 'index.html';
+    });
   });
 }
 
@@ -301,21 +330,24 @@ function configurarLogin() {
   }
 }
 
-/* ── tentarLogin — Firebase via DoaVidaSync.verificarSenha ──────── */
+/* ── tentarLogin — Firebase Authentication real ─────────────────── */
 function tentarLogin() {
+  var emEl   = document.getElementById("login-email");
   var pwEl   = document.getElementById("login-password");
   var errEl  = document.getElementById("login-error");
   var errTxt = document.getElementById("login-error-txt");
   var btn    = document.getElementById("login-btn");
 
-  var senha = pwEl ? pwEl.value : "";
+  var email = emEl ? emEl.value.trim() : "";
+  var senha  = pwEl ? pwEl.value        : "";
 
   function _mostrarErro(msg) {
     if (errTxt) errTxt.textContent = msg;
     if (errEl)  errEl.classList.add("visible");
   }
 
-  if (!senha) { if (pwEl) pwEl.focus(); return; }
+  if (!email) { if (emEl) emEl.focus(); return; }
+  if (!senha)  { if (pwEl) pwEl.focus(); return; }
 
   /* Bloqueia múltiplos cliques */
   if (btn) { btn.disabled = true; btn.classList.add("bio-btn--scanning"); }
@@ -325,15 +357,12 @@ function tentarLogin() {
 
   (async function () {
     try {
-      _bioAtualizarMensagem('Validando senha…');
+      _bioAtualizarMensagem('Autenticando no Firebase…');
 
-      /* Verifica a senha no Firebase Firestore (coleção configuracao) */
-      var ok = await DoaVidaSync.verificarSenha(senha);
-      if (!ok) throw new Error('INVALID_CREDENTIALS');
+      /* Login real via Firebase Authentication */
+      await DoaVidaSync.login(email, senha);
 
-      /* Inicia sessão local de 8h */
       _bioAtualizarMensagem('Abrindo painel…');
-      if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.iniciarSessao();
 
       /* ✅ Sucesso */
       _bioOverlaySucesso(function () {
@@ -346,7 +375,7 @@ function tentarLogin() {
       var mensagem = _adminTraduzErro(e.message);
       _bioOverlayErro(function () {
         _mostrarErro(mensagem);
-        if (pwEl)  { pwEl.value = ""; pwEl.focus(); }
+        if (pwEl) { pwEl.value = ""; pwEl.focus(); }
         if (btn) {
           btn.disabled = false;
           btn.classList.remove("bio-btn--scanning", "bio-btn--ok");
@@ -451,9 +480,7 @@ function configurarLogout() {
   if (!btn) return;
   btn.addEventListener("click", function () {
     if (!confirm("Deseja sair do painel?")) return;
-    if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.encerrarSessao();
-    function sair() { location.reload(); }
-    sair();
+    DoaVidaSync.logout().then(function () { location.reload(); }).catch(function () { location.reload(); });
   });
 }
 

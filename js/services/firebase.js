@@ -15,11 +15,8 @@ var _firebaseConfig = {
   appId:             '1:968054368178:web:ef6cd7a41aa109463e66ab'
 };
 
-var _db          = null;
-var _localUser   = null;
-var LOCAL_ADMIN_PW = (function () {
-  try { return localStorage.getItem('doavida_senha') || '@maanaim1818'; } catch (e) { return '@maanaim1818'; }
-})();
+var _db   = null;
+var _auth = null;
 
 /* ── Inicialização ────────────────────────────────────────────────── */
 function inicializarFirebase() {
@@ -28,13 +25,13 @@ function inicializarFirebase() {
       console.error('[DoaVida] Firebase SDK não carregado. Verifique os scripts no HTML.');
       return false;
     }
-    /* Evita inicializar mais de uma vez */
     if (!firebase.apps || firebase.apps.length === 0) {
       firebase.initializeApp(_firebaseConfig);
     }
-    _db = firebase.firestore();
+    _db   = firebase.firestore();
+    _auth = firebase.auth();
     window._doaVidaFirestoreOk = true;
-    console.log('[DoaVida] ✅ Firebase Firestore conectado — projeto: acao-social-ab5a6');
+    console.log('[DoaVida] ✅ Firebase Auth + Firestore conectados — projeto: acao-social-ab5a6');
     return true;
   } catch (e) {
     console.error('[DoaVida] Erro ao inicializar Firebase:', e.message);
@@ -44,43 +41,6 @@ function inicializarFirebase() {
 
 function inicializarSupabase() { return inicializarFirebase(); }
 window.inicializarSupabase = inicializarSupabase;
-
-/* ── Auth local (compatibilidade com admin.js) ───────────────────── */
-window.supabaseClient = {
-  auth: {
-    signInWithPassword: async function (creds) {
-      var localPw = LOCAL_ADMIN_PW;
-      try { localPw = localStorage.getItem('doavida_senha') || LOCAL_ADMIN_PW; } catch (_) {}
-      if (creds.password === localPw) {
-        _localUser = { id: 'admin', uid: 'admin', email: creds.email || 'admin@doavida.local' };
-        return { data: { user: _localUser, session: { user: _localUser } }, error: null };
-      }
-      return { data: null, error: { message: 'E-mail ou senha inválidos.' } };
-    },
-    signOut:          async function () { _localUser = null; },
-    getSession:       function () { return Promise.resolve({ data: { session: _localUser ? { user: _localUser } : null } }); },
-    onAuthStateChange: function () {}
-  },
-  from: function (table) {
-    if (table === 'profiles') {
-      return { select: function () { return { eq: function () { return { single: function () {
-        if (!_localUser) return Promise.resolve({ data: null, error: { message: 'Not authenticated' } });
-        return Promise.resolve({ data: { role: 'admin', nome: _localUser.email }, error: null });
-      }}}}};
-    }
-    /* Redireciona outras chamadas para DoaVidaSync quando possível */
-    return {
-      select: function () { return { order: function () { return Promise.resolve({ data: [], error: null }); } }; },
-      insert: function () { return { select: function () { return { single: function () { return Promise.resolve({ data: null, error: { message: 'Use DoaVidaSync' } }); } } }; },
-      update: function () { return { eq: function () { return Promise.resolve({ data: null, error: null }); } }; },
-      delete: function () { return { eq: function () { return Promise.resolve({ data: null, error: null }); } }; },
-      upsert: function () { return Promise.resolve({ data: null, error: null }); }
-    };
-  },
-  channel:       function () { var ch = { on: function () { return ch; }, subscribe: function () { return ch; } }; return ch; },
-  removeChannel: function () {},
-  storage:       { from: function () { return { remove: async function () { return { data: null, error: null }; } }; } }
-};
 
 /* ── Helpers internos ─────────────────────────────────────────────── */
 function _now() { return new Date().toISOString(); }
@@ -142,8 +102,44 @@ var DoaVidaSync = {
 
   init: function () {
     inicializarFirebase();
-    console.log('[DoaVidaSync] ✅ Inicializado — Firebase Firestore');
+    console.log('[DoaVidaSync] ✅ Inicializado — Firebase Auth + Firestore');
     window.dispatchEvent(new CustomEvent('DoaVidaSyncPronto'));
+  },
+
+  /* ── AUTENTICAÇÃO (Firebase Auth real) ── */
+
+  /*
+    Login com e-mail e senha via Firebase Authentication.
+    @param {string} email
+    @param {string} senha
+    @returns {Promise<Object>} usuário Firebase
+  */
+  login: async function (email, senha) {
+    if (!_auth) throw new Error('Firebase Auth não inicializado.');
+    var result = await _auth.signInWithEmailAndPassword(email, senha);
+    return result.user;
+  },
+
+  /* Logout via Firebase Authentication */
+  logout: async function () {
+    if (_auth) await _auth.signOut();
+    if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.encerrarSessao();
+  },
+
+  /* Retorna o usuário autenticado atual (ou null) */
+  getUsuarioAtual: function () {
+    return (_auth && _auth.currentUser) ? _auth.currentUser : null;
+  },
+
+  /* Escuta mudanças de estado de autenticação */
+  onAuthChange: function (callback) {
+    if (_auth) _auth.onAuthStateChanged(callback);
+  },
+
+  /* verificarSenha mantida para compatibilidade — delega ao Firebase Auth */
+  verificarSenha: async function (senha) {
+    /* Não usada com Firebase Auth real — login usa email+senha direto */
+    return false;
   },
 
   /* ── ALIMENTOS ── */
