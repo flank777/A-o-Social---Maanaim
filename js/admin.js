@@ -4223,7 +4223,7 @@ async function salvarFoto() {
       }
 
     } else {
-      /* ── Modo Upload: arquivo → Supabase Storage → URL → tabela ── */
+      /* ── Modo Upload: arquivo → Cloudinary → URL → tabela ── */
       if (AdminState.pendingPhotos.length === 0) {
         showToast("⚠️ Selecione ao menos uma mídia.", "error");
         return;
@@ -4236,23 +4236,28 @@ async function salvarFoto() {
       for (var i = 0; i < AdminState.pendingPhotos.length; i++) {
         var arquivo = AdminState.pendingPhotos[i];
         try {
-          var ehVideo   = arquivo.type.startsWith('video/');
-          var nomeLimpo = arquivo.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
-          var nomeUnico = Date.now() + '_' + nomeLimpo;
+          var ehVideo = arquivo.type.startsWith('video/');
 
-          /* Upload para o bucket "galeria" do Supabase Storage */
-          var urlPublica = await DoaVidaSync.uploadImagemGaleria(arquivo, nomeUnico);
+          showToast('⬆️ Enviando ' + arquivo.name + '…', 'info');
 
-          /* Salva a URL pública na tabela galeria com metadados completos */
+          /* Upload para o Cloudinary (gratuito, sem pausar) */
+          var resultado = await DoaVidaCloudinary.upload(arquivo, ehVideo ? 'video' : 'image', function(pct) {
+            if (btnSalvar) btnSalvar.textContent = 'Enviando ' + pct + '%…';
+          });
+
+          var urlPublica = resultado.url;
+          var publicId   = resultado.public_id;
+
+          /* Salva a URL na galeria via DoaVidaSync */
           await DoaVidaSync.addFotoGaleria({
             url:         urlPublica,
-            storage_path: nomeUnico,
+            storage_path: publicId,
             legenda:     meta.titulo || arquivo.name,
             titulo:      meta.titulo || arquivo.name,
             alt:         meta.alt,
             categoria:   meta.categoria,
             tipo:        ehVideo ? 'video' : 'imagem',
-            poster_url:  meta.poster_url,
+            poster_url:  ehVideo ? DoaVidaCloudinary.thumbnailVideo(publicId) : '',
             order_index: meta.order_index,
             ativo:       meta.ativo,
             publica:     meta.publica
