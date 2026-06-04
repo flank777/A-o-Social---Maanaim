@@ -137,64 +137,28 @@ document.addEventListener("DOMContentLoaded", function () {
 }); /* fim DOMContentLoaded */
 
 /* ══════════════════════════════════════════════════════════════════════
-   SEÇÃO 3 — AUTENTICAÇÃO (Supabase Auth + verificação de role admin)
+   SEÇÃO 3 — AUTENTICAÇÃO (Firebase via DoaVidaSync + sessão local 8h)
    ══════════════════════════════════════════════════════════════════════ */
-
-/* ── Helpers internos de autenticação ──────────────────────────── */
-
-function _adminSb() { return window.supabaseClient || null; }
-
-async function _adminFetchProfile(userId) {
-  var sb = _adminSb();
-  if (!sb) return null;
-  var res = await sb.from('profiles').select('role, nome').eq('id', userId).single();
-  if (res.error) return null;
-  return res.data;
-}
 
 function _adminTraduzErro(codigo) {
   var c = String(codigo || '').toUpperCase();
-  if (c === 'INVALID_CREDENTIALS')   return 'E-mail ou senha inválidos.';
-  if (c === 'NOT_ALLOWED')           return 'Você não tem permissão para acessar esta área.';
-  if (c === 'PROFILE_NOT_FOUND')     return 'Não foi possível validar suas credenciais no momento. Tente novamente.';
-  if (c === 'NO_SUPABASE')           return 'Serviço indisponível. Verifique sua conexão e tente novamente.';
-  var m = String(codigo || '').toLowerCase();
-  if (m.indexOf('invalid login') >= 0 || m.indexOf('invalid credentials') >= 0)
-    return 'E-mail ou senha inválidos.';
-  if (m.indexOf('too many') >= 0)
-    return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
-  return 'Não foi possível validar suas credenciais no momento. Tente novamente.';
+  if (c === 'INVALID_CREDENTIALS') return 'Senha incorreta. Tente novamente.';
+  if (c === 'NOT_ALLOWED')         return 'Você não tem permissão para acessar esta área.';
+  if (c === 'FIREBASE_OFFLINE')    return 'Serviço indisponível. Verifique sua conexão.';
+  return 'Não foi possível validar suas credenciais. Tente novamente.';
 }
 
-/* Verifica sessão ativa ao carregar a página — abre o painel direto se já autenticado */
+/* Verifica sessão local (8h) ao carregar — abre o painel direto se válida */
 async function _adminVerificarSessaoAtiva() {
-  var sb = _adminSb();
-  if (!sb) return;
   try {
-    var sessRes = await sb.auth.getSession();
-    var session = sessRes && sessRes.data ? sessRes.data.session : null;
-    if (!session || !session.user) return;
-    var profile = await _adminFetchProfile(session.user.id);
-    if (!profile) return;
-    if (profile.role === 'admin' || profile.role === 'super_admin') {
+    if (typeof DoaVidaAPI !== 'undefined' && DoaVidaAPI.verificarSessao()) {
       abrirPainel();
     }
   } catch (e) { /* sessão inválida — permanece na tela de login */ }
 }
 
-/* Escuta SIGNED_OUT (logout em outra aba, token expirado) */
-function _adminWatchAuth() {
-  var sb = _adminSb();
-  if (!sb) return;
-  sb.auth.onAuthStateChange(function (event) {
-    if (event === 'SIGNED_OUT') {
-      var panel = document.getElementById('admin-panel');
-      if (panel && panel.classList.contains('visible')) {
-        location.reload();
-      }
-    }
-  });
-}
+/* Stub mantido para compatibilidade com chamadas legadas no código */
+function _adminWatchAuth() {}
 
 /*
   Intercepta cliques em qualquer link que leve de volta ao site público
@@ -206,20 +170,12 @@ function _adminConfigurarSaidaParaSite() {
     var link = e.target.closest('a[href="index.html"]');
     if (!link) return;
 
-    /* Só intercepta se o painel estiver visível (admin está logado) */
     var panel = document.getElementById('admin-panel');
     if (!panel || !panel.classList.contains('visible')) return;
 
     e.preventDefault();
-
-    var sb = _adminSb();
-    function ir() { window.location.href = 'index.html'; }
-
-    if (sb) {
-      sb.auth.signOut().then(ir).catch(ir);
-    } else {
-      ir();
-    }
+    if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.encerrarSessao();
+    window.location.href = 'index.html';
   });
 }
 
@@ -345,30 +301,21 @@ function configurarLogin() {
   }
 }
 
-/* ── tentarLogin — Supabase Auth real + verificação de role ─────── */
+/* ── tentarLogin — Firebase via DoaVidaSync.verificarSenha ──────── */
 function tentarLogin() {
-  var emEl   = document.getElementById("login-email");
   var pwEl   = document.getElementById("login-password");
   var errEl  = document.getElementById("login-error");
   var errTxt = document.getElementById("login-error-txt");
   var btn    = document.getElementById("login-btn");
 
-  var email = emEl  ? emEl.value.trim()  : "";
-  var senha  = pwEl  ? pwEl.value         : "";
+  var senha = pwEl ? pwEl.value : "";
 
   function _mostrarErro(msg) {
     if (errTxt) errTxt.textContent = msg;
     if (errEl)  errEl.classList.add("visible");
   }
 
-  if (!email) { if (emEl) emEl.focus(); return; }
-  if (!senha)  { if (pwEl) pwEl.focus(); return; }
-
-  var sb = _adminSb();
-  if (!sb) {
-    _mostrarErro(_adminTraduzErro('NO_SUPABASE'));
-    return;
-  }
+  if (!senha) { if (pwEl) pwEl.focus(); return; }
 
   /* Bloqueia múltiplos cliques */
   if (btn) { btn.disabled = true; btn.classList.add("bio-btn--scanning"); }
@@ -376,30 +323,17 @@ function tentarLogin() {
 
   _bioMostrarOverlay();
 
-  /* Executa o fluxo async via Promise chain (compatível com ES5+async) */
   (async function () {
     try {
-      /* 1. Autenticar via Supabase Auth */
-      _bioAtualizarMensagem('Validando credenciais…');
-      var authRes = await sb.auth.signInWithPassword({ email: email, password: senha });
-      if (authRes.error || !authRes.data || !authRes.data.user) {
-        throw new Error('INVALID_CREDENTIALS');
-      }
+      _bioAtualizarMensagem('Validando senha…');
 
-      /* 2. Buscar perfil e verificar role */
-      _bioAtualizarMensagem('Consultando permissões…');
-      var profile = await _adminFetchProfile(authRes.data.user.id);
-      if (!profile) {
-        await sb.auth.signOut();
-        throw new Error('PROFILE_NOT_FOUND');
-      }
+      /* Verifica a senha no Firebase Firestore (coleção configuracao) */
+      var ok = await DoaVidaSync.verificarSenha(senha);
+      if (!ok) throw new Error('INVALID_CREDENTIALS');
 
-      /* 3. Verificar se é admin */
-      _bioAtualizarMensagem('Confirmando acesso administrativo…');
-      if (profile.role !== 'admin' && profile.role !== 'super_admin') {
-        await sb.auth.signOut();
-        throw new Error('NOT_ALLOWED');
-      }
+      /* Inicia sessão local de 8h */
+      _bioAtualizarMensagem('Abrindo painel…');
+      if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.iniciarSessao();
 
       /* ✅ Sucesso */
       _bioOverlaySucesso(function () {
@@ -409,9 +343,6 @@ function tentarLogin() {
       });
 
     } catch (e) {
-      /* ❌ Erro — tenta signOut por garantia (ignora falha) */
-      try { if (sb) await sb.auth.signOut(); } catch (_) {}
-
       var mensagem = _adminTraduzErro(e.message);
       _bioOverlayErro(function () {
         _mostrarErro(mensagem);
@@ -514,19 +445,15 @@ function _mostrarStatusFirebase() {
   document.body.appendChild(banner);
 }
 
-/* Configura o botão de logout — encerra sessão Supabase e recarrega */
+/* Configura o botão de logout — encerra sessão Firebase e recarrega */
 function configurarLogout() {
   var btn = document.getElementById("logout-btn");
   if (!btn) return;
   btn.addEventListener("click", function () {
     if (!confirm("Deseja sair do painel?")) return;
-    var sb = _adminSb();
+    if (typeof DoaVidaAPI !== 'undefined') DoaVidaAPI.encerrarSessao();
     function sair() { location.reload(); }
-    if (sb) {
-      sb.auth.signOut().then(sair).catch(sair);
-    } else {
-      sair();
-    }
+    sair();
   });
 }
 
