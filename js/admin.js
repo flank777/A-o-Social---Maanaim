@@ -137,8 +137,12 @@ document.addEventListener("DOMContentLoaded", function () {
 }); /* fim DOMContentLoaded */
 
 /* ══════════════════════════════════════════════════════════════════════
-   SEÇÃO 3 — AUTENTICAÇÃO (Firebase via DoaVidaSync + sessão local 8h)
+   SEÇÃO 3 — AUTENTICAÇÃO (Firebase Authentication real)
    ══════════════════════════════════════════════════════════════════════ */
+
+/* true enquanto o fluxo de login está em andamento — impede que o
+   listener de sessão abra o painel antes da animação terminar */
+var _loginEmAndamento = false;
 
 function _adminTraduzErro(codigo) {
   var m = String(codigo || '').toLowerCase();
@@ -150,41 +154,33 @@ function _adminTraduzErro(codigo) {
     return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
   if (m.indexOf('network-request-failed') >= 0 || m.indexOf('offline') >= 0)
     return 'Sem conexão com a internet. Verifique sua rede.';
-  if (m.indexOf('not_allowed') >= 0 || m.indexOf('not allowed') >= 0)
-    return 'Você não tem permissão para acessar esta área.';
   return 'Não foi possível validar suas credenciais. Tente novamente.';
 }
 
-/* Verifica sessão Firebase ao carregar — abre o painel direto se autenticado */
-async function _adminVerificarSessaoAtiva() {
-  /* Firebase Auth restaura a sessão automaticamente ao recarregar a página.
-     Aguardamos o evento onAuthStateChanged para saber o estado real. */
-  if (typeof DoaVidaSync !== 'undefined' && DoaVidaSync.onAuthChange) {
-    DoaVidaSync.onAuthChange(function (user) {
-      if (user) {
-        var panel = document.getElementById('admin-panel');
-        /* Só abre automaticamente se o painel ainda não estiver visível */
-        if (!panel || !panel.classList.contains('visible')) {
-          abrirPainel();
-        }
-      }
-    });
-  }
+/*
+  Listener único de Auth — cuida de dois casos:
+  1. Sessão restaurada ao recarregar a página → abre painel direto
+  2. Logout detectado (outra aba) → recarrega a página
+*/
+function _adminVerificarSessaoAtiva() {
+  if (typeof firebase === 'undefined' || !firebase.auth) return;
+
+  firebase.auth().onAuthStateChanged(function (user) {
+    var panel      = document.getElementById('admin-panel');
+    var painelAberto = panel && panel.classList.contains('visible');
+
+    if (user && !_loginEmAndamento && !painelAberto) {
+      /* Sessão restaurada ao recarregar — abre o painel direto */
+      abrirPainel();
+    } else if (!user && painelAberto) {
+      /* Logout em outra aba ou token expirado */
+      location.reload();
+    }
+  });
 }
 
-/* Escuta mudanças de sessão (logout em outra aba) */
-function _adminWatchAuth() {
-  if (typeof DoaVidaSync !== 'undefined' && DoaVidaSync.onAuthChange) {
-    DoaVidaSync.onAuthChange(function (user) {
-      if (!user) {
-        var panel = document.getElementById('admin-panel');
-        if (panel && panel.classList.contains('visible')) {
-          location.reload();
-        }
-      }
-    });
-  }
-}
+/* Mantido por compatibilidade — o listener já está em _adminVerificarSessaoAtiva */
+function _adminWatchAuth() {}
 
 /*
   Intercepta cliques em qualquer link que leve de volta ao site público
@@ -349,7 +345,8 @@ function tentarLogin() {
   if (!email) { if (emEl) emEl.focus(); return; }
   if (!senha)  { if (pwEl) pwEl.focus(); return; }
 
-  /* Bloqueia múltiplos cliques */
+  /* Bloqueia múltiplos cliques e impede listener de abrir painel antes da hora */
+  _loginEmAndamento = true;
   if (btn) { btn.disabled = true; btn.classList.add("bio-btn--scanning"); }
   if (errEl) errEl.classList.remove("visible");
 
@@ -364,14 +361,16 @@ function tentarLogin() {
 
       _bioAtualizarMensagem('Abrindo painel…');
 
-      /* ✅ Sucesso */
+      /* ✅ Sucesso — abre painel após a animação */
       _bioOverlaySucesso(function () {
+        _loginEmAndamento = false;
         _bioFecharOverlay();
         if (btn) { btn.classList.remove("bio-btn--scanning"); btn.classList.add("bio-btn--ok"); }
         abrirPainel();
       });
 
     } catch (e) {
+      _loginEmAndamento = false;
       var mensagem = _adminTraduzErro(e.message);
       _bioOverlayErro(function () {
         _mostrarErro(mensagem);
