@@ -1,162 +1,54 @@
 /*
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  DoaVida — js/services/firebase.js  (usa Supabase internamente)     ║
-  ║  Camada de dados: Supabase Postgres                                  ║
-  ║  URL:  https://jrugfqkeyyvekqkprdwr.supabase.co                     ║
-  ╚══════════════════════════════════════════════════════════════════════╝
+  DoaVida — js/services/firebase.js
+  Banco de dados: Firebase Firestore (Google)
+  Projeto: acao-social-ab5a6
+  Plano: Spark (gratuito, nunca pausa, sem cartão)
 */
 
-var _SUPA_URL = 'https://qklehrgkbyuvwhcclkst.supabase.co';
-var _SUPA_KEY = 'sb_publishable_iCZWL3_h7wNs9Ukr9QNUZQ_JIWoHmVR';
+/* ── Configuração ─────────────────────────────────────────────────── */
+var _firebaseConfig = {
+  apiKey:            'AIzaSyBmKdkqM-YsrV9WmfrNXoUmcCepu5klp_4',
+  authDomain:        'acao-social-ab5a6.firebaseapp.com',
+  projectId:         'acao-social-ab5a6',
+  storageBucket:     'acao-social-ab5a6.firebasestorage.app',
+  messagingSenderId: '968054368178',
+  appId:             '1:968054368178:web:ef6cd7a41aa109463e66ab'
+};
 
-var _sb  = null;  /* cliente Supabase */
-var _localUser = null;
-
+var _db          = null;
+var _localUser   = null;
 var LOCAL_ADMIN_PW = (function () {
   try { return localStorage.getItem('doavida_senha') || '@maanaim1818'; } catch (e) { return '@maanaim1818'; }
 })();
 
-/* ══════════════════════════════════════════════════════════════════════
-   INICIALIZAÇÃO
-   ══════════════════════════════════════════════════════════════════════ */
-
+/* ── Inicialização ────────────────────────────────────────────────── */
 function inicializarFirebase() {
-  if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
-    _sb = window.supabase.createClient(_SUPA_URL, _SUPA_KEY);
+  try {
+    if (typeof firebase === 'undefined') {
+      console.error('[DoaVida] Firebase SDK não carregado. Verifique os scripts no HTML.');
+      return false;
+    }
+    /* Evita inicializar mais de uma vez */
+    if (!firebase.apps || firebase.apps.length === 0) {
+      firebase.initializeApp(_firebaseConfig);
+    }
+    _db = firebase.firestore();
     window._doaVidaFirestoreOk = true;
-    console.log('[DoaVida] ✅ Supabase conectado —', _SUPA_URL);
-  } else {
-    /* SDK Supabase não carregou — usa REST direto */
-    _sb = _buildRestClient();
-    window._doaVidaFirestoreOk = true;
-    console.log('[DoaVida] ✅ Supabase REST ativo (sem SDK)');
+    console.log('[DoaVida] ✅ Firebase Firestore conectado — projeto: acao-social-ab5a6');
+    return true;
+  } catch (e) {
+    console.error('[DoaVida] Erro ao inicializar Firebase:', e.message);
+    return false;
   }
-  return true;
 }
 
 function inicializarSupabase() { return inicializarFirebase(); }
 window.inicializarSupabase = inicializarSupabase;
 
-/* ══════════════════════════════════════════════════════════════════════
-   CLIENTE REST FALLBACK (quando o SDK não carregar)
-   ══════════════════════════════════════════════════════════════════════ */
-
-function _buildRestClient() {
-  var base = _SUPA_URL + '/rest/v1/';
-  var hdrs = {
-    'apikey':        _SUPA_KEY,
-    'Authorization': 'Bearer ' + _SUPA_KEY,
-    'Content-Type':  'application/json',
-    'Prefer':        'return=representation'
-  };
-
-  function _get(table, params) {
-    var qs = Object.keys(params || {}).map(function (k) {
-      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
-    }).join('&');
-    return fetch(base + table + (qs ? '?' + qs : ''), { headers: hdrs })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { return { data: Array.isArray(d) ? d : [], error: null }; })
-      .catch(function (e) { return { data: [], error: { message: e.message } }; });
-  }
-
-  function _post(table, body) {
-    return fetch(base + table, { method: 'POST', headers: hdrs, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { return { data: Array.isArray(d) ? d[0] : d, error: null }; })
-      .catch(function (e) { return { data: null, error: { message: e.message } }; });
-  }
-
-  function _patch(table, id, body) {
-    return fetch(base + table + '?id=eq.' + id, { method: 'PATCH', headers: hdrs, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { return { data: Array.isArray(d) ? d[0] : d, error: null }; })
-      .catch(function (e) { return { data: null, error: { message: e.message } }; });
-  }
-
-  function _del(table, id) {
-    return fetch(base + table + '?id=eq.' + id, { method: 'DELETE', headers: hdrs })
-      .then(function () { return { data: null, error: null }; })
-      .catch(function (e) { return { data: null, error: { message: e.message } }; });
-  }
-
-  return {
-    from: function (table) {
-      var _filters = [];
-      var _orderCol = null, _orderAsc = true, _lim = null, _isSingle = false, _selectCols = null;
-      var b = {
-        select: function (cols) { if (cols && cols !== '*') _selectCols = cols; return b; },
-        eq: function (col, val) { _filters.push(col + '=eq.' + val); return b; },
-        order: function (col, opts) { _orderCol = col; _orderAsc = !(opts && opts.ascending === false); return b; },
-        limit: function (n) { _lim = n; return b; },
-        single: function () { _isSingle = true; return b; },
-        then: function (res, rej) {
-          var params = {};
-          if (_selectCols) params['select'] = _selectCols;
-          _filters.forEach(function (f) { var p = f.split('='); params[p[0]] = p.slice(1).join('='); });
-          if (_orderCol) params['order'] = _orderCol + (_orderAsc ? '.asc' : '.desc');
-          if (_lim) params['limit'] = _lim;
-          return _get(table, params).then(function (r) {
-            if (_isSingle) {
-              var row = Array.isArray(r.data) ? r.data[0] : r.data;
-              return res({ data: row || null, error: row ? null : { message: 'Not found' } });
-            }
-            return res(r);
-          }, rej);
-        },
-        insert: function (rows) {
-          var row = Array.isArray(rows) ? rows[0] : rows;
-          var b2 = {
-            select: function () { return b2; },
-            single: function () { return _post(table, row); }
-          };
-          return b2;
-        },
-        update: function (data) {
-          return {
-            eq: function (col, val) {
-              var inner = {
-                select: function () { return inner; },
-                single: function () { return _patch(table, val, data); },
-                then: function (res) { return _patch(table, val, data).then(res); }
-              };
-              return inner;
-            }
-          };
-        },
-        delete: function () {
-          return {
-            eq: function (col, val) {
-              return _del(table, val);
-            }
-          };
-        },
-        upsert: function (data) {
-          var uHdrs = Object.assign({}, hdrs, { 'Prefer': 'resolution=merge-duplicates,return=representation' });
-          return fetch(base + table, { method: 'POST', headers: uHdrs, body: JSON.stringify(data) })
-            .then(function (r) { return r.json(); })
-            .then(function (d) { return { data: d, error: null }; })
-            .catch(function (e) { return { data: null, error: { message: e.message } }; });
-        }
-      };
-      return b;
-    },
-    auth: { signInWithPassword: function () { return Promise.resolve({ data: null, error: { message: 'SDK não carregado' } }); } },
-    storage: { from: function () { return { remove: function () { return Promise.resolve({ data: null, error: null }); } }; } },
-    channel: function () { var ch = { on: function () { return ch; }, subscribe: function () { return ch; } }; return ch; },
-    removeChannel: function () {}
-  };
-}
-
-/* ══════════════════════════════════════════════════════════════════════
-   window.supabaseClient — interface esperada por admin.js
-   ══════════════════════════════════════════════════════════════════════ */
-
+/* ── Auth local (compatibilidade com admin.js) ───────────────────── */
 window.supabaseClient = {
-
   auth: {
     signInWithPassword: async function (creds) {
-      /* Só verifica a senha local — autenticação simplificada */
       var localPw = LOCAL_ADMIN_PW;
       try { localPw = localStorage.getItem('doavida_senha') || LOCAL_ADMIN_PW; } catch (_) {}
       if (creds.password === localPw) {
@@ -165,57 +57,32 @@ window.supabaseClient = {
       }
       return { data: null, error: { message: 'E-mail ou senha inválidos.' } };
     },
-
-    signOut: async function () { _localUser = null; },
-
-    getSession: function () {
-      return Promise.resolve({
-        data: { session: _localUser ? { user: _localUser } : null }
-      });
-    },
-
+    signOut:          async function () { _localUser = null; },
+    getSession:       function () { return Promise.resolve({ data: { session: _localUser ? { user: _localUser } : null } }); },
     onAuthStateChange: function () {}
   },
-
   from: function (table) {
     if (table === 'profiles') {
-      return {
-        select: function () {
-          return {
-            eq: function () {
-              return {
-                single: function () {
-                  if (!_localUser) return Promise.resolve({ data: null, error: { message: 'Not authenticated' } });
-                  return Promise.resolve({ data: { role: 'admin', nome: _localUser.email }, error: null });
-                }
-              };
-            }
-          };
-        }
-      };
+      return { select: function () { return { eq: function () { return { single: function () {
+        if (!_localUser) return Promise.resolve({ data: null, error: { message: 'Not authenticated' } });
+        return Promise.resolve({ data: { role: 'admin', nome: _localUser.email }, error: null });
+      }}}}};
     }
-    return _sb.from(table);
+    /* Redireciona outras chamadas para DoaVidaSync quando possível */
+    return {
+      select: function () { return { order: function () { return Promise.resolve({ data: [], error: null }); } }; },
+      insert: function () { return { select: function () { return { single: function () { return Promise.resolve({ data: null, error: { message: 'Use DoaVidaSync' } }); } } }; },
+      update: function () { return { eq: function () { return Promise.resolve({ data: null, error: null }); } }; },
+      delete: function () { return { eq: function () { return Promise.resolve({ data: null, error: null }); } }; },
+      upsert: function () { return Promise.resolve({ data: null, error: null }); }
+    };
   },
-
-  channel: function () {
-    var ch = { on: function () { return ch; }, subscribe: function () { return ch; } };
-    return ch;
-  },
+  channel:       function () { var ch = { on: function () { return ch; }, subscribe: function () { return ch; } }; return ch; },
   removeChannel: function () {},
-
-  storage: {
-    from: function () {
-      return {
-        remove: async function () { return { data: null, error: null }; }
-      };
-    }
-  }
+  storage:       { from: function () { return { remove: async function () { return { data: null, error: null }; } }; } }
 };
 
-/* ══════════════════════════════════════════════════════════════════════
-   HELPERS INTERNOS
-   ══════════════════════════════════════════════════════════════════════ */
-
+/* ── Helpers internos ─────────────────────────────────────────────── */
 function _now() { return new Date().toISOString(); }
 
 function _withTimeout(promise, ms, fallback) {
@@ -232,123 +99,116 @@ function _withTimeout(promise, ms, fallback) {
   });
 }
 
-async function _getAll(table, order) {
+/* Lê todos os documentos de uma coleção, ordenados por campo */
+async function _getAll(colecao, orderField) {
   try {
-    var q = _sb.from(table).select('*');
-    if (order) q = q.order(order, { ascending: true });
-    var r = await _withTimeout(q, 12000, { data: [], error: null });
-    return (r && r.data) ? r.data : [];
-  } catch (e) { console.error('[DoaVida]', table, e.message); return []; }
+    var q = orderField
+      ? _db.collection(colecao).orderBy(orderField, 'desc')
+      : _db.collection(colecao);
+    var snap = await _withTimeout(q.get(), 12000, null);
+    if (!snap || !snap.docs) return [];
+    return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+  } catch (e) {
+    console.error('[DoaVida]', colecao, e.message);
+    return [];
+  }
 }
 
-async function _insert(table, payload) {
-  var r = await _sb.from(table).insert(payload).select().single();
-  if (r.error) throw new Error(r.error.message);
-  return r.data;
+/* Adiciona um documento (ID gerado pelo Firestore) */
+async function _insert(colecao, payload) {
+  var dados = Object.assign({}, payload, { created_at: _now() });
+  var ref   = await _db.collection(colecao).add(dados);
+  return Object.assign({ id: ref.id }, dados);
 }
 
-async function _update(table, id, dados) {
-  var r = await _sb.from(table).update(Object.assign({}, dados, { updated_at: _now() })).eq('id', id).select().single();
-  if (r.error) throw new Error(r.error.message);
-  return r.data;
+/* Atualiza campos de um documento pelo ID */
+async function _update(colecao, id, dados) {
+  var atualizado = Object.assign({}, dados, { updated_at: _now() });
+  await _db.collection(colecao).doc(id).update(atualizado);
+  return Object.assign({ id: id }, atualizado);
 }
 
-async function _delete(table, id) {
-  var r = await _sb.from(table).delete().eq('id', id);
-  if (r.error) throw new Error(r.error.message);
+/* Remove um documento pelo ID */
+async function _delete(colecao, id) {
+  await _db.collection(colecao).doc(id).delete();
   return true;
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   DoaVidaSync — interface pública usada por form.js e admin.js
+   DoaVidaSync — interface pública usada por form.js, admin.js e index.js
+   Mantém exatamente o mesmo contrato do serviço anterior.
    ══════════════════════════════════════════════════════════════════════ */
-
 var DoaVidaSync = {
 
   init: function () {
     inicializarFirebase();
-    console.log('[DoaVidaSync] ✅ Inicializado');
+    console.log('[DoaVidaSync] ✅ Inicializado — Firebase Firestore');
     window.dispatchEvent(new CustomEvent('DoaVidaSyncPronto'));
   },
 
   /* ── ALIMENTOS ── */
-  getAlimentos: async function () { return _getAll('alimentos', 'name'); },
+  getAlimentos: async function () {
+    var lista = await _getAll('alimentos', 'name');
+    if (!lista || lista.length === 0) {
+      return typeof DoaVidaAPI !== 'undefined' ? DoaVidaAPI.getAlimentos() : [];
+    }
+    return lista;
+  },
 
   addAlimento: async function (dados) {
-    return _insert('alimentos', Object.assign({}, dados, { kg: dados.kg || 0, created_at: _now() }));
+    return _insert('alimentos', Object.assign({ kg: 0 }, dados));
   },
 
   updateAlimento: async function (id, dados) { return _update('alimentos', id, dados); },
-  deleteAlimento: async function (id) { return _delete('alimentos', id); },
+  deleteAlimento: async function (id)        { return _delete('alimentos', id); },
 
   getAlimentoById: async function (id) {
-    var r = await _sb.from('alimentos').select('*').eq('id', id).single();
-    return r.data || null;
+    try {
+      var doc = await _db.collection('alimentos').doc(id).get();
+      return doc.exists ? Object.assign({ id: doc.id }, doc.data()) : null;
+    } catch (e) { return null; }
   },
 
   /* ── DOAÇÕES ── */
   getDoacoes: async function () {
-    try {
-      var r = await _withTimeout(
-        _sb.from('doacoes').select('*').order('created_at', { ascending: false }), 12000, { data: [] }
-      );
-      return (r && r.data) ? r.data : [];
-    } catch (e) { return []; }
+    return _getAll('doacoes', 'created_at');
   },
 
   addDoacao: async function (dados) {
-    return _insert('doacoes', Object.assign({}, dados, { created_at: _now() }));
+    return _insert('doacoes', dados);
   },
 
   updateDoacaoStatus: async function (id, status) { return _update('doacoes', id, { status: status }); },
-  updateDoacao: async function (id, dados) { return _update('doacoes', id, dados); },
-  deleteDoacao: async function (id) { return _delete('doacoes', id); },
+  updateDoacao:       async function (id, dados)  { return _update('doacoes', id, dados); },
+  deleteDoacao:       async function (id)         { return _delete('doacoes', id); },
 
   /* ── FAMÍLIAS ── */
-  getFamilias: async function () { return _getAll('familias', 'created_at'); },
-  addFamilia:  async function (dados) { return _insert('familias', Object.assign({}, dados, { created_at: _now() })); },
-  updateFamilia: async function (id, dados) { return _update('familias', id, dados); },
-  deleteFamilia: async function (id) { return _delete('familias', id); },
+  getFamilias:   async function ()           { return _getAll('familias', 'created_at'); },
+  addFamilia:    async function (dados)      { return _insert('familias', dados); },
+  updateFamilia: async function (id, dados)  { return _update('familias', id, dados); },
+  deleteFamilia: async function (id)         { return _delete('familias', id); },
 
   /* ── VOLUNTÁRIOS ── */
-  getVoluntarios: async function () { return _getAll('voluntarios', 'created_at'); },
-  addVoluntario:  async function (dados) { return _insert('voluntarios', Object.assign({}, dados, { created_at: _now() })); },
+  getVoluntarios:   async function ()          { return _getAll('voluntarios', 'created_at'); },
+  addVoluntario:    async function (dados)     { return _insert('voluntarios', dados); },
   updateVoluntario: async function (id, dados) { return _update('voluntarios', id, dados); },
-  deleteVoluntario: async function (id) { return _delete('voluntarios', id); },
+  deleteVoluntario: async function (id)        { return _delete('voluntarios', id); },
 
   /* ── ORAÇÕES ── */
-  getOracoes: async function () { return _getAll('oracoes', 'created_at'); },
-  addOracao:  async function (dados) { return _insert('oracoes', Object.assign({}, dados, { created_at: _now() })); },
+  getOracoes:   async function ()          { return _getAll('oracoes', 'created_at'); },
+  addOracao:    async function (dados)     { return _insert('oracoes', dados); },
   updateOracao: async function (id, dados) { return _update('oracoes', id, dados); },
-  deleteOracao: async function (id) { return _delete('oracoes', id); },
+  deleteOracao: async function (id)        { return _delete('oracoes', id); },
 
   /* ── GALERIA ── */
+  getGaleriaMetadata: async function () { return _getAll('galeria', 'created_at'); },
+  getGaleria:         async function () { return _getAll('galeria', 'created_at'); },
 
-  /* Busca só metadados (sem url) para montar a grade rapidamente */
-  getGaleriaMetadata: async function () {
-    try {
-      var cols = 'id,titulo,legenda,categoria,tipo,ativo,visibilidade,order_index,poster_url,storage_path,created_at';
-      var q = _sb.from('galeria').select(cols).order('created_at', { ascending: true });
-      var r = await _withTimeout(q, 15000, { data: [], error: null });
-      return (r && r.data) ? r.data : [];
-    } catch (e) { console.error('[DoaVida] galeria metadata', e.message); return []; }
-  },
-
-  /* Busca a URL de um único item (pode ser base64 grande — feito individualmente) */
   getGaleriaItemUrl: async function (id) {
     try {
-      var r = await _sb.from('galeria').select('url').eq('id', id).single();
-      return (r && r.data && r.data.url) ? r.data.url : '';
+      var doc = await _db.collection('galeria').doc(id).get();
+      return (doc.exists && doc.data().url) ? doc.data().url : '';
     } catch (e) { return ''; }
-  },
-
-  /* Versão completa (com url) — usada pelo modal de edição */
-  getGaleria: async function () {
-    try {
-      var q = _sb.from('galeria').select('*').order('created_at', { ascending: true });
-      var r = await _withTimeout(q, 60000, { data: [], error: null });
-      return (r && r.data) ? r.data : [];
-    } catch (e) { console.error('[DoaVida] galeria', e.message); return []; }
   },
 
   addFotoGaleria: async function (foto) {
@@ -363,117 +223,67 @@ var DoaVidaSync = {
       order_index:  typeof foto.order_index === 'number' ? foto.order_index : 0,
       ativo:        foto.ativo !== false,
       storage_path: foto.storage_path || '',
-      visibilidade: (foto.publica === false || foto.isPublic === false) ? 'privada' : 'publica',
-      created_at:   _now()
+      visibilidade: (foto.publica === false || foto.isPublic === false) ? 'privada' : 'publica'
     };
     return _insert('galeria', payload);
   },
 
   updateFotoGaleria: async function (id, dados) { return _update('galeria', id, dados); },
+  deleteFotoGaleria: async function (id)        { return _delete('galeria', id); },
 
-  deleteFotoGaleria: async function (id) { return _delete('galeria', id); },
-
+  /* Upload → Cloudinary (não usa Firebase Storage para evitar cobrança) */
   uploadImagemGaleria: async function (arquivo, nomeArquivo) {
-    /* Tenta Supabase Storage; cai em base64 só se falhar */
-    try {
-      if (window.supabase && _sb && typeof _sb.storage === 'object') {
-        /* SDK disponível — upload real para o bucket "galeria" */
-        var upResult = await _sb.storage.from('galeria').upload(nomeArquivo, arquivo, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: arquivo.type || 'application/octet-stream'
-        });
-        if (upResult.error) throw new Error(upResult.error.message);
-        var urlResult = _sb.storage.from('galeria').getPublicUrl(nomeArquivo);
-        return urlResult.data.publicUrl;
-      }
-
-      /* REST fallback — upload direto para a Storage API */
-      var storageEndpoint = _SUPA_URL + '/storage/v1/object/galeria/' + encodeURIComponent(nomeArquivo);
-      var resp = await fetch(storageEndpoint, {
-        method: 'POST',
-        headers: {
-          'apikey':        _SUPA_KEY,
-          'Authorization': 'Bearer ' + _SUPA_KEY,
-          'Content-Type':  arquivo.type || 'application/octet-stream',
-          'x-upsert':      'true'
-        },
-        body: arquivo
-      });
-      if (!resp.ok) {
-        var errBody = await resp.json().catch(function () { return { message: resp.statusText }; });
-        throw new Error(errBody.message || 'Upload falhou (' + resp.status + ')');
-      }
-      return _SUPA_URL + '/storage/v1/object/public/galeria/' + encodeURIComponent(nomeArquivo);
-
-    } catch (storageErr) {
-      console.warn('[DoaVida] Storage falhou, convertendo para base64:', storageErr.message);
-      /* Fallback final: base64 (compatibilidade) */
-      return new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onload  = function (e) { resolve(e.target.result); };
-        reader.onerror = reject;
-        reader.readAsDataURL(arquivo);
-      });
+    if (typeof DoaVidaCloudinary === 'undefined') {
+      throw new Error('Cloudinary não carregado. Adicione js/services/cloudinary.js antes de firebase.js.');
     }
+    var tipo      = arquivo.type.startsWith('video/') ? 'video' : 'image';
+    var resultado = await DoaVidaCloudinary.upload(arquivo, tipo);
+    return resultado.url;
   },
 
   /* ── MODELO CESTA ── */
-  getModeloCestaItens: async function () {
-    try {
-      var r = await _withTimeout(
-        _sb.from('modelo_cesta_itens').select('*').order('created_at', { ascending: true }), 10000, { data: [] }
-      );
-      return (r && r.data) ? r.data : [];
-    } catch (e) { return []; }
-  },
+  getModeloCestaItens: async function () { return _getAll('modelo_cesta_itens', 'created_at'); },
 
   addModeloCestaItem: async function (dados) {
-    return _insert('modelo_cesta_itens', Object.assign({}, dados, { created_at: _now() }));
+    return _insert('modelo_cesta_itens', dados);
   },
 
   updateModeloCestaItem: async function (id, dados) { return _update('modelo_cesta_itens', id, dados); },
-  deleteModeloCestaItem: async function (id) { return _delete('modelo_cesta_itens', id); },
+  deleteModeloCestaItem: async function (id)        { return _delete('modelo_cesta_itens', id); },
 
   /* ── CESTAS FORMADAS ── */
-  getCestasFormadas: async function () { return _getAll('cestas_formadas', 'created_at'); },
+  getCestasFormadas:  async function ()      { return _getAll('cestas_formadas', 'created_at'); },
+  addCestaFormada:    async function (dados) { return _insert('cestas_formadas', dados); },
+  deleteCestaFormada: async function (id)    { return _delete('cestas_formadas', id); },
 
-  addCestaFormada: async function (dados) {
-    return _insert('cestas_formadas', Object.assign({}, dados, { created_at: _now() }));
-  },
-
-  deleteCestaFormada: async function (id) { return _delete('cestas_formadas', id); },
-
-  /* ── CONFIGURAÇÕES ── */
+  /* ── CONFIGURAÇÕES (chave/valor) ── */
   getConfig: async function (chave) {
     try {
-      var r = await _sb.from('configuracao').select('valor').eq('chave', chave).single();
-      return (r.data && r.data.valor !== undefined) ? r.data.valor : null;
+      var doc = await _db.collection('configuracao').doc(chave).get();
+      return (doc.exists && doc.data().valor !== undefined) ? doc.data().valor : null;
     } catch (e) { return null; }
   },
 
   setConfig: async function (chave, valor) {
-    var r = await _sb.from('configuracao').upsert(
-      { chave: chave, valor: String(valor), updated_at: _now() }
+    await _db.collection('configuracao').doc(chave).set(
+      { chave: chave, valor: String(valor), updated_at: _now() },
+      { merge: true }
     );
-    if (r && r.error) throw new Error(r.error.message);
   },
 
   getAllConfigs: async function () {
     try {
-      var r = await _sb.from('configuracao').select('*');
-      var obj = {};
-      if (r.data) r.data.forEach(function (row) { obj[row.chave] = row.valor; });
+      var snap = await _db.collection('configuracao').get();
+      var obj  = {};
+      snap.docs.forEach(function (d) { obj[d.id] = d.data().valor; });
       return obj;
     } catch (e) { return {}; }
   },
 
   /* ── SENHA ADMIN ── */
   getSenha: async function () {
-    try {
-      var v = await DoaVidaSync.getConfig('senha_admin');
-      return v || '@maanaim1818';
-    } catch (e) { return '@maanaim1818'; }
+    var v = await DoaVidaSync.getConfig('senha_admin');
+    return v || '@maanaim1818';
   },
 
   setSenha: async function (novaSenha) {
@@ -514,45 +324,8 @@ var DoaVidaSync = {
     ]);
   },
 
-  /* ── MIGRAÇÃO LOCAL → SUPABASE ── */
-  migrarLocalParaFirestore: async function () {
-    try {
-      var deFoods = JSON.parse(localStorage.getItem('doavida_foods')        || '[]');
-      var deLocal = JSON.parse(localStorage.getItem('doavida_fs_alimentos') || '[]');
-      var mapa = {};
-      deFoods.concat(deLocal).forEach(function (a) {
-        if (a && a.name) mapa[a.name.toLowerCase().trim()] = a;
-      });
-      var lista = Object.keys(mapa).map(function (k) { return mapa[k]; });
-      if (!lista.length) return { ok: false, msg: 'Nenhum alimento local para migrar.' };
-
-      var existentes = await DoaVidaSync.getAlimentos();
-      var nomesEx = existentes.map(function (a) { return (a.name || '').toLowerCase().trim(); });
-      var migrados = 0;
-      for (var i = 0; i < lista.length; i++) {
-        var a = lista[i];
-        if (!a.name || nomesEx.indexOf(a.name.toLowerCase().trim()) !== -1) continue;
-        await DoaVidaSync.addAlimento({
-          name:    a.name,
-          goal:    a.goal    || 0,
-          kg:      a.kg      || 0,
-          img:     a.img     || '',
-          emoji:   a.emoji   || '🥫',
-          peso:    a.peso    || 1,
-          unidade: a.unidade || 'kg'
-        });
-        migrados++;
-      }
-      return { ok: true, migrados: migrados };
-    } catch (e) { return { ok: false, msg: e.message }; }
-  },
-
-  /* ── EMAIL ── */
+  /* ── EMAIL (stub) ── */
   notificarEmail: async function () {},
-
-  EMAILJS_SERVICE_ID:  '',
-  EMAILJS_TEMPLATE_ID: '',
-  EMAILJS_PUBLIC_KEY:  '',
 };
 
 window.DoaVidaSync = DoaVidaSync;
