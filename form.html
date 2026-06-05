@@ -291,24 +291,21 @@
     /* 
        RESTAURANT-STYLE APP LAYOUT
      */
-    /* App layout */
+    /* App layout — tela cheia, sem scroll na pagina */
+    html, body { height: 100%; overflow: hidden; }
     .doa-app {
       display: block;
-      min-height: 100vh;
+      height: 100vh;
       background: #f4f4f4;
+      overflow: hidden;
     }
-    /* Left panel  margem direita para não ficar sob o sidebar fixo */
+    /* Left panel — rola internamente */
     .doa-left {
-      padding: 100px 28px 40px;
+      padding: 80px 28px 40px;
       margin-right: 320px;
-    }
-    .doa-search-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px; gap: 16px;
-    }
-    .doa-search-row h2 {
-      font-family: var(--ff-display); font-size: 1.3rem; font-weight: 900;
-      color: #1a1a1a; margin: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-sizing: border-box;
     }
     .doa-search {
       padding: 10px 16px 10px 40px;
