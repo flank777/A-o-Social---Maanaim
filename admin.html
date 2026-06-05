@@ -8960,16 +8960,30 @@ CREATE POLICY "pub_del_cformd" ON public.cestas_formadas FOR DELETE USING (true)
 
             <!-- Area de upload -->
             <div id="food-img-upload-area"
-              style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text2);font-size:.85rem;transition:border-color .2s,background .2s;"
-              onclick="document.getElementById('food-img-file').click()"
+              style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;color:var(--text2);font-size:.85rem;transition:border-color .2s,background .2s;"
               ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
               ondragleave="this.style.borderColor=''"
               ondrop="event.preventDefault();this.style.borderColor='';_foodImgHandleFiles(event.dataTransfer.files)">
-              <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem;display:block;margin-bottom:8px;color:var(--gold)"></i>
-              <strong>Clique ou arraste</strong> uma imagem aqui<br>
-              <span style="font-size:.72rem;">JPG, PNG, WebP &mdash; max. 10 MB</span>
+              <i class="fas fa-image" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--gold)"></i>
+              <div style="margin-bottom:12px;font-size:.82rem;">Arraste uma imagem aqui ou escolha uma opcao:</div>
+              <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                <button type="button"
+                  onclick="document.getElementById('food-img-file').click()"
+                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--gold);color:#1A3312;border:none;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;">
+                  <i class="fas fa-folder-open"></i> Selecionar do computador
+                </button>
+                <button type="button"
+                  onclick="document.getElementById('food-img-camera').click()"
+                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;">
+                  <i class="fas fa-camera"></i> Usar camera
+                </button>
+              </div>
+              <div style="margin-top:10px;font-size:.7rem;color:var(--text2);">JPG, PNG, WebP &mdash; max. 10 MB</div>
             </div>
+            <!-- Input arquivo do computador -->
             <input type="file" id="food-img-file" accept="image/*" style="display:none" onchange="_foodImgHandleFiles(this.files)" />
+            <!-- Input camera (mobile e webcam) -->
+            <input type="file" id="food-img-camera" accept="image/*" capture="environment" style="display:none" onchange="_foodImgHandleFiles(this.files)" />
 
             <!-- Preview apos upload -->
             <div id="food-img-preview" style="display:none;margin-top:10px;position:relative;">
