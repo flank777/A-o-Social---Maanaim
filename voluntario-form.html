@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -19,6 +19,11 @@
       --radius: 20px;
     }
     body { background: #f4f6f2; min-height: 100vh; }
+    /* Desktop: form fixo na tela, sem scroll da pagina */
+    @media (min-width: 601px) {
+      html, body { height: 100%; overflow: hidden; }
+      .vol-form-page { height: 100vh; overflow-y: auto; padding: 80px 24px; }
+    }
     /*  Navbar  */
     #nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
