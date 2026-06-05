@@ -2028,6 +2028,9 @@ function abrirModalAlimento(id) {
     if (el) el.value = "";
   });
 
+  /* Reseta área de upload de imagem */
+  _foodImgRemover();
+
   /* Esconde alerta de meta */
   var metaAlerta = document.getElementById("food-meta-alerta");
   if (metaAlerta) metaAlerta.style.display = "none";
@@ -2047,6 +2050,16 @@ function abrirModalAlimento(id) {
       setVal("food-goal", food.goal || "");
       setVal("food-kg",   food.kg   || "");
       setVal("food-img",  food.img  || "");
+
+      /* Mostra preview da imagem existente */
+      if (food.img) {
+        var _prev    = document.getElementById('food-img-preview');
+        var _prevImg = document.getElementById('food-img-preview-img');
+        var _area    = document.getElementById('food-img-upload-area');
+        if (_prevImg) _prevImg.src = food.img;
+        if (_prev)    _prev.style.display = 'block';
+        if (_area)    _area.style.display = 'none';
+      }
 
       /* Seleciona a unidade correta */
       var unidadeVal = food.unidade || "kg";
@@ -2209,6 +2222,68 @@ async function salvarAlimento() {
   if (typeof renderCestas === "function") renderCestas();
 }
 window.salvarAlimento = salvarAlimento;
+
+/* ── Upload de imagem do alimento via Cloudinary ─────────────────── */
+function _foodImgHandleFiles(files) {
+  if (!files || files.length === 0) return;
+  var arquivo = files[0];
+
+  if (!window.DoaVidaCloudinary) {
+    showToast('❌ Cloudinary não carregado.', 'error');
+    return;
+  }
+
+  var validacao = DoaVidaCloudinary.validar(arquivo);
+  if (!validacao.ok) {
+    showToast('⚠️ ' + validacao.erro, 'error');
+    return;
+  }
+
+  /* Mostra barra de progresso */
+  var wrap = document.getElementById('food-img-progress-wrap');
+  var bar  = document.getElementById('food-img-progress-bar');
+  var txt  = document.getElementById('food-img-progress-txt');
+  var area = document.getElementById('food-img-upload-area');
+  if (wrap) wrap.style.display = 'block';
+  if (area) area.style.display = 'none';
+
+  DoaVidaCloudinary.upload(arquivo, 'image', function (pct) {
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = 'Enviando ' + pct + '%…';
+  }).then(function (resultado) {
+    /* Salva URL no campo oculto */
+    var input = document.getElementById('food-img');
+    if (input) input.value = resultado.url;
+
+    /* Mostra preview */
+    var prev    = document.getElementById('food-img-preview');
+    var prevImg = document.getElementById('food-img-preview-img');
+    if (prev)    prev.style.display = 'block';
+    if (prevImg) prevImg.src = resultado.url;
+    if (wrap)    wrap.style.display = 'none';
+
+    showToast('✅ Imagem enviada!', 'success');
+  }).catch(function (e) {
+    if (wrap) wrap.style.display = 'none';
+    if (area) area.style.display = 'block';
+    showToast('❌ Falha no upload: ' + (e.message || e), 'error');
+  });
+}
+window._foodImgHandleFiles = _foodImgHandleFiles;
+
+function _foodImgRemover() {
+  var input   = document.getElementById('food-img');
+  var prev    = document.getElementById('food-img-preview');
+  var prevImg = document.getElementById('food-img-preview-img');
+  var area    = document.getElementById('food-img-upload-area');
+  var fileEl  = document.getElementById('food-img-file');
+  if (input)   input.value = '';
+  if (prevImg) prevImg.src = '';
+  if (prev)    prev.style.display = 'none';
+  if (area)    area.style.display = 'block';
+  if (fileEl)  fileEl.value = '';
+}
+window._foodImgRemover = _foodImgRemover;
 
 /*
   Atualiza o painel de informações da cesta no modal de alimento.

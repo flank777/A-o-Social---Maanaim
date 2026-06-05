@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   �"�"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"
   �"  DoaVida � admin.html  v4.0                                         �"
@@ -8955,19 +8955,39 @@ CREATE POLICY "pub_del_cformd" ON public.cestas_formadas FOR DELETE USING (true)
             Imagem do Alimento
           </div>
           <div class="modal-form-group">
-            <label class="modal-label" for="food-img"
-              >URL da Imagem (opcional)</label
-            >
-            <input
-              type="url"
-              id="food-img"
-              class="modal-input"
-              placeholder="https://images.unsplash.com/photo-...?w=300&q=70"
-            />
-            <small class="modal-hint"
-              >�xR Se estiver vazio, o sistema usará automaticamente o emoji
-              padrão como ícone.</small
-            >
+            <!-- Campo oculto que guarda a URL final apos o upload -->
+            <input type="hidden" id="food-img" />
+
+            <!-- Area de upload -->
+            <div id="food-img-upload-area"
+              style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:var(--text2);font-size:.85rem;transition:border-color .2s,background .2s;"
+              onclick="document.getElementById('food-img-file').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="event.preventDefault();this.style.borderColor='';_foodImgHandleFiles(event.dataTransfer.files)">
+              <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem;display:block;margin-bottom:8px;color:var(--gold)"></i>
+              <strong>Clique ou arraste</strong> uma imagem aqui<br>
+              <span style="font-size:.72rem;">JPG, PNG, WebP &mdash; max. 10 MB</span>
+            </div>
+            <input type="file" id="food-img-file" accept="image/*" style="display:none" onchange="_foodImgHandleFiles(this.files)" />
+
+            <!-- Preview apos upload -->
+            <div id="food-img-preview" style="display:none;margin-top:10px;position:relative;">
+              <img id="food-img-preview-img" style="width:100%;max-height:180px;object-fit:contain;border-radius:8px;background:#f5f5f5;" />
+              <button type="button" onclick="_foodImgRemover()" style="position:absolute;top:6px;right:6px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;" aria-label="Remover imagem"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Progresso do upload -->
+            <div id="food-img-progress-wrap" style="display:none;margin-top:8px;">
+              <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden;">
+                <div id="food-img-progress-bar" style="height:100%;background:var(--gold);width:0%;transition:width .2s;"></div>
+              </div>
+              <small id="food-img-progress-txt" style="color:var(--text2);font-size:.72rem;">Enviando...</small>
+            </div>
+
+            <small class="modal-hint" style="margin-top:6px;display:block;">
+              Se nao enviar imagem, o emoji do alimento sera exibido como icone.
+            </small>
           </div>
         </div>
 
