@@ -134,22 +134,21 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.09);
       background: #fff;
     }
-    /* Área da imagem */
+    /* Área da imagem — altura adaptada ao tamanho da imagem */
     .fcard-img-wrap {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1;
       overflow: hidden;
       background: #f8f8f8;
       flex-shrink: 0;
+      border-radius: 16px;
+      margin: 8px 8px 0;
+      width: calc(100% - 16px);
     }
     .fcard-img {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
+      height: auto;
       display: block;
-      padding: 6px;
     }
     .fcard-emoji-fb {
       width: 100%; height: 100%;
@@ -468,8 +467,7 @@
     .fcard--ativo { border-color: #2d6e1f; }
     .fcard--meta { opacity: .6; pointer-events: none; }
     .fcard-img-wrap {
-      position: relative; width: 100%;
-      aspect-ratio: 1 / 1;
+      position: relative;
       overflow: hidden;
       background: #f8f8f8; flex-shrink: 0;
       border-radius: 16px;
@@ -477,10 +475,10 @@
       width: calc(100% - 16px);
     }
     .fcard-img {
-      width: 100%; height: 100%;
-      object-fit: contain; object-position: center;
+      width: 100%;
+      height: auto;
+      display: block;
       border-radius: 12px;
-      padding: 6px;
     }
     .fcard-emoji-fb {
       width: 100%; height: 100%;
@@ -658,14 +656,13 @@
 
       /* Imagem quadrada sem cortar */
       .fcard-img-wrap {
-        aspect-ratio: 1/1 !important;
         margin: 5px 5px 0 !important;
         width: calc(100% - 10px) !important;
         border-radius: 10px !important;
       }
       .fcard-img {
-        object-fit: contain !important;
-        padding: 4px !important;
+        width: 100% !important;
+        height: auto !important;
         border-radius: 8px !important;
       }
       .fcard-emoji-fb { font-size: 2rem !important; border-radius: 8px !important; }
