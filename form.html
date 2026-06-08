@@ -239,20 +239,24 @@
     /* Rodapé: quantidade selecionada + controles */
     .fcard-footer {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
       margin-top: auto;
     }
+    .fcard-qty-display:empty { display: none; }
     .fcard-qty-label {
       font-size: 1.2rem;
       font-weight: 800;
       color: var(--gold, #2d6e1f);
       font-family: var(--ff-mono, monospace);
+      text-align: center;
     }
     /* Barra de controle  n + */
     .fcard-ctrl {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0;
       background: #f0f0f0;
       border-radius: 10px;
@@ -530,14 +534,15 @@
       font-size: .78rem; color: #888; margin-bottom: 12px; line-height: 1.4;
     }
     .fcard-footer {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-top: auto;
-      gap: 8px;
+      display: flex; flex-direction: column;
+      align-items: stretch; margin-top: auto;
+      gap: 6px;
     }
     .fcard-qty-display {
       font-size: .95rem; font-weight: 800;
-      color: #2d6e1f; min-width: 30px;
+      color: #2d6e1f; text-align: center;
     }
+    .fcard-qty-display:empty { display: none; }
     /* "Adicionar" button  full width, rounded, colored */
     .fcard-order-btn {
       width: 100%;
@@ -552,9 +557,9 @@
     .fcard-order-btn:hover { background: #2d6e1f; }
     /* Counter (when q>0) */
     .fcard-ctrl {
-      display: flex; align-items: center; gap: 0;
+      display: flex; align-items: center; justify-content: center; gap: 0;
       background: #f0f0f0; border-radius: 50px; overflow: hidden;
-      flex: 1;
+      flex: unset;
     }
     .fcard-btn-minus, .fcard-btn-plus {
       width: 32px; height: 32px; border: none;
@@ -712,15 +717,18 @@
       .fcard-info-row .fcard-unit-txt { font-size: .60rem !important; }
       .fcard-info-row .fcard-tag { font-size: .55rem !important; padding: 1px 5px !important; }
 
-      /* Botão "Adicionar" */
+      /* Botão "Adicionar" — centralizado, largura total */
+      .fcard-footer { flex-direction: column !important; align-items: stretch !important; }
       .fcard-order-btn {
-        padding: 6px 6px !important;
+        width: 100% !important;
+        padding: 7px 6px !important;
         font-size: .68rem !important;
         border-radius: 30px !important;
+        text-align: center !important;
       }
 
       /* Controles +/- — mínimo 26px para toque funcional */
-      .fcard-ctrl { border-radius: 30px !important; }
+      .fcard-ctrl { border-radius: 30px !important; justify-content: center !important; }
       .fcard-btn-minus, .fcard-btn-plus {
         width: 26px !important;
         height: 26px !important;
