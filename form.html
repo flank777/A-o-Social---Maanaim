@@ -101,7 +101,7 @@
       gap: 20px !important;
       max-height: none !important;
       overflow-y: visible !important;
-      padding: 4px 2px;
+      padding: 4px 2px 32px !important;
       align-items: flex-start !important;
     }
     /* Card base */
@@ -310,16 +310,16 @@
     html, body { height: 100%; overflow: hidden; }
     .doa-app {
       display: block;
-      height: 100vh;
+      min-height: 100vh;
       background: #f4f4f4;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     /* Left panel — rola internamente */
     .doa-left {
       padding: 80px 28px 40px;
       margin-right: 320px;
-      height: 100vh;
-      overflow-y: auto;
+      min-height: 100vh;
+      overflow-y: visible;
       box-sizing: border-box;
     }
     .doa-search {
@@ -669,7 +669,7 @@
     /*  Tablet / mobile (0768px): sidebar oculta, barra de rodapé  */
     @media (max-width: 768px) {
       .doa-sidebar { display: none !important; }
-      .doa-left { padding: 80px 12px 120px !important; margin-right: 0 !important; }
+      .doa-left { padding: 80px 12px 160px !important; margin-right: 0 !important; min-height: 100vh !important; overflow-y: visible !important; }
 
       /* 3 colunas — ~6 itens visíveis de uma vez sem scroll */
       #foods-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; align-items: flex-start !important; }
