@@ -451,28 +451,28 @@
 
 /* Container da imagem — proporção fixa via padding-top (evita CLS) */
 .fcard-img-wrap {
-  position: relative;          /* ancora os filhos posicionados */
+  position: relative;
   width: 100%;
-  padding-top: 70%;             /* altura = 70% da largura — aspecto 10:7 */
+  padding-top: 0;
   background: var(--surface2);
-  overflow: hidden;
-  flex-shrink: 0;               /* não encolhe em flex column */
+  flex-shrink: 0;
 }
 
-/* Imagem preenche todo o container — a chave para não "desaparecer" */
+/* Imagem em fluxo normal — card se adapta à altura da imagem */
 .fcard-img {
-  position: absolute;           /* sai do fluxo, mas respeita o .fcard-img-wrap */
-  inset: 0;                     /* top:0 right:0 bottom:0 left:0 */
+  position: static;
+  inset: auto;
   width: 100%;
-  height: 100%;
-  object-fit: cover;            /* não distorce */
+  height: auto;
   display: block;
 }
 
-/* Emoji fallback quando imagem falha ou não existe */
+/* Emoji fallback */
 .fcard-emoji-fb {
-  position: absolute;
-  inset: 0;
+  position: static;
+  inset: auto;
+  width: 100%;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -134,27 +134,37 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.09);
       background: #fff;
     }
-    /* Área da imagem — altura adaptada ao tamanho da imagem */
+    /* Área da imagem — altura natural, card se adapta */
     .fcard-img-wrap {
       position: relative;
-      width: 100%;
-      overflow: hidden;
+      width: calc(100% - 16px);
+      padding-top: 0;
+      overflow: visible;
       background: #f8f8f8;
       flex-shrink: 0;
       border-radius: 16px;
       margin: 8px 8px 0;
-      width: calc(100% - 16px);
     }
     .fcard-img {
+      position: static !important;
+      inset: auto !important;
       width: 100%;
       height: auto;
+      object-fit: unset;
       display: block;
+      border-radius: 12px;
     }
     .fcard-emoji-fb {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 4rem;
+      position: static !important;
+      inset: auto !important;
+      width: 100%;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
       background: #f0f0f0;
+      border-radius: 12px;
     }
     /* Badge de peso (canto inferior esquerdo da imagem) */
     .fcard-weight-badge {
@@ -465,20 +475,26 @@
     .fcard--meta { opacity: .6; pointer-events: none; }
     .fcard-img-wrap {
       position: relative;
-      overflow: hidden;
+      padding-top: 0;
+      overflow: visible;
       background: #f8f8f8; flex-shrink: 0;
       border-radius: 16px;
       margin: 8px 8px 0;
       width: calc(100% - 16px);
     }
     .fcard-img {
+      position: static !important;
+      inset: auto !important;
       width: 100%;
       height: auto;
+      object-fit: unset;
       display: block;
       border-radius: 12px;
     }
     .fcard-emoji-fb {
-      width: 100%; height: 100%;
+      position: static !important;
+      inset: auto !important;
+      width: 100%; min-height: 80px;
       display: flex; align-items: center; justify-content: center;
       font-size: 3rem; background: #f0f0f0;
       border-radius: 12px;
@@ -651,18 +667,29 @@
       /* 3 colunas — ~6 itens visíveis de uma vez sem scroll */
       #foods-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
 
-      /* Imagem quadrada sem cortar */
+      /* Imagem sem cortar — card se adapta */
       .fcard-img-wrap {
         margin: 5px 5px 0 !important;
         width: calc(100% - 10px) !important;
         border-radius: 10px !important;
+        padding-top: 0 !important;
+        overflow: visible !important;
       }
       .fcard-img {
+        position: static !important;
+        inset: auto !important;
         width: 100% !important;
         height: auto !important;
+        object-fit: unset !important;
         border-radius: 8px !important;
       }
-      .fcard-emoji-fb { font-size: 2rem !important; border-radius: 8px !important; }
+      .fcard-emoji-fb {
+        position: static !important;
+        inset: auto !important;
+        min-height: 60px !important;
+        font-size: 2rem !important;
+        border-radius: 8px !important;
+      }
 
       /* Corpo compacto */
       .fcard { border-radius: 14px !important; }
