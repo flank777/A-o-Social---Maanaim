@@ -102,12 +102,13 @@
       max-height: none !important;
       overflow-y: visible !important;
       padding: 4px 2px;
+      align-items: flex-start !important;
     }
     /* Card base */
     .fcard {
       background: #fff;
       border-radius: 18px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 4px 20px rgba(0,0,0,0.09);
       display: flex;
       flex-direction: column;
@@ -460,11 +461,12 @@
       gap: 20px !important;
       max-height: none !important;
       overflow-y: visible !important;
+      align-items: flex-start !important;
     }
     .fcard {
       background: #fff;
       border-radius: 20px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 4px 20px rgba(0,0,0,0.09);
       display: flex; flex-direction: column;
       transition: transform .2s, box-shadow .2s;
@@ -665,7 +667,7 @@
       .doa-left { padding: 80px 12px 120px !important; margin-right: 0 !important; }
 
       /* 3 colunas — ~6 itens visíveis de uma vez sem scroll */
-      #foods-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+      #foods-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; align-items: flex-start !important; }
 
       /* Imagem sem cortar — card se adapta */
       .fcard-img-wrap {
@@ -692,7 +694,7 @@
       }
 
       /* Corpo compacto */
-      .fcard { border-radius: 14px !important; }
+      .fcard { border-radius: 14px !important; overflow: visible !important; }
       .fcard-body { padding: 6px 8px 8px !important; }
       .fcard-name {
         font-size: .76rem !important;
