@@ -26,6 +26,36 @@
 */
 
 /* ══════════════════════════════════════════════════════════════════════
+   UTILITÁRIO — FORMATAÇÃO DE UNIDADES (kg, g, L, mL)
+
+   Converte valores decimais para a unidade mais legível:
+   0.125 kg → "125 g" | 1.5 kg → "1,5 kg" | 0.5 L → "500 mL" ══════════════════════════════════════════════════════════════════════ */
+function fmtUnidade(valor, unidade) {
+  var v = parseFloat(valor) || 0;
+  var u = (unidade || 'kg').trim().toLowerCase();
+
+  function numBR(n) {
+    return n % 1 === 0
+      ? String(Math.round(n))
+      : n.toFixed(1).replace('.', ',');
+  }
+
+  if (u === 'l' || u === 'litro' || u === 'litros') {
+    if (v < 1) return Math.round(v * 1000) + ' mL';
+    return numBR(v) + ' L';
+  }
+  /* kg / g e qualquer outra unidade de massa */
+  if (v > 0 && v < 1) return Math.round(v * 1000) + ' g';
+  return numBR(v) + ' kg';
+}
+
+/* Formata o total geral do carrinho (sempre em kg ou g) */
+function fmtTotal(totalKg) {
+  if (totalKg > 0 && totalKg < 1) return Math.round(totalKg * 1000) + ' g';
+  return (totalKg > 0 ? totalKg.toFixed(1) : '0').replace('.', ',') + ' kg';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
    SEÇÃO 1 — ESTADO DO FORMULÁRIO
    Variáveis que guardam o estado enquanto o usuário preenche
    ══════════════════════════════════════════════════════════════════════ */
@@ -36,15 +66,24 @@
 */
 var FormState = {
   qtds:          {},    /* {id: quantidade} — quantidades por alimento */
-  entrega:       null,  /* 'igreja' ou 'coleta' — forma de entrega */
+  entrega:       null,  /* 'igreja' ou 'retirada' — forma de entrega */
   enviando:      false, /* true = está processando, evita duplo envio */
   passoAtual:    1,     /* 1, 2 ou 3 */
+  /*
+    true quando o doador escolheu "Cesta Completa". As quantidades em
+    `qtds` continuam sendo preenchidas (1 unidade de cada alimento) para
+    que o cálculo de peso total e a baixa de estoque por alimento
+    continuem corretos — mas a grade/carrinho exibem só 1 item
+    ("Cesta básica completa"), nunca a lista de alimentos marcados.
+    Ver atualizarCard(), doaItensExibicao() e doaSelecionarCestaCompleta().
+  */
+  cestaCompleta: false,
 };
 
 /* Mapa de texto para cada forma de entrega */
 var ENTREGA_LABELS = {
-  'igreja': 'Entrega na Igreja',
-  'coleta': 'Coleta no Endereço',
+  'igreja':   'Entrega na Igreja',
+  'retirada': 'Buscar em Casa',
 };
 
 /* Cache local dos alimentos carregados do Supabase (preenchido por doaRenderGrid) */
@@ -113,7 +152,7 @@ function conectarEventos() {
     btnNext1.addEventListener('click', function () {
       /* Verifica se há pelo menos 1 item no carrinho */
       if (carrinhoVazio()) {
-        showToast('⚠️ Selecione ao menos 1 alimento!', 'warning');
+        showToast(' Selecione ao menos 1 alimento!', 'warning');
         return;
       }
       /* Preenche o resumo do passo 2 e avança */
@@ -153,7 +192,7 @@ function conectarEventos() {
     btnNova.addEventListener('click', reiniciarForm);
   }
 
-  /* ── Cards de entrega (Igreja / Coleta) ── */
+  /* ── Cards de entrega (Igreja / Buscar em casa) ── */
   document.querySelectorAll('.delivery-card').forEach(function (card) {
     card.addEventListener('click', function () { selecionarEntrega(this); });
     /* Acessibilidade: Enter e Espaço também selecionam */
@@ -262,6 +301,7 @@ function conectarEventos() {
   if (drawerLimpar) {
     drawerLimpar.addEventListener('click', function () {
       FormState.qtds = {};
+      FormState.cestaCompleta = false;
       doaRenderGrid();
       fecharGaveta();
       atualizarBotaoContinuar();
@@ -279,7 +319,7 @@ function conectarEventos() {
   if (drawerContinuar) {
     drawerContinuar.addEventListener('click', function () {
       if (carrinhoVazio()) {
-        showToast('⚠️ Selecione ao menos 1 alimento!', 'warning');
+        showToast(' Selecione ao menos 1 alimento!', 'warning');
         return;
       }
       fecharGaveta();
@@ -293,7 +333,7 @@ function conectarEventos() {
   if (barContinuar) {
     barContinuar.addEventListener('click', function () {
       if (carrinhoVazio()) {
-        showToast('⚠️ Selecione ao menos 1 alimento!', 'warning');
+        showToast(' Selecione ao menos 1 alimento!', 'warning');
         return;
       }
       preencherResumo();
@@ -341,7 +381,7 @@ async function doaRenderGrid() {
   /* Se Firestore retornou vazio, tenta 1× mais após 3 segundos */
   if ((!alimentos || alimentos.length === 0) && window._doaVidaFirestoreOk) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:var(--text2)">' +
-      '<div style="font-size:1.5rem;margin-bottom:8px">🔄</div>' +
+      '<div style="font-size:1.5rem;margin-bottom:8px"></div>' +
       '<p style="font-size:.9rem">Carregando alimentos...</p></div>';
     await new Promise(function (r) { setTimeout(r, 3000); });
     var retry = await comTimeout(DoaVidaSync.getAlimentos(), 10000);
@@ -373,6 +413,31 @@ async function doaRenderGrid() {
   /* Limpa a grade */
   grid.innerHTML = '';
 
+  /* ── Card especial: Cesta Completa ── */
+  var cestaCard = document.createElement('div');
+  cestaCard.className = 'fcard fcard--cesta';
+  cestaCard.id = 'fcard-cesta-completa';
+  var cestaAtiva = !!FormState.cestaCompleta;
+  var cestaImgSalva = localStorage.getItem('doavida_cesta_img') || 'img/cesta-basica.jpg';
+  cestaCard.innerHTML =
+    '<div class="fcard-img-wrap">' +
+      '<img class="fcard-img" src="' + cestaImgSalva + '" alt="Cesta Completa" ' +
+        'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
+      '<div class="fcard-emoji-fb" style="display:none;"></div>' +
+    '</div>' +
+    '<div class="fcard-body">' +
+      '<p class="fcard-name">Cesta Completa</p>' +
+      '<p class="fcard-price-txt">1 unidade de cada item disponível</p>' +
+      '<div class="fcard-footer">' +
+        '<button class="fcard-order-btn" id="btn-cesta-completa" type="button" ' +
+          'onclick="doaSelecionarCestaCompleta()" ' +
+          'style="background:' + (cestaAtiva ? '#e8c96a;color:#1a1a1a' : '#1a1a1a') + '">' +
+          (cestaAtiva ? ' Cesta Selecionada' : 'Selecionar Tudo') +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  grid.appendChild(cestaCard);
+
   /* Cria um card para cada alimento */
   alimentos.forEach(function (food) {
     var q       = FormState.qtds[food.id] || 0;
@@ -385,15 +450,14 @@ async function doaRenderGrid() {
     var foodId   = window.escHtml ? escHtml(food.id) : food.id;
     var foodName = window.escHtml ? escHtml(food.name) : food.name;
     var unidade  = food.unidade || 'kg';
-    var pesoTxt  = (food.peso || 1) + ' ' + unidade;
-    var emoji    = food.emoji || '🥫';
+    var pesoTxt  = fmtUnidade(food.peso || 1, unidade);
+    var emoji    = food.emoji || '';
 
     /* Imagem ou emoji fallback (posicionados absolutamente dentro do padding-top wrap) */
     var imgHtml = food.img
       ? '<img class="fcard-img" src="' + escHtml(food.img) + '" alt="' + foodName + '" loading="lazy" ' +
           'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
-        '<div class="fcard-emoji-fb" style="display:none;">' + emoji + '</div>'
-      : '<div class="fcard-emoji-fb">' + emoji + '</div>';
+        '<div class="fcard-emoji-fb" style="display:none;">' + emoji + '</div>' : '<div class="fcard-emoji-fb">' + emoji + '</div>';
 
     /* Controles de quantidade (contador inline) */
     var ctrlHtml = metaBat ? '' :
@@ -459,8 +523,18 @@ function _alimentoBloqueado(id) {
 */
 function doaCP(id) {
   if (_alimentoBloqueado(id)) {
-    showToast('⛔ Este alimento já atingiu a meta de arrecadação.', 'warning');
+    showToast(' Este alimento já atingiu a meta de arrecadação.', 'warning');
     return;
+  }
+  /* Escolher um item manualmente sai do modo "Cesta Completa" */
+  if (FormState.cestaCompleta) {
+    var alimentosAtuais = _alimentosCache.length ? _alimentosCache : alimentosPadrao();
+    FormState.cestaCompleta = false;
+    alimentosAtuais.forEach(function (f) { FormState.qtds[f.id] = 0; });
+    var btnCesta = document.getElementById('btn-cesta-completa');
+    if (btnCesta) { btnCesta.textContent = 'Selecionar Tudo'; btnCesta.style.background = '#1a1a1a'; btnCesta.style.color = '#fff'; }
+    doaRenderGrid();
+    showToast(' Cesta completa removida — escolha os itens manualmente.', 'info');
   }
   FormState.qtds[id] = (FormState.qtds[id] || 0) + 1;
   atualizarCard(id);
@@ -496,7 +570,7 @@ function atualizarCard(id) {
     var imgWrap = card.querySelector('.fcard-img-wrap');
     var strip   = document.createElement('div');
     strip.className   = 'fcard-meta-strip';
-    strip.textContent = '✅ Meta atingida';
+    strip.textContent = ' Meta atingida';
     if (imgWrap && imgWrap.nextSibling) {
       card.insertBefore(strip, imgWrap.nextSibling);
     } else {
@@ -504,7 +578,7 @@ function atualizarCard(id) {
     }
     /* Atualiza o texto de unidade para "Não disponível" */
     var unitEl = card.querySelector('.fcard-unit');
-    if (unitEl) unitEl.textContent = '⛔ Não disponível';
+    if (unitEl) unitEl.textContent = ' Não disponível';
   } else if (!bloqueado && stripExistente) {
     stripExistente.remove();
   }
@@ -521,7 +595,13 @@ function atualizarCard(id) {
     return;
   }
 
-  var q = FormState.qtds[id] || 0;
+  /*
+    Enquanto a Cesta Completa estiver ativa, os cards individuais ficam
+    visualmente neutros (não "selecionados"), mesmo que FormState.qtds
+    tenha 1 unidade de cada — esse valor é usado só para calcular o peso
+    total e dar baixa no estoque por alimento, nunca para a exibição.
+  */
+  var q = FormState.cestaCompleta ? 0 : (FormState.qtds[id] || 0);
   card.classList.toggle('fcard--ativo', q > 0);
   card.classList.remove('fcard--meta');
 
@@ -550,17 +630,21 @@ function doaAtualizarCarrinho() {
   var emptyEl   = document.getElementById('cart-empty');
   var totalEl   = document.getElementById('cart-total');
   var countEl   = document.getElementById('cart-items-count');
-  var itens     = doaItens();
+  var itens     = doaItensExibicao();
   var totalKg   = kgTotal();
 
   /* Atualiza o total */
-  if (totalEl) totalEl.textContent = (totalKg > 0 ? totalKg.toFixed(1) : '0') + ' kg';
+  if (totalEl) totalEl.textContent = fmtTotal(totalKg);
 
   /* Atualiza contador de itens */
   if (countEl) countEl.textContent = itens.length;
 
   /* Atualiza sempre a gaveta inteligente (independente do carrinho lateral) */
   _atualizarGaveta();
+  /* Sincroniza o estado do botão "Cesta Completa" */
+  _sincronizarBotaoCesta();
+  /* Atualiza o display do passo 2 quando o usuário ajusta itens nele */
+  if (FormState.passoAtual === 2) { _atualizarStep2Display(); }
 
   if (!cartEl) return;
 
@@ -580,19 +664,21 @@ function doaAtualizarCarrinho() {
     var imgPart = item.img
       ? '<img class="doa-cart-item-img" src="' + item.img + '" alt="' + item.nome +
         '" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
-        '<span class="doa-cart-item-img" style="display:none;align-items:center;justify-content:center;font-size:1.4rem;background:#f0f0f0;">' + (item.emoji || '🥫') + '</span>'
-      : '<span class="doa-cart-item-img" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:#f0f0f0;">' + (item.emoji || '🥫') + '</span>';
+        '<span class="doa-cart-item-img" style="display:none;align-items:center;justify-content:center;font-size:1.4rem;background:#f0f0f0;">' + (item.emoji || '') + '</span>' : '<span class="doa-cart-item-img" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:#f0f0f0;">' + (item.emoji || '') + '</span>';
+    var ctrlPart = item.id === 'cesta-completa'
+      ? '<div class="doa-cart-item-ctrl"><button class="doa-cart-item-btn" type="button" onclick="doaSelecionarCestaCompleta()" aria-label="Remover cesta completa" title="Remover">✕</button></div>'
+      : '<div class="doa-cart-item-ctrl">' +
+          '<button class="doa-cart-item-btn" type="button" onclick="doaCM(\'' + item.id + '\')" aria-label="Diminuir">−</button>' +
+          '<span class="doa-cart-item-num">' + item.qty + '</span>' +
+          '<button class="doa-cart-item-btn" type="button" onclick="doaCP(\'' + item.id + '\')" aria-label="Aumentar">+</button>' +
+        '</div>';
     row.innerHTML =
       imgPart +
       '<div class="doa-cart-item-info">' +
         '<div class="doa-cart-item-name">' + item.nome + '</div>' +
-        '<div class="doa-cart-item-qty">' + item.totalKg.toFixed(1) + ' kg</div>' +
+        '<div class="doa-cart-item-qty">' + fmtUnidade(item.totalKg, item.unidade || 'kg') + '</div>' +
       '</div>' +
-      '<div class="doa-cart-item-ctrl">' +
-        '<button class="doa-cart-item-btn" type="button" onclick="doaCM(\'' + item.id + '\')" aria-label="Diminuir">−</button>' +
-        '<span class="doa-cart-item-num">' + item.qty + '</span>' +
-        '<button class="doa-cart-item-btn" type="button" onclick="doaCP(\'' + item.id + '\')" aria-label="Aumentar">+</button>' +
-      '</div>';
+      ctrlPart;
     cartEl.insertBefore(row, emptyEl);
   });
 }
@@ -640,18 +726,17 @@ function _atualizarGaveta() {
   var barTotal   = document.getElementById('cart-bar-total');
   var barItens   = document.getElementById('cart-bar-itens');
 
-  var itens   = doaItens();
+  var itens   = doaItensExibicao();
   var totalKg = kgTotal();
   var vazio   = itens.length === 0;
 
   /* Totais na barra fixa */
-  if (barTotal) barTotal.textContent = (totalKg > 0 ? totalKg.toFixed(1) : '0') + ' kg';
+  if (barTotal) barTotal.textContent = fmtTotal(totalKg);
   if (barItens) barItens.textContent = vazio
-    ? 'Nenhum item'
-    : itens.length + (itens.length === 1 ? ' item' : ' itens');
+    ? 'Nenhum item' : itens.length + (itens.length === 1 ? ' item' : ' itens');
 
   /* Total no rodapé da gaveta */
-  if (totalEl) totalEl.textContent = (totalKg > 0 ? totalKg.toFixed(1) : '0') + ' kg';
+  if (totalEl) totalEl.textContent = fmtTotal(totalKg);
 
   /* Botão continuar da gaveta */
   if (continuarEl) continuarEl.disabled = vazio;
@@ -679,22 +764,24 @@ function _atualizarGaveta() {
     var imgPart = item.img
       ? '<img class="cart-drawer-item-img" src="' + item.img + '" alt="' + item.nome +
         '" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
-        '<span class="cart-drawer-item-emoji" style="display:none;">' + (item.emoji || '🥫') + '</span>'
-      : '<span class="cart-drawer-item-emoji">' + (item.emoji || '🥫') + '</span>';
+        '<span class="cart-drawer-item-emoji" style="display:none;">' + (item.emoji || '') + '</span>' : '<span class="cart-drawer-item-emoji">' + (item.emoji || '') + '</span>';
 
+    var ctrlPart = item.id === 'cesta-completa'
+      ? '<div class="cart-drawer-item-ctrl"><button type="button" onclick="doaSelecionarCestaCompleta()" aria-label="Remover cesta completa" title="Remover">✕</button></div>'
+      : '<div class="cart-drawer-item-ctrl">' +
+          '<button type="button" onclick="doaCM(\'' + item.id + '\')">−</button>' +
+          '<span id="gdraw-qty-' + item.id + '">' + item.qty + '</span>' +
+          '<button type="button" onclick="doaCP(\'' + item.id + '\')">+</button>' +
+        '</div>';
     row.innerHTML =
       imgPart +
       '<span class="cart-drawer-item-nome">' +
         item.nome +
         '<small style="display:block;font-weight:400;color:var(--text2);margin-top:2px;">' +
-          item.totalKg.toFixed(1) + ' kg' +
+          fmtUnidade(item.totalKg, item.unidade || 'kg') +
         '</small>' +
       '</span>' +
-      '<div class="cart-drawer-item-ctrl">' +
-        '<button type="button" onclick="doaCM(\'' + item.id + '\')">−</button>' +
-        '<span id="gdraw-qty-' + item.id + '">' + item.qty + '</span>' +
-        '<button type="button" onclick="doaCP(\'' + item.id + '\')">+</button>' +
-      '</div>';
+      ctrlPart;
 
     itemsEl.appendChild(row);
   });
@@ -710,7 +797,7 @@ window.fecharGaveta = fecharGaveta;
 */
 function atualizarBotaoContinuar() {
   var vazio   = carrinhoVazio();
-  var itens   = doaItens();
+  var itens   = doaItensExibicao();
   var totalKg = kgTotal();
 
   /* Botão dentro do modal (desktop sem etapa1) */
@@ -722,10 +809,9 @@ function atualizarBotaoContinuar() {
   var barTotal = document.getElementById('cart-bar-total');
   var barItens = document.getElementById('cart-bar-itens');
   if (barBtn)   barBtn.disabled   = vazio;
-  if (barTotal) barTotal.textContent = (totalKg > 0 ? totalKg.toFixed(1) : '0') + ' kg';
+  if (barTotal) barTotal.textContent = fmtTotal(totalKg);
   if (barItens) barItens.textContent = vazio
-    ? 'Nenhum item'
-    : itens.length + (itens.length === 1 ? ' item' : ' itens');
+    ? 'Nenhum item' : itens.length + (itens.length === 1 ? ' item' : ' itens');
 
   /* Botão Continuar dentro do cart-panel (sidebar desktop) */
   var panelBtn = document.getElementById('cart-panel-continuar');
@@ -753,7 +839,7 @@ function doaItens() {
         id:      f.id,
         nome:    f.name,
         img:     f.img  || '',
-        emoji:   f.emoji || '🥫',
+        emoji:   f.emoji || '',
         qty:     FormState.qtds[f.id],
         peso:    f.peso || 1,
         totalKg: (FormState.qtds[f.id] || 0) * (f.peso || 1),
@@ -792,8 +878,7 @@ function doaIrPasso(n) {
     doaRenderGrid();
   } else if (n === 2) {
     if (fs2) {
-      fs2.style.display = 'block';
-      preencherResumo();
+      fs2.style.display = 'flex';
       _atualizarStep2Display();
     }
   } else if (n === 3) {
@@ -803,21 +888,67 @@ function doaIrPasso(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* Atualiza o display de itens e total no passo 2 */
+/* Atualiza todo o display do passo 2 (itens, totais, barra inferior, impacto) */
 function _atualizarStep2Display() {
-  var itens = doaItens();
-  var total = itens.reduce(function(s, i) { return s + i.totalKg; }, 0);
-  var displayEl = document.getElementById('step2-items-display');
-  var totalEl   = document.getElementById('step2-total-display');
-  if (displayEl) {
-    displayEl.innerHTML = itens.map(function(i) {
-      return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:.85rem;">' +
-               '<span>' + (window.escHtml ? escHtml(i.nome) : i.nome) + '</span>' +
-               '<span style="color:#2d6e1f;font-weight:700;">' + i.qty + ' un. · ' + i.totalKg.toFixed(1) + ' kg</span>' +
-             '</div>';
+  var itens   = doaItensExibicao();
+  var totalKg = itens.reduce(function(s, i) { return s + i.totalKg; }, 0);
+  var count   = itens.length;
+
+  /* Lista de itens com controles +/- */
+  var listEl = document.getElementById('s2-items-list');
+  if (listEl) {
+    listEl.innerHTML = itens.map(function(i) {
+      var nome = window.escHtml ? escHtml(i.nome) : i.nome;
+      var id   = i.id;
+      var imgHtml = i.img
+        ? '<img class="rs2-item-img" src="' + (window.escHtml ? escHtml(i.img) : i.img) + '" alt="' + nome +
+          '" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
+          '<span class="rs2-item-emoji" style="display:none">' + (i.emoji || '') + '</span>'
+        : '<span class="rs2-item-emoji">' + (i.emoji || '') + '</span>';
+      var ctrlPart = id === 'cesta-completa'
+        ? '<div class="rs2-item-ctrl"><button class="rs2-item-btn" type="button" onclick="doaSelecionarCestaCompleta()" aria-label="Remover cesta completa" title="Remover">✕</button></div>'
+        : '<div class="rs2-item-ctrl">' +
+            '<button class="rs2-item-btn" type="button" onclick="doaCM(\'' + id + '\')" aria-label="Diminuir">&#8722;</button>' +
+            '<span class="rs2-item-num">' + i.qty + '</span>' +
+            '<button class="rs2-item-btn" type="button" onclick="doaCP(\'' + id + '\')" aria-label="Aumentar">+</button>' +
+          '</div>';
+      return '<div class="rs2-item-row">' +
+        imgHtml +
+        '<div class="rs2-item-info">' +
+          '<div class="rs2-item-name">' + nome + '</div>' +
+          '<div class="rs2-item-unit">' + fmtUnidade(i.peso || 1, i.unidade || 'kg') + '</div>' +
+        '</div>' +
+        ctrlPart +
+        '<span class="rs2-item-weight">' + fmtUnidade(i.totalKg, i.unidade || 'kg') + '</span>' +
+      '</div>';
     }).join('');
   }
-  if (totalEl) totalEl.textContent = total.toFixed(1) + ' kg';
+
+  /* Total estimado */
+  var totalEl = document.getElementById('s2-total-kg');
+  if (totalEl) totalEl.textContent = fmtTotal(totalKg);
+
+  /* Card de impacto: famílias e progresso (cesta ~15 kg) */
+  var familias   = totalKg > 0 ? Math.max(1, Math.floor(totalKg / 15)) : 0;
+  var familiasEl = document.getElementById('s2-familias');
+  if (familiasEl) familiasEl.textContent = familias + (familias === 1 ? ' família' : ' famílias');
+
+  var subEl = document.getElementById('s2-impact-sub');
+  if (subEl) subEl.textContent = count + (count === 1 ? ' item' : ' itens') + ' • ' + fmtTotal(totalKg);
+
+  var pct    = Math.min(100, Math.round((totalKg / 15) * 100));
+  var progEl = document.getElementById('s2-progress');
+  if (progEl) progEl.style.width = pct + '%';
+
+  /* Barra inferior */
+  var barEl = document.getElementById('s2-bar-count');
+  if (barEl) barEl.innerHTML = count + (count === 1 ? ' item' : ' itens') + ' &bull; ' + fmtTotal(totalKg);
+
+  /* Resumo final */
+  var finalItensEl = document.getElementById('s2-final-itens');
+  if (finalItensEl) finalItensEl.textContent = count + (count === 1 ? ' item' : ' itens');
+  var finalKgEl = document.getElementById('s2-final-kg');
+  if (finalKgEl) finalKgEl.textContent = fmtTotal(totalKg);
 }
 
 /*
@@ -851,11 +982,11 @@ function preencherResumo() {
     itemsEl.innerHTML = itens.map(function (i) {
       return '<span style="margin-right:10px;">' +
         i.nome + ' <strong style="color:var(--gold);">' +
-        i.totalKg.toFixed(1) + 'kg</strong>' +
+        fmtUnidade(i.totalKg, i.unidade || 'kg') + '</strong>' +
         '</span>';
     }).join('');
   }
-  if (kgEl) kgEl.textContent = total.toFixed(1) + ' kg';
+  if (kgEl) kgEl.textContent = fmtTotal(total);
 }
 
 
@@ -864,7 +995,7 @@ function preencherResumo() {
    ══════════════════════════════════════════════════════════════════════ */
 
 /*
-  Seleciona uma forma de entrega (Igreja ou Coleta).
+  Seleciona uma forma de entrega (Igreja ou Buscar em casa).
   @param {HTMLElement} card - O elemento .delivery-card clicado
 */
 function selecionarEntrega(card) {
@@ -877,10 +1008,34 @@ function selecionarEntrega(card) {
   /* Aplica a seleção no card clicado */
   card.classList.add('selected');
   card.setAttribute('aria-checked', 'true');
-  FormState.entrega = card.dataset.val; /* 'igreja' ou 'coleta' */
+  FormState.entrega = card.dataset.val; /* 'igreja' ou 'retirada' */
 
   /* Limpa mensagem de erro de entrega */
-  setFieldState('field-entrega', 'msg-entrega', 'ok', '✓ Forma de entrega selecionada');
+  setFieldState('field-entrega', 'msg-entrega', 'ok', ' Forma de entrega selecionada');
+
+  /* Mostra seção de endereço apenas para retirada em casa */
+  var endSection = document.getElementById('endereco-section');
+  if (endSection) {
+    var mostrar = FormState.entrega === 'retirada';
+    endSection.style.display = mostrar ? '' : 'none';
+    if (mostrar) {
+      /* Scroll suave até a seção e foca no primeiro campo */
+      setTimeout(function () {
+        endSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        var primeiroInput = document.getElementById('inp-rua');
+        if (primeiroInput) primeiroInput.focus();
+      }, 350);
+    } else {
+      /* Limpa os campos quando outra forma é selecionada */
+      ['inp-rua','inp-numero','inp-complemento','inp-bairro-end','inp-referencia']
+        .forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+      var msgEnd = document.getElementById('msg-endereco');
+      if (msgEnd) msgEnd.textContent = '';
+    }
+  }
 }
 
 
@@ -898,7 +1053,7 @@ function doaValNome() {
   if (!nome)        return { ok: false, msg: 'Por favor, informe seu nome.' };
   if (nome.length < 3) return { ok: false, msg: 'Nome muito curto (mínimo 3 letras).' };
   if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(nome)) return { ok: false, msg: 'Use apenas letras no nome.' };
-  return { ok: true, msg: '✓ Nome válido' };
+  return { ok: true, msg: ' Nome válido' };
 }
 
 /*
@@ -912,15 +1067,14 @@ function doaValTel() {
   if (!raw)           return { ok: false, msg: 'Por favor, informe seu WhatsApp.' };
   if (raw.length < 8) return { ok: false, msg: 'Telefone incompleto. Use DDD + número.' };
   if (raw.length > 11)return { ok: false, msg: 'Telefone muito longo.' };
-  return { ok: true, msg: '✓ WhatsApp válido' };
+  return { ok: true, msg: ' WhatsApp válido' };
 }
 
 /*
   Define o estado visual de um campo (ok, err ou '').
   @param {string} fieldId  - ID do .form-field
   @param {string} msgId    - ID da .field-msg
-  @param {string} estado   - 'ok', 'err' ou ''
-  @param {string} mensagem - Texto de feedback
+  @param {string} estado   - 'ok', 'err' ou '' @param {string} mensagem - Texto de feedback
 */
 function setFieldState(fieldId, msgId, estado, mensagem) {
   var fieldEl = document.getElementById(fieldId);
@@ -952,7 +1106,7 @@ function setFieldState(fieldId, msgId, estado, mensagem) {
 function doaSubmit() {
   /* Verifica se há pelo menos 1 item no carrinho */
   if (carrinhoVazio()) {
-    showToast('⚠️ Selecione ao menos 1 alimento!', 'warning');
+    showToast(' Selecione ao menos 1 alimento!', 'warning');
     return;
   }
 
@@ -994,6 +1148,36 @@ function doaSubmit() {
     return;
   }
 
+  /* ── Valida e coleta endereço (obrigatório quando retirada em casa) ── */
+  var enderecoObj = null;
+  if (FormState.entrega === 'retirada') {
+    var _rua    = (document.getElementById('inp-rua')        || {value:''}).value.trim();
+    var _bairro = (document.getElementById('inp-bairro-end') || {value:''}).value.trim();
+    var msgEnd  = document.getElementById('msg-endereco');
+
+    if (!_rua) {
+      if (msgEnd) { msgEnd.style.color = '#c0392b'; msgEnd.textContent = 'Informe o nome da sua rua.'; }
+      var elRua = document.getElementById('inp-rua');
+      if (elRua) { elRua.style.borderColor = '#c0392b'; elRua.focus(); }
+      return;
+    }
+    if (!_bairro) {
+      if (msgEnd) { msgEnd.style.color = '#c0392b'; msgEnd.textContent = 'Informe seu bairro.'; }
+      var elBairro = document.getElementById('inp-bairro-end');
+      if (elBairro) { elBairro.style.borderColor = '#c0392b'; elBairro.focus(); }
+      return;
+    }
+
+    if (msgEnd) { msgEnd.style.color = '#2d6e1f'; msgEnd.textContent = ' Endereço confirmado'; }
+    enderecoObj = {
+      rua:         _rua,
+      numero:      (document.getElementById('inp-numero')      || {value:''}).value.trim(),
+      complemento: (document.getElementById('inp-complemento') || {value:''}).value.trim(),
+      bairro:      _bairro,
+      referencia:  (document.getElementById('inp-referencia')  || {value:''}).value.trim(),
+    };
+  }
+
   /* ── Bloqueia o botão e mostra loading ── */
   FormState.enviando = true;
   var btn = document.getElementById('btn-submit');
@@ -1002,10 +1186,25 @@ function doaSubmit() {
   /* Pequeno delay para o usuário ver o spinner */
   setTimeout(async function () {
     try {
-      var itens      = doaItens();
+      var itens      = doaItens();   /* itens reais — usados também para atualizar o estoque abaixo */
       var totalKg    = kgTotal();
       var protocolo  = gerarProtocolo();
       var now        = new Date();
+
+      /*
+        Quando o doador seleciona a cesta básica completa (todos os alimentos
+        disponíveis), a doação é registrada como 1 único item — "Cesta básica
+        completa" — em vez da lista individual de alimentos. Isso é só para
+        o que é SALVO/exibido (recibo, WhatsApp, admin); o estoque de cada
+        alimento continua sendo atualizado item a item via `itens` abaixo.
+      */
+      var ehCestaCompleta = _ehDoacaoDeCestaCompleta();
+      var itensParaSalvar = ehCestaCompleta
+        ? [{ id: 'cesta-completa', nome: 'Cesta básica completa', qty: 1, totalKg: totalKg }]
+        : itens.map(function (i) { return { id: i.id, nome: i.nome, qty: i.qty, totalKg: i.totalKg }; });
+      var foodLabel = ehCestaCompleta
+        ? 'Cesta básica completa'
+        : itens.map(function (i) { return i.nome; }).join(', ');
 
       /*
         Objeto da doação — salvo no Supabase via DoaVidaSync.addDoacao().
@@ -1016,21 +1215,27 @@ function doaSubmit() {
         protocolo: protocolo,
         /* name e food são obrigatórios */
         name:      nome,
-        food:      itens.map(function (i) { return i.nome; }).join(', '),
-        amount:    itens.reduce(function(s,i){ return s + (i.qty||0); }, 0) || 1,
+        food:      foodLabel,
+        amount:    ehCestaCompleta ? 1 : (itens.reduce(function(s,i){ return s + (i.qty||0); }, 0) || 1),
         /* Campos extras para o recibo e WhatsApp */
         nome:      nome,
         phone:     tel.replace(/\D/g, ''),     /* Só dígitos */
         telefone:  tel,                          /* Com máscara */
         delivery:  FormState.entrega,
         observacao: prayer,
-        itens:     itens.map(function (i) {
-          return { id: i.id, nome: i.nome, qty: i.qty, totalKg: i.totalKg };
-        }),
+        itens:     itensParaSalvar,
+        tipo_doacao: ehCestaCompleta ? 'cesta_completa' : 'itens',
         totalKg:   totalKg,
         total_kg:  totalKg,
         status:    'pendente',
         createdAt: now.toISOString(),
+        endereco:  enderecoObj,
+        endereco_texto: enderecoObj
+          ? [enderecoObj.rua, enderecoObj.numero, enderecoObj.complemento,
+             enderecoObj.bairro ? 'Bairro: ' + enderecoObj.bairro : '',
+             enderecoObj.referencia ? 'Ref: ' + enderecoObj.referencia : '']
+              .filter(Boolean).join(', ')
+          : '',
       };
 
       /*
@@ -1066,25 +1271,6 @@ function doaSubmit() {
         console.warn('[DoaVida] Estoque não atualizado:', e);
       }
 
-      /*
-        ── Auto-salvar pedido de oração ──────────────────────────────
-        Se o doador preencheu o campo de oração, registra automaticamente
-        um pedido na coleção de Oração com status 'precisa-oracao'.
-        Isso aparece diretamente na aba Oração do painel admin.
-      */
-      if (prayer) {
-        try {
-          await DoaVidaSync.addOracao({
-            nome:      nome || 'Anônimo',
-            categoria: 'outros',    /* categoria padrão para pedidos do formulário */
-            mensagem:  prayer
-          });
-        } catch (e) {
-          /* Não bloqueia o fluxo principal se falhar */
-          console.warn('[DoaVida] Não foi possível salvar pedido de oração:', e);
-        }
-      }
-
       /* Notifica o admin por WhatsApp (assíncrono — não trava a interface) */
       try { DoaVidaAPI.notificarAdminWA(doaSalva); } catch(e) { /* ignora */ }
 
@@ -1097,7 +1283,7 @@ function doaSubmit() {
       doaBuildRecibo(doaSalva, now);
       doaIrPasso(3);
 
-      showToast('🎉 Doação registrada com sucesso!', 'success');
+      showToast(' Doação registrada com sucesso!', 'success');
 
     } catch (erro) {
       console.error('[DoaVida] Erro ao salvar doação:', erro);
@@ -1106,7 +1292,7 @@ function doaSubmit() {
       if (msg.toLowerCase().includes('fetch') || msg.includes('503') || msg.includes('network')) {
         msg = 'Servidor indisponível. Verifique sua conexão e tente novamente.';
       }
-      showToast('❌ Erro: ' + msg, 'error');
+      showToast(' Erro: ' + msg, 'error');
     } finally {
       /* Sempre libera o botão, mesmo em caso de erro */
       FormState.enviando = false;
@@ -1147,8 +1333,27 @@ function doaBuildRecibo(d, now) {
   _s('r-data',    dataFormatada);
   _s('r-hora',    horaFormatada);
 
+  /* Endereço — só mostra se retirada em casa */
+  var endRowEl = document.getElementById('r-endereco-row');
+  var endEl    = document.getElementById('r-endereco');
+  if (endRowEl && endEl) {
+    var endTexto = d.endereco_texto || '';
+    if (!endTexto && d.endereco) {
+      var e = d.endereco;
+      endTexto = [e.rua, e.numero, e.complemento,
+        e.bairro ? 'Bairro: ' + e.bairro : '',
+        e.referencia ? 'Ref: ' + e.referencia : ''].filter(Boolean).join(', ');
+    }
+    if (endTexto) {
+      endEl.textContent = endTexto;
+      endRowEl.style.display = '';
+    } else {
+      endRowEl.style.display = 'none';
+    }
+  }
+
   /* Atualiza o título de sucesso */
-  _s('success-title', 'Obrigado, ' + nomeDisplay + '! 🌾');
+  _s('success-title', 'Obrigado, ' + nomeDisplay + '! ');
   _s('success-msg',   'Sua doação foi registrada com sucesso.');
 
   /* Preenche os itens do comprovante (estilo cupom fiscal) */
@@ -1163,12 +1368,12 @@ function doaBuildRecibo(d, now) {
       row.innerHTML =
         '<span class="rcpt-item-desc">' + nome.toUpperCase() + '</span>' +
         '<span class="rcpt-item-qty">' + i.qty + ' un</span>' +
-        '<span class="rcpt-item-total">' + (i.totalKg || 0).toFixed(1) + ' kg</span>';
+        '<span class="rcpt-item-total">' + fmtUnidade(i.totalKg || 0, i.unidade || 'kg') + '</span>';
       itemsEl.appendChild(row);
       totalKg += (i.totalKg || 0);
     });
     var elTotalKg = document.getElementById('r-total-kg');
-    if (elTotalKg) elTotalKg.textContent = totalKg.toFixed(1) + ' kg';
+    if (elTotalKg) elTotalKg.textContent = fmtTotal(totalKg);
     /* Atualiza número no barcode */
     var barEl = document.getElementById('r-barcode-num');
     if (barEl && d.protocolo) barEl.textContent = '* ' + d.protocolo + ' *';
@@ -1288,7 +1493,7 @@ function doaBuildRecibo(d, now) {
             title: 'Comprovante de Doação — DoaVida',
             files: [file],
           }).then(function () {
-            showToast('📱 Comprovante compartilhado!', 'success');
+            showToast(' Comprovante compartilhado!', 'success');
           });
         }
 
@@ -1299,13 +1504,13 @@ function doaBuildRecibo(d, now) {
         document.body.appendChild(a); a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        window.open('https://wa.me/?text=' + encodeURIComponent(textoComprovante), '_blank');
-        showToast('📥 Imagem baixada! Anexe-a no WhatsApp.', 'success');
+        abrirWhatsApp('whatsapp://send?text=' + encodeURIComponent(textoComprovante));
+        showToast(' Imagem baixada! Anexe-a no WhatsApp.', 'success');
 
       }).catch(function () {
         /* Fallback final: só texto */
-        window.open('https://wa.me/?text=' + encodeURIComponent(textoComprovante), '_blank');
-        showToast('📱 WhatsApp aberto! Escolha para quem enviar.', 'success');
+        abrirWhatsApp('whatsapp://send?text=' + encodeURIComponent(textoComprovante));
+        showToast(' WhatsApp aberto! Escolha para quem enviar.', 'success');
       });
     };
   }
@@ -1322,7 +1527,7 @@ function doaBuildRecibo(d, now) {
         document.body.appendChild(a); a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast('📥 Comprovante baixado!', 'success');
+        showToast(' Comprovante baixado!', 'success');
       }).catch(function () {
         /* Fallback: baixa como texto */
         downloadReciboComoImagem(d.protocolo || 'recibo');
@@ -1342,7 +1547,7 @@ function doaBuildRecibo(d, now) {
       */
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(textoComprovante).then(function () {
-          showToast('📋 Comprovante copiado!', 'success');
+          showToast(' Comprovante copiado!', 'success');
         }).catch(function () {
           /* Fallback: seleciona texto manual */
           copiarTextoFallback(textoComprovante);
@@ -1384,18 +1589,26 @@ function montarTextoComprovante(d, data, hora) {
 
   var linhas = [];
   linhas.push(sep);
-  linhas.push('       AÇÃO SOCIAL SEMEAR');
-  linhas.push('       Comunidade Maanaim');
-  linhas.push('       Belém, PA');
+  linhas.push(' AÇÃO SOCIAL SEMEAR');
+  linhas.push(' Comunidade Maanaim');
+  linhas.push(' Belém, PA');
   linhas.push(sep);
   linhas.push('');
-  linhas.push('    COMPROVANTE DE DOAÇÃO');
+  linhas.push(' COMPROVANTE DE DOAÇÃO');
   linhas.push(sep2);
   linhas.push('Protocolo: ' + proto);
   linhas.push('Data:      ' + data + ' às ' + hora);
   linhas.push('Doador:    ' + (d.nome || d.name || 'Anônimo').toUpperCase());
   linhas.push('WhatsApp:  ' + (d.phone || d.telefone || '—'));
   linhas.push('Entrega:   ' + (ENTREGA_LABELS[d.delivery] || d.delivery || '—').toUpperCase());
+  var _endTxt = d.endereco_texto || '';
+  if (!_endTxt && d.endereco) {
+    var _e = d.endereco;
+    _endTxt = [_e.rua, _e.numero, _e.complemento,
+      _e.bairro ? 'Bairro: ' + _e.bairro : '',
+      _e.referencia ? 'Ref: ' + _e.referencia : ''].filter(Boolean).join(', ');
+  }
+  if (_endTxt) linhas.push('Endereço:  ' + _endTxt);
   linhas.push(sep2);
   linhas.push('');
   linhas.push(pad('ITEM', 16) + pad('QTD', 5) + padL('TOTAL', 9));
@@ -1405,12 +1618,12 @@ function montarTextoComprovante(d, data, hora) {
   (d.itens || []).forEach(function (item) {
     var nome  = pad(item.nome || '?', 16);
     var qty   = pad('x' + (item.qty || 1), 5);
-    var total = padL((item.totalKg || 0).toFixed(1) + 'kg', 9);
+    var total = padL(fmtUnidade(item.totalKg || 0, item.unidade || 'kg'), 9);
     linhas.push(nome + qty + total);
   });
 
   linhas.push(sep2);
-  linhas.push(pad('TOTAL', 21) + padL(totalKg.toFixed(1) + ' kg', 9));
+  linhas.push(pad('TOTAL', 21) + padL(fmtTotal(totalKg), 9));
   linhas.push('');
   linhas.push(sep);
   linhas.push('');
@@ -1428,16 +1641,16 @@ function montarTextoComprovante(d, data, hora) {
 */
 function downloadReciboComoImagem(nomeArquivo) {
   if (typeof window.gerarImagemRecibo !== 'function') {
-    showToast('⚠️ Gerador de imagem não disponível.', 'warning');
+    showToast(' Gerador de imagem não disponível.', 'warning');
     return;
   }
 
-  showToast('⏳ Gerando imagem...', 'info');
+  showToast(' Gerando imagem...', 'info');
 
   try {
     window.gerarImagemRecibo(function (err, blob) {
       if (err || !blob) {
-        showToast('⚠️ Erro ao gerar imagem.', 'warning');
+        showToast(' Erro ao gerar imagem.', 'warning');
         return;
       }
       var url = URL.createObjectURL(blob);
@@ -1448,10 +1661,10 @@ function downloadReciboComoImagem(nomeArquivo) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('📥 Comprovante baixado!', 'success');
+      showToast(' Comprovante baixado!', 'success');
     });
   } catch (e) {
-    showToast('⚠️ Erro ao gerar comprovante.', 'warning');
+    showToast(' Erro ao gerar comprovante.', 'warning');
   }
 }
 
@@ -1470,9 +1683,9 @@ function copiarTextoFallback(texto) {
   ta.select();
   try {
     document.execCommand('copy');
-    showToast('📋 Comprovante copiado!', 'success');
+    showToast(' Comprovante copiado!', 'success');
   } catch (e) {
-    showToast('⚠️ Não foi possível copiar.', 'warning');
+    showToast(' Não foi possível copiar.', 'warning');
   }
   document.body.removeChild(ta);
 }
@@ -1513,16 +1726,25 @@ window.gerarProtocolo = gerarProtocolo;
 */
 function reiniciarForm() {
   /* Zera o estado */
-  FormState.qtds      = {};
-  FormState.entrega   = null;
-  FormState.enviando  = false;
-  FormState.passoAtual = 1;
+  FormState.qtds          = {};
+  FormState.entrega       = null;
+  FormState.enviando      = false;
+  FormState.passoAtual    = 1;
+  FormState.cestaCompleta = false;
 
   /* Limpa os campos de texto */
-  ['inp-nome', 'inp-tel', 'inp-prayer'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.value = '';
-  });
+  ['inp-nome', 'inp-tel', 'inp-prayer',
+   'inp-cep', 'inp-rua', 'inp-numero', 'inp-complemento', 'inp-bairro-end', 'inp-referencia']
+    .forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) { el.value = ''; el.style.borderColor = ''; }
+    });
+
+  /* Esconde seção de endereço */
+  var endSection = document.getElementById('endereco-section');
+  if (endSection) endSection.style.display = 'none';
+  var msgEnd = document.getElementById('msg-endereco');
+  if (msgEnd) msgEnd.textContent = '';
 
   /* Remove seleção das formas de entrega */
   document.querySelectorAll('.delivery-card').forEach(function (c) {
@@ -1563,13 +1785,435 @@ function alimentosPadrao() {
   }
   /* Fallback de emergência (igual ao api.js) */
   return [
-    { id:'arroz',    name:'Arroz 5kg',       peso:5,   img:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&q=70',  goal:2000, kg:0, emoji:'🌾' },
-    { id:'feijao',   name:'Feijão 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1612257999756-3b9d3acd5e66?w=300&q=70',  goal:800,  kg:0, emoji:'🫘' },
-    { id:'macarrao', name:'Macarrão 500g',    peso:0.5, img:'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=300&q=70',  goal:500,  kg:0, emoji:'🍝' },
-    { id:'oleo',     name:'Óleo de Soja 1L',  peso:1,   img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&q=70',  goal:400,  kg:0, emoji:'🫙' },
-    { id:'acucar',   name:'Açúcar 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70',  goal:400,  kg:0, emoji:'🍬' },
-    { id:'sal',      name:'Sal 1kg',           peso:1,   img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300&q=70',  goal:200,  kg:0, emoji:'🧂' },
+    { id:'arroz',    name:'Arroz 5kg',       peso:5,   img:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&q=70',  goal:2000, kg:0, emoji:'' },
+    { id:'feijao',   name:'Feijão 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1612257999756-3b9d3acd5e66?w=300&q=70',  goal:800,  kg:0, emoji:'' },
+    { id:'macarrao', name:'Macarrão 500g',    peso:0.5, img:'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=300&q=70',  goal:500,  kg:0, emoji:'' },
+    { id:'oleo',     name:'Óleo de Soja 1L',  peso:1,   img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&q=70',  goal:400,  kg:0, emoji:'' },
+    { id:'acucar',   name:'Açúcar 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70',  goal:400,  kg:0, emoji:'' },
+    { id:'sal',      name:'Sal 1kg',           peso:1,   img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300&q=70',  goal:200,  kg:0, emoji:'' },
   ];
 }
 
-console.log('[DoaVida] form.js ✅ carregado');
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 11 — CESTA COMPLETA
+   Seleciona automaticamente 1 unidade de cada alimento disponível
+   ══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Indica se o doador escolheu a Cesta Completa (FormState.cestaCompleta).
+  Usado para sincronizar o botão "Selecionar Tudo" (toggle) e, no envio,
+  para decidir se a doação deve ser salva como 1 cesta completa em vez
+  da lista individual de alimentos.
+*/
+function _cestaCompletaSelecionada() {
+  return !!FormState.cestaCompleta;
+}
+
+/*
+  Mais estrito que _cestaCompletaSelecionada(): só considera "cesta completa"
+  quando há pelo menos 2 alimentos no catálogo. Com 1 único item disponível,
+  selecioná-lo é só aquele item, não uma cesta — usado na decisão do envio.
+*/
+function _ehDoacaoDeCestaCompleta() {
+  var alimentos = _alimentosCache.length ? _alimentosCache : alimentosPadrao();
+  var disponiveis = alimentos.filter(function (f) { return !_alimentoBloqueado(f.id); });
+  return disponiveis.length >= 2 && _cestaCompletaSelecionada();
+}
+
+/*
+  Retorna os itens "para exibição" no carrinho/gaveta/resumo do passo 2.
+  Quando a Cesta Completa está ativa, mostra só 1 linha ("Cesta básica
+  completa") em vez de marcar/listar cada alimento individualmente —
+  mas o cálculo de peso e a baixa de estoque continuam usando doaItens()
+  (a lista real, alimento por alimento), sem nenhuma mudança ali.
+*/
+function doaItensExibicao() {
+  if (FormState.cestaCompleta) {
+    var cestaImgSalva = (typeof localStorage !== 'undefined' && localStorage.getItem('doavida_cesta_img')) || 'img/cesta-basica.jpg';
+    return [{
+      id:      'cesta-completa',
+      nome:    'Cesta básica completa',
+      img:     cestaImgSalva,
+      emoji:   '',
+      qty:     1,
+      peso:    1,
+      totalKg: kgTotal(),
+    }];
+  }
+  return doaItens();
+}
+
+/*
+  Ativa/desativa o modo "Cesta Completa" (toggle).
+  Ao ativar: marca 1 unidade de cada alimento disponível internamente
+  (necessário para o cálculo de peso total e baixa de estoque por
+  alimento), mas os cards individuais permanecem visualmente neutros —
+  ver atualizarCard(). Na tela, só o card "Cesta Completa" fica marcado
+  e o carrinho mostra 1 único item.
+*/
+function doaSelecionarCestaCompleta() {
+  var alimentos = _alimentosCache.length ? _alimentosCache : alimentosPadrao();
+  var disponiveis = alimentos.filter(function (f) { return !_alimentoBloqueado(f.id); });
+
+  if (!disponiveis.length) {
+    showToast(' Nenhum item disponível no momento.', 'warning');
+    return;
+  }
+
+  var btn = document.getElementById('btn-cesta-completa');
+
+  if (FormState.cestaCompleta) {
+    /* Desativa: remove a cesta completa e zera as quantidades */
+    FormState.cestaCompleta = false;
+    disponiveis.forEach(function (f) {
+      FormState.qtds[f.id] = 0;
+      atualizarCard(f.id);
+    });
+    if (btn) { btn.textContent = 'Selecionar Tudo'; btn.style.background = '#1a1a1a'; btn.style.color = '#fff'; }
+    showToast(' Cesta removida do carrinho.', 'info');
+  } else {
+    /* Ativa: marca 1 unidade de cada item (cálculo interno), sem
+       selecionar visualmente os cards individuais */
+    FormState.cestaCompleta = true;
+    disponiveis.forEach(function (f) {
+      FormState.qtds[f.id] = 1;
+      atualizarCard(f.id);
+    });
+    if (btn) { btn.textContent = ' Cesta Selecionada'; btn.style.background = '#e8c96a'; btn.style.color = '#1a1a1a'; }
+    showToast(' Cesta completa adicionada!', 'success');
+  }
+
+  doaAtualizarCarrinho();
+  atualizarBotaoContinuar();
+}
+window.doaSelecionarCestaCompleta = doaSelecionarCestaCompleta;
+
+/*
+  Sincroniza o estado visual do botão da cesta sempre que o carrinho muda.
+  Chamada por doaAtualizarCarrinho() para manter o botão atualizado.
+*/
+function _sincronizarBotaoCesta() {
+  var btn = document.getElementById('btn-cesta-completa');
+  if (!btn) return;
+  var alimentos = _alimentosCache.length ? _alimentosCache : alimentosPadrao();
+  var disponiveis = alimentos.filter(function (f) { return !_alimentoBloqueado(f.id); });
+  if (!disponiveis.length) return;
+  if (_cestaCompletaSelecionada()) {
+    btn.textContent = ' Cesta Selecionada';
+    btn.style.background = '#e8c96a';
+    btn.style.color = '#1a1a1a';
+  } else {
+    btn.textContent = 'Selecionar Tudo';
+    btn.style.background = '#1a1a1a';
+    btn.style.color = '#fff';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 12 — PREENCHIMENTO AUTOMÁTICO DE ENDEREÇO
+   Método 1 (principal): CEP → ViaCEP (Correios) — funciona em todo o Brasil
+   Método 2 (alternativa): GPS → Nominatim reverse geocoding
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Máscara do campo CEP: digita "66085460" → exibe "66085-460" */
+function _mascaraCEP(el) {
+  var v = el.value.replace(/\D/g, '').slice(0, 8);
+  el.value = v.length > 5 ? v.slice(0, 5) + '-' + v.slice(5) : v;
+  /* Dispara a busca automaticamente quando os 8 dígitos estão completos */
+  if (v.length === 8) buscarEnderecoPorCEP();
+}
+
+/* Liga a máscara ao campo CEP quando o DOM estiver pronto */
+document.addEventListener('DOMContentLoaded', function () {
+  var cepInput = document.getElementById('inp-cep');
+  if (cepInput) {
+    cepInput.addEventListener('input', function () { _mascaraCEP(this); });
+    cepInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); buscarEnderecoPorCEP(); }
+    });
+  }
+});
+
+/*
+  buscarEnderecoPorCEP()
+  Consulta a API ViaCEP (gratuita, oficial dos Correios) e preenche
+  automaticamente Rua e Bairro. O usuário só precisa digitar Número e Referência.
+*/
+function buscarEnderecoPorCEP() {
+  var cepInput = document.getElementById('inp-cep');
+  var btnBuscar = document.getElementById('btn-buscar-cep');
+  var cep = (cepInput ? cepInput.value : '').replace(/\D/g, '');
+
+  if (cep.length !== 8) {
+    showToast('Digite o CEP completo (8 números).', 'warning');
+    if (cepInput) cepInput.focus();
+    return;
+  }
+
+  /* Estado de carregamento */
+  if (btnBuscar) { btnBuscar.disabled = true; btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...'; }
+
+  fetch('https://viacep.com.br/ws/' + cep + '/json/')
+    .then(function (r) {
+      if (!r.ok) throw new Error('viacep-error');
+      return r.json();
+    })
+    .then(function (d) {
+      if (d.erro) {
+        showToast('CEP não encontrado. Verifique o número e tente novamente.', 'warning');
+        if (cepInput) { cepInput.style.borderColor = '#d97706'; cepInput.focus(); }
+        return;
+      }
+
+      /* Preenche os campos */
+      var elRua    = document.getElementById('inp-rua');
+      var elBairro = document.getElementById('inp-bairro-end');
+      var elNum    = document.getElementById('inp-numero');
+
+      if (elRua)    { elRua.value    = d.logradouro || ''; elRua.style.borderColor    = d.logradouro ? '' : '#d97706'; }
+      if (elBairro) { elBairro.value = d.bairro     || ''; elBairro.style.borderColor = d.bairro     ? '' : '#d97706'; }
+
+      /* Limpa mensagem de erro e mostra confirmação */
+      var msgEnd = document.getElementById('msg-endereco');
+      if (msgEnd) {
+        msgEnd.style.color = '#2d6e1f';
+        msgEnd.textContent = '✓ Endereço encontrado! Confirme o número da sua casa.';
+      }
+      if (cepInput) cepInput.style.borderColor = '#2d6e1f';
+
+      /* Foca no número (único campo que o CEP não preenche) */
+      setTimeout(function () {
+        if (elNum) elNum.focus();
+      }, 250);
+
+      showToast('Endereço preenchido pelo CEP!', 'success');
+    })
+    .catch(function () {
+      showToast('Erro ao buscar o CEP. Verifique sua conexão ou preencha manualmente.', 'warning');
+    })
+    .finally(function () {
+      if (btnBuscar) { btnBuscar.disabled = false; btnBuscar.innerHTML = '<i class="fas fa-magnifying-glass"></i> Buscar'; }
+    });
+}
+window.buscarEnderecoPorCEP = buscarEnderecoPorCEP;
+
+/* ══════════════════════════════════════════════════════════════════════
+   GEOLOCALIZAÇÃO (alternativa ao CEP)
+   Usa a Geolocation API do browser + Nominatim (OpenStreetMap) para
+   reverse geocoding — gratuito, sem chave de API.
+   ══════════════════════════════════════════════════════════════════════ */
+
+function usarLocalizacaoGPS() {
+  var btn = document.getElementById('btn-usar-localizacao');
+
+  if (!navigator.geolocation) {
+    showToast('Seu dispositivo não suporta localização automática.', 'warning');
+    return;
+  }
+
+  function setBtnCarregando(ativo) {
+    if (!btn) return;
+    btn.disabled = ativo;
+    btn.classList.remove('btn-geo--ok');
+    btn.innerHTML = ativo
+      ? '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Buscando sua localização...'
+      : '<i class="fas fa-location-crosshairs" aria-hidden="true"></i> Usar minha localização';
+  }
+
+  /* Extrai logradouro do display_name como último recurso.
+     Ex: "Travessa das Palmeiras, Agulha, Belém, PA, Brasil" → "Travessa das Palmeiras" */
+  function extrairRuaDoDisplayName(displayName, bairroJaEncontrado) {
+    if (!displayName) return '';
+    var partes = displayName.split(',').map(function (p) { return p.trim(); });
+    var candidato = partes[0] || '';
+    if (/^(rua|av\.?|avenida|trav\.?|travessa|alameda|estrada|rodovia|beco|passagem|via |setor|quadra|qd\b|qn\b|qi\b)/i.test(candidato)) {
+      return candidato;
+    }
+    /* Aceita qualquer primeira parte se não for o bairro, cidade ou estado */
+    if (candidato &&
+        candidato.toLowerCase() !== (bairroJaEncontrado || '').toLowerCase() &&
+        !/^(belém|belem|pará|para|brasil|região|regiao|municipio|município)/i.test(candidato)) {
+      return candidato;
+    }
+    return '';
+  }
+
+  function bairroValidoGPS(valor) {
+    var v = String(valor || '').trim();
+    if (!v) return '';
+    if (/^(bel[eé]m|par[aá]|brasil|regi[aã]o|regiao|munic[ií]pio|municipio|state of par[aá]|regi[aã]o metropolitana)$/i.test(v)) {
+      return '';
+    }
+    return v;
+  }
+
+  function extrairBairroNominatim(address) {
+    var candidatos = [
+      address.neighbourhood,
+      address.quarter,
+      address.suburb,
+      address.city_district,
+      address.district,
+      address.borough
+    ];
+    for (var i = 0; i < candidatos.length; i++) {
+      var bairro = bairroValidoGPS(candidatos[i]);
+      if (bairro) return bairro;
+    }
+    return '';
+  }
+
+  /* Preenche os campos do DOM e exibe o feedback final */
+  function aplicarEndereco(rua, numero, bairro) {
+    var elRua    = document.getElementById('inp-rua');
+    var elNum    = document.getElementById('inp-numero');
+    var elBairro = document.getElementById('inp-bairro-end');
+
+    if (elRua)    { elRua.value    = rua;    elRua.style.borderColor    = ''; }
+    if (elNum)    { elNum.value    = numero; }
+    if (elBairro) { elBairro.value = bairro; elBairro.style.borderColor = ''; }
+
+    var faltando = [];
+    if (!rua)    faltando.push('rua');
+    if (!bairro) faltando.push('bairro');
+
+    var msgEnd = document.getElementById('msg-endereco');
+    if (msgEnd) {
+      if (!faltando.length) {
+        msgEnd.style.color   = '#2d6e1f';
+        msgEnd.textContent   = '✓ Endereço detectado! Confira e ajuste se precisar.';
+      } else {
+        msgEnd.style.color   = '#92400e';
+        msgEnd.textContent   = 'Não conseguimos detectar: ' + faltando.join(' e ') + '. Digite abaixo.';
+      }
+    }
+
+    if (btn) {
+      btn.disabled  = false;
+      btn.innerHTML = !faltando.length
+        ? '<i class="fas fa-circle-check" aria-hidden="true"></i> Localização preenchida!'
+        : '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Complete os campos em laranja';
+      btn.classList.add('btn-geo--ok');
+      setTimeout(function () {
+        btn.innerHTML = '<i class="fas fa-location-crosshairs" aria-hidden="true"></i> Usar minha localização';
+        btn.classList.remove('btn-geo--ok');
+        btn.disabled  = false;
+      }, 4000);
+    }
+
+    /* Destaca em laranja os campos que faltam */
+    if (!rua    && elRua)    elRua.style.borderColor    = '#d97706';
+    if (!bairro && elBairro) elBairro.style.borderColor = '#d97706';
+
+    /* Foca no primeiro campo vazio */
+    setTimeout(function () {
+      if (!rua && elRua)          { elRua.focus(); return; }
+      if (!bairro && elBairro)    { elBairro.focus(); return; }
+      var elRef = document.getElementById('inp-referencia');
+      if (elRef) elRef.focus();
+    }, 350);
+
+    showToast(
+      !faltando.length
+        ? 'Endereço preenchido! Confira os dados.'
+        : 'Quase lá! Preencha: ' + faltando.join(' e ') + '.',
+      !faltando.length ? 'success' : 'warning'
+    );
+  }
+
+  function avisarGPSImpreciso() {
+    var elBairro = document.getElementById('inp-bairro-end');
+    var msgEnd = document.getElementById('msg-endereco');
+    if (elBairro) {
+      elBairro.value = '';
+      elBairro.style.borderColor = '#d97706';
+    }
+    if (msgEnd) {
+      msgEnd.style.color = '#92400e';
+      msgEnd.textContent = 'GPS impreciso para definir o bairro. Digite o CEP ou informe o bairro manualmente.';
+    }
+  }
+
+  setBtnCarregando(true);
+
+  navigator.geolocation.getCurrentPosition(
+    function (pos) {
+      var lat = pos.coords.latitude;
+      var lon = pos.coords.longitude;
+      var precisao = Number(pos.coords.accuracy || 9999);
+      var gpsPreciso = precisao <= 120;
+
+      /* ── Passo 1: Nominatim — converte coordenadas em endereço ── */
+      fetch(
+        'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&zoom=18&lat=' +
+        lat + '&lon=' + lon + '&accept-language=pt-BR'
+      )
+      .then(function (r) {
+        if (!r.ok) throw new Error('nominatim-error');
+        return r.json();
+      })
+      .then(function (data) {
+        var a      = data.address || {};
+        var bairroSugerido = extrairBairroNominatim(a);
+        var bairro = '';
+        var numero = a.house_number || '';
+        var cep    = (a.postcode || '').replace(/\D/g, '');
+        var elCep  = document.getElementById('inp-cep');
+
+        /* Tenta extrair rua de vários campos do Nominatim */
+        var rua = a.road || a.pedestrian || a.footway || a.path ||
+                  a.cycleway || a.residential || a.hamlet || '';
+
+        /* Fallback no display_name se Nominatim não retornou campo de rua */
+        if (!rua) rua = extrairRuaDoDisplayName(data.display_name, bairroSugerido);
+
+        /* ── Passo 2: se temos CEP → consulta ViaCEP ──
+           ViaCEP é a API oficial brasileira de endereços por CEP.
+           Em Belém, o bairro do OSM pode vir como região/bairro vizinho.
+           O bairro só é preenchido se o GPS estiver preciso; se a localização
+           vier aproximada por IP/Wi-Fi, deixamos o usuário confirmar pelo CEP. */
+        if (cep.length === 8) {
+          if (elCep) elCep.value = cep.slice(0, 5) + '-' + cep.slice(5);
+          fetch('https://viacep.com.br/ws/' + cep + '/json/')
+            .then(function (r2) { return r2.json(); })
+            .then(function (vd) {
+              if (!vd.erro) {
+                rua    = vd.logradouro || rua;
+                bairro = gpsPreciso ? (vd.bairro || '') : '';
+              }
+              aplicarEndereco(rua, numero, bairro);
+              if (!gpsPreciso) avisarGPSImpreciso();
+            })
+            .catch(function () {
+              /* ViaCEP falhou — usa o que temos */
+              aplicarEndereco(rua, numero, '');
+              if (!gpsPreciso) avisarGPSImpreciso();
+            });
+          return; /* ViaCEP assume o controle do fluxo */
+        }
+
+        aplicarEndereco(rua, numero, '');
+        if (!gpsPreciso || bairroSugerido) avisarGPSImpreciso();
+      })
+      .catch(function () {
+        setBtnCarregando(false);
+        showToast('Não foi possível traduzir sua localização. Preencha o endereço manualmente.', 'warning');
+      });
+    },
+
+    function (err) {
+      setBtnCarregando(false);
+      var msgs = {
+        1: 'Permissão negada. Permita o acesso à localização nas configurações do navegador.',
+        2: 'Localização indisponível no momento. Preencha o endereço manualmente.',
+        3: 'A busca demorou muito. Verifique sua conexão e tente novamente.',
+      };
+      showToast(msgs[err.code] || 'Não foi possível obter a localização.', 'warning');
+    },
+
+    { timeout: 12000, maximumAge: 60000, enableHighAccuracy: true }
+  );
+}
+window.usarLocalizacaoGPS = usarLocalizacaoGPS;
+
+console.log('[DoaVida] form.js  carregado');

@@ -73,6 +73,28 @@ function inicializarLoader() {
 
   /* Teto de 1200ms: mobile nunca espera além disso */
   setTimeout(esconderLoader, 1200);
+
+  /*
+    BUG: voltar pela página travava no loader.
+
+    Ao clicar num link, inicializarTransicaoPagina() remove "hidden"
+    do loader ANTES de navegar (linha ~137). Se o usuário volta pelo
+    botão "voltar" do navegador (ou gesto de voltar no mobile), o
+    Chrome/Firefox podem restaurar a página via bfcache: o DOM volta
+    exatamente como foi congelado — loader visível — e nem
+    "DOMContentLoaded" nem "load" disparam de novo, então nada nunca
+    esconde o loader. Resultado: tela de carregamento presa "para sempre".
+
+    "pageshow" dispara sempre que a página fica visível, incluindo
+    restauração via bfcache. event.persisted = true identifica esse caso.
+  */
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) {
+      loaderJaEscondido = false;
+      loader.classList.add("hidden");
+      loaderJaEscondido = true;
+    }
+  });
 } /* Fim de inicializarLoader */
 
 /* ══════════════════════════════════════════════════════════════════════

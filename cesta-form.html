@@ -1,0 +1,1122 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitar Cesta Básica | Ação Social Semear</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript>
+  <link rel="stylesheet" href="css/global.css" />
+  <style>
+    /* ── Reset e base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { background: #f5f7f3; font-family: 'DM Sans', sans-serif; }
+
+    .cf-main {
+      min-height: 100vh;
+      padding-top: 130px; /* navbar + progress header */
+      padding-bottom: 96px;
+    }
+
+    /* ── Barra de progresso (sticky abaixo da navbar) ── */
+    .cf-progress-wrap {
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid #e8ede4;
+      padding: 12px 20px 14px;
+      z-index: 200;
+    }
+
+    .cf-progress-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: #2d5a1b;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .cf-progress-bars { display: flex; gap: 6px; }
+
+    .cf-pbar {
+      flex: 1; height: 4px; border-radius: 2px;
+      background: #dde6d8;
+      transition: background .35s;
+    }
+    .cf-pbar.done    { background: #2d5a1b; }
+    .cf-pbar.current { background: linear-gradient(90deg, #2d5a1b 60%, #8ab878); }
+
+    /* ── Step panels ── */
+    .cf-step { display: none; max-width: 560px; margin: 0 auto; padding: 24px 16px; position: relative; }
+    .cf-step.active { display: block; }
+
+    /* Decoração de folha */
+    .cf-leaf-deco {
+      position: absolute;
+      top: 16px; right: 0;
+      width: 120px; opacity: .10;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── Cabeçalho do step ── */
+    .cf-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.05rem, 3.8vw, 1.75rem); font-weight: 900;
+      color: #1a3312; line-height: 1.2;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+
+    .cf-subtitle {
+      font-size: .88rem; color: #666;
+      line-height: 1.6; margin-bottom: 20px;
+    }
+
+    /* ── Info card ── */
+    .cf-info-card {
+      background: #fff;
+      border: 1px solid #e0e8db;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+      margin-bottom: 16px;
+      position: relative; overflow: hidden;
+    }
+
+    .cf-info-card.amber {
+      background: #fffbf0;
+      border-color: #f0d888;
+    }
+
+    .cf-info-ico {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #2d5a1b;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1rem; flex-shrink: 0;
+    }
+
+    .cf-info-card.amber .cf-info-ico { background: #c97d0a; }
+
+    .cf-info-body { flex: 1; }
+    .cf-info-card-title { font-size: .9rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .cf-info-card-desc  { font-size: .8rem; color: #666; line-height: 1.55; }
+
+    .cf-info-card-deco {
+      position: absolute; right: 10px; bottom: -6px;
+      font-size: 3rem; color: #2d5a1b; opacity: .12;
+      pointer-events: none;
+    }
+
+    /* ── Section block ── */
+    .cf-section {
+      background: #fff;
+      border: 1px solid #e0e8db;
+      border-radius: 16px;
+      padding: 18px 16px;
+      margin-bottom: 14px;
+    }
+
+    .cf-section-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .cf-section-ico {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #edf5e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #2d5a1b; font-size: .9rem; flex-shrink: 0;
+    }
+
+    .cf-section-title { font-size: 1rem; font-weight: 700; color: #1a1a1a; }
+
+    /* ── Campos de input ── */
+    .cf-fields { display: flex; flex-direction: column; gap: 10px; }
+
+    .cf-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cf-row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+
+    .cf-field { position: relative; }
+
+    .cf-field-ico {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: #aaa; font-size: .78rem;
+      pointer-events: none; z-index: 1;
+    }
+
+    .cf-input, .cf-select {
+      width: 100%;
+      padding: 13px 14px 13px 38px;
+      border: 1.5px solid #dde6d8;
+      border-radius: 12px;
+      font-size: .88rem; font-family: 'DM Sans', sans-serif;
+      color: #1a1a1a; background: #fafcf9;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+
+    .cf-input:focus, .cf-select:focus {
+      border-color: #2d5a1b;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(45,90,27,.09);
+    }
+
+    .cf-input.err { border-color: #e53935; }
+    .cf-input.ok  { border-color: #4caf50; }
+
+    /* Seta do select */
+    .cf-sel-wrap { position: relative; }
+    .cf-sel-wrap::after {
+      content: '';
+      position: absolute; right: 13px; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #999;
+      pointer-events: none;
+    }
+
+    /* ── Dropdown item (família) ── */
+    .cf-dd-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px;
+      border: 1.5px solid #dde6d8;
+      border-radius: 12px;
+      background: #fafcf9;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      position: relative;
+    }
+
+    .cf-dd-item:hover { border-color: #2d5a1b; background: #f5fbf2; }
+    .cf-dd-item.filled { border-color: #4caf50; }
+
+    .cf-dd-item-ico { color: #2d5a1b; font-size: .82rem; width: 18px; flex-shrink: 0; }
+    .cf-dd-item-lbl { font-size: .88rem; color: #555; flex: 1; }
+    .cf-dd-item.filled .cf-dd-item-lbl { color: #1a1a1a; }
+    .cf-dd-arrow { color: #bbb; font-size: .72rem; }
+
+    .cf-dd-item select {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+
+    /* ── Alert card (aviso) ── */
+    .cf-alert-card {
+      background: #fffbf0;
+      border: 1px solid #f0d888;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .cf-alert-ico {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #fef3c7;
+      display: flex; align-items: center; justify-content: center;
+      color: #c97d0a; font-size: .9rem; flex-shrink: 0;
+    }
+
+    .cf-alert-txt { font-size: .82rem; color: #555; line-height: 1.55; }
+
+    /* ══ STEP 3 — Sucesso ══ */
+    .cf-success-card {
+      background: #fff;
+      border: 1px solid #e0e8db;
+      border-radius: 16px;
+      padding: 20px 16px;
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 14px;
+      position: relative; overflow: hidden;
+    }
+
+    .cf-success-check {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: #2d5a1b;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.5rem; flex-shrink: 0;
+    }
+
+    .cf-success-body { flex: 1; }
+    .cf-success-title { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
+
+    .cf-success-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .84rem; margin-bottom: 8px;
+    }
+
+    .cf-success-row i { color: #2d5a1b; width: 16px; text-align: center; }
+    .cf-success-lbl   { color: #999; min-width: 90px; }
+    .cf-success-val   { font-weight: 700; color: #1a1a1a; }
+
+    .cf-status-badge {
+      display: inline-block; padding: 3px 12px;
+      border-radius: 50px; font-size: .72rem; font-weight: 700;
+      background: #edf5e8; color: #2d5a1b;
+      border: 1px solid #c0d8b0;
+    }
+
+    /* Próximos passos */
+    .cf-list-card {
+      background: #fff;
+      border: 1px solid #e0e8db;
+      border-radius: 16px;
+      padding: 18px 16px;
+      margin-bottom: 14px;
+    }
+
+    .cf-list-card-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .85rem; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 14px;
+    }
+
+    .cf-list-card-title i { color: #2d5a1b; }
+
+    .cf-list-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .cf-list-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .cf-list-ico {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #edf5e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #2d5a1b; font-size: .85rem; flex-shrink: 0;
+    }
+
+    .cf-list-body { flex: 1; }
+    .cf-list-title { font-size: .88rem; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
+    .cf-list-desc  { font-size: .76rem; color: #888; line-height: 1.45; }
+    .cf-list-arrow { color: #ccc; font-size: .7rem; margin-top: 5px; }
+
+    /* Canais */
+    .cf-canais-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+    }
+
+    .cf-canal { text-align: center; }
+
+    .cf-canal-ico {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #edf5e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #2d5a1b; font-size: .9rem; margin: 0 auto 6px;
+    }
+
+    .cf-canal-name { font-size: .76rem; font-weight: 700; color: #1a1a1a; line-height: 1.3; margin-bottom: 2px; }
+    .cf-canal-info { font-size: .68rem; color: #888; line-height: 1.4; }
+
+    /* Acompanhar link */
+    .cf-acompanhar {
+      background: #fff;
+      border: 1px solid #e0e8db;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+      cursor: pointer; text-decoration: none;
+      transition: background .15s;
+    }
+
+    .cf-acompanhar:hover { background: #f5fbf2; border-color: #2d5a1b; }
+
+    .cf-acompanhar-ico {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #edf5e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #2d5a1b; font-size: .9rem; flex-shrink: 0;
+    }
+
+    .cf-acompanhar-txt { font-size: .9rem; font-weight: 700; color: #1a1a1a; flex: 1; }
+
+    /* ── Barra inferior fixa ── */
+    .cf-bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #e0e8db;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      z-index: 500;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+    }
+
+    .cf-bar-left {
+      display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+    }
+
+    .cf-bar-ico {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: #edf5e8;
+      display: flex; align-items: center; justify-content: center;
+      color: #2d5a1b; font-size: .9rem; flex-shrink: 0;
+    }
+
+    .cf-bar-title { font-size: .85rem; font-weight: 700; color: #1a1a1a; }
+    .cf-bar-sub   { font-size: .72rem; color: #888; }
+
+    .cf-bar-btns  { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .cf-btn-back {
+      padding: 12px 18px;
+      border: 1.5px solid #ddd; border-radius: 50px;
+      background: #fff; color: #555;
+      font-size: .85rem; font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color .15s, color .15s;
+    }
+
+    .cf-btn-back:hover { border-color: #2d5a1b; color: #2d5a1b; }
+
+    .cf-btn-next {
+      padding: 12px 22px;
+      background: #2d5a1b; color: #fff;
+      border: none; border-radius: 50px;
+      font-size: .88rem; font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+
+    .cf-btn-next:hover { background: #1e4015; transform: translateY(-1px); }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .cf-title { font-size: clamp(0.88rem, 4.2vw, 1.35rem); }
+      .cf-row, .cf-row-3 { grid-template-columns: 1fr; }
+      .cf-canais-grid { grid-template-columns: repeat(3,1fr); gap: 6px; }
+    }
+
+    /* ── Bottom bar mobile ── */
+    @media (max-width: 600px) {
+      .cf-bottom-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 14px 14px;
+      }
+
+      .cf-bar-left { gap: 10px; }
+
+      .cf-bar-ico { width: 36px; height: 36px; font-size: .8rem; }
+
+      .cf-bar-title {
+        font-size: .82rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .cf-bar-sub { font-size: .7rem; }
+
+      .cf-bar-btns {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .cf-btn-back {
+        padding: 11px 16px;
+        font-size: .82rem;
+        flex-shrink: 0;
+      }
+
+      .cf-btn-next {
+        flex: 1;
+        justify-content: center;
+        padding: 11px 16px;
+        font-size: .84rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar injetada pelo app.js -->
+
+  <!-- Barra de progresso -->
+  <div class="cf-progress-wrap">
+    <div class="cf-progress-label" id="cf-etapa-label">Etapa 1 de 3</div>
+    <div class="cf-progress-bars">
+      <div class="cf-pbar current" id="cfbar-1"></div>
+      <div class="cf-pbar"         id="cfbar-2"></div>
+      <div class="cf-pbar"         id="cfbar-3"></div>
+    </div>
+  </div>
+
+  <main class="cf-main">
+
+    <!-- ═══════════════════════════════════════
+         PASSO 1 — Dados do responsável
+    ═══════════════════════════════════════ -->
+    <div class="cf-step active" id="cf-step-1">
+
+      <svg class="cf-leaf-deco" viewBox="0 0 160 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 248 C80 248 8 178 8 104 C8 48 40 8 80 8 C120 8 152 48 152 104 C152 178 80 248 80 248Z" fill="#2d5a1b"/>
+        <line x1="80" y1="8" x2="80" y2="248" stroke="white" stroke-width="1.5" opacity=".35"/>
+        <path d="M80 55 C108 72 134 92 148 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C105 100 126 115 138 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 125 C102 132 118 143 126 162" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 55 C52 72 26 92 12 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C55 100 34 115 22 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+      </svg>
+
+      <h1 class="cf-title">Cadastro para receber cesta básica</h1>
+      <p class="cf-subtitle">Preencha seus dados iniciais para que possamos analisar sua solicitação com cuidado e organização.</p>
+
+      <div class="cf-info-card">
+        <div class="cf-info-ico"><i class="fas fa-circle-info"></i></div>
+        <div class="cf-info-body">
+          <div class="cf-info-card-title">Solicitação social</div>
+          <div class="cf-info-card-desc">Sua solicitação será analisada pela nossa equipe antes da aprovação e do envio da cesta básica.</div>
+        </div>
+        <div class="cf-info-card-deco"><i class="fas fa-seedling"></i></div>
+      </div>
+
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-ico"><i class="fas fa-user"></i></div>
+          <span class="cf-section-title">1. Dados do responsável</span>
+        </div>
+        <div class="cf-fields">
+
+          <div class="cf-field">
+            <i class="cf-field-ico fas fa-user"></i>
+            <input class="cf-input" id="cf-nome" type="text" placeholder="Nome completo *" maxlength="120" autocomplete="name" />
+          </div>
+
+          <div class="cf-field">
+            <i class="cf-field-ico fas fa-phone"></i>
+            <input class="cf-input" id="cf-tel" type="tel" placeholder="Telefone / WhatsApp *" inputmode="numeric" maxlength="16" autocomplete="tel" />
+          </div>
+
+          <div class="cf-row">
+            <div class="cf-field cf-sel-wrap">
+              <i class="cf-field-ico fas fa-heart"></i>
+              <select class="cf-select" id="cf-estado-civil">
+                <option value="" disabled selected>Estado civil *</option>
+                <option>Solteiro(a)</option>
+                <option>Casado(a)</option>
+                <option>União estável</option>
+                <option>Separado(a)</option>
+                <option>Divorciado(a)</option>
+                <option>Viúvo(a)</option>
+              </select>
+            </div>
+            <div class="cf-field cf-sel-wrap">
+              <i class="cf-field-ico fas fa-person"></i>
+              <select class="cf-select" id="cf-sexo">
+                <option value="" disabled selected>Sexo / Gênero *</option>
+                <option>Masculino</option>
+                <option>Feminino</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="cf-alert-card">
+        <div class="cf-alert-ico"><i class="fas fa-bell"></i></div>
+        <div class="cf-alert-txt">Os campos marcados com * são obrigatórios e devem ser preenchidos.</div>
+      </div>
+
+    </div><!-- /step-1 -->
+
+
+    <!-- ═══════════════════════════════════════
+         PASSO 2 — Endereço + Família
+    ═══════════════════════════════════════ -->
+    <div class="cf-step" id="cf-step-2">
+
+      <svg class="cf-leaf-deco" viewBox="0 0 160 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 248 C80 248 8 178 8 104 C8 48 40 8 80 8 C120 8 152 48 152 104 C152 178 80 248 80 248Z" fill="#2d5a1b"/>
+        <line x1="80" y1="8" x2="80" y2="248" stroke="white" stroke-width="1.5" opacity=".35"/>
+        <path d="M80 55 C108 72 134 92 148 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C105 100 126 115 138 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 55 C52 72 26 92 12 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C55 100 34 115 22 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+      </svg>
+
+      <h1 class="cf-title">Cadastro para receber cesta básica</h1>
+      <p class="cf-subtitle">Informe seu endereço e a composição da família para que a equipe compreenda sua necessidade social.</p>
+
+      <div class="cf-info-card">
+        <div class="cf-info-ico"><i class="fas fa-lock"></i></div>
+        <div class="cf-info-body">
+          <div class="cf-info-card-title">Privacidade e análise social</div>
+          <div class="cf-info-card-desc">Suas informações são protegidas e utilizadas exclusivamente para análise social e definição de prioridades.</div>
+        </div>
+        <div class="cf-info-card-deco"><i class="fas fa-shield-halved"></i></div>
+      </div>
+
+      <!-- 2. Endereço -->
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-ico"><i class="fas fa-location-dot"></i></div>
+          <span class="cf-section-title">2. Endereço</span>
+        </div>
+        <div class="cf-fields">
+
+          <div class="cf-row">
+            <div class="cf-field">
+              <i class="cf-field-ico fas fa-location-dot"></i>
+              <input class="cf-input" id="cf-cep" type="text" placeholder="CEP" inputmode="numeric" maxlength="9" />
+            </div>
+            <div class="cf-field">
+              <i class="cf-field-ico fas fa-house"></i>
+              <input class="cf-input" id="cf-endereco" type="text" placeholder="Endereço" />
+            </div>
+          </div>
+
+          <div class="cf-row">
+            <div class="cf-field">
+              <i class="cf-field-ico fas fa-hashtag"></i>
+              <input class="cf-input" id="cf-numero" type="text" placeholder="Número" inputmode="numeric" />
+            </div>
+            <div class="cf-field">
+              <i class="cf-field-ico fas fa-building"></i>
+              <input class="cf-input" id="cf-complemento" type="text" placeholder="Complemento (opcional)" />
+            </div>
+          </div>
+
+          <div class="cf-field">
+            <i class="cf-field-ico fas fa-map"></i>
+            <input class="cf-input" id="cf-bairro" type="text" placeholder="Bairro" />
+          </div>
+
+          <div class="cf-row-3">
+            <div class="cf-field">
+              <i class="cf-field-ico fas fa-city"></i>
+              <input class="cf-input" id="cf-cidade" type="text" placeholder="Cidade" />
+            </div>
+            <div class="cf-field cf-sel-wrap">
+              <i class="cf-field-ico fas fa-map-pin"></i>
+              <select class="cf-select" id="cf-uf">
+                <option value="" disabled selected>UF</option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                <option>MG</option><option selected>PA</option><option>PB</option><option>PR</option>
+                <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                <option>SP</option><option>SE</option><option>TO</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cf-field">
+            <i class="cf-field-ico fas fa-comment"></i>
+            <input class="cf-input" id="cf-referencia" type="text" placeholder="Ponto de referência (opcional)" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. Informações da família -->
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-ico"><i class="fas fa-people-group"></i></div>
+          <span class="cf-section-title">3. Informações da família</span>
+        </div>
+        <div class="cf-fields">
+
+          <div class="cf-dd-item" id="dd-pessoas">
+            <i class="cf-dd-item-ico fas fa-people-group"></i>
+            <span class="cf-dd-item-lbl" id="lbl-pessoas">Quantas pessoas moram na casa?</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-pessoas" onchange="cfDdChange(this,'lbl-pessoas','dd-pessoas')">
+              <option value="">Quantas pessoas moram na casa?</option>
+              <option>1 pessoa</option><option>2 pessoas</option><option>3 pessoas</option>
+              <option>4 pessoas</option><option>5 pessoas</option><option>6 ou mais</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-criancas">
+            <i class="cf-dd-item-ico fas fa-child"></i>
+            <span class="cf-dd-item-lbl" id="lbl-criancas">Crianças na residência</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-criancas" onchange="cfDdChange(this,'lbl-criancas','dd-criancas')">
+              <option value="">Crianças na residência</option>
+              <option>Nenhuma</option><option>1 criança</option><option>2 crianças</option>
+              <option>3 crianças</option><option>4 ou mais</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-idosos">
+            <i class="cf-dd-item-ico fas fa-person-cane"></i>
+            <span class="cf-dd-item-lbl" id="lbl-idosos">Idosos na residência</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-idosos" onchange="cfDdChange(this,'lbl-idosos','dd-idosos')">
+              <option value="">Idosos na residência</option>
+              <option>Nenhum</option><option>1 idoso</option><option>2 idosos</option>
+              <option>3 ou mais</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-deficiencia">
+            <i class="cf-dd-item-ico fas fa-wheelchair"></i>
+            <span class="cf-dd-item-lbl" id="lbl-deficiencia">Pessoa com deficiência?</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-deficiencia" onchange="cfDdChange(this,'lbl-deficiencia','dd-deficiencia')">
+              <option value="">Pessoa com deficiência?</option>
+              <option>Não</option><option>Sim</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-renda">
+            <i class="cf-dd-item-ico fas fa-money-bill-wave"></i>
+            <span class="cf-dd-item-lbl" id="lbl-renda">Renda familiar mensal</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-renda" onchange="cfDdChange(this,'lbl-renda','dd-renda')">
+              <option value="">Renda familiar mensal</option>
+              <option>Sem renda</option>
+              <option>Até 1 salário mínimo</option>
+              <option>1 a 2 salários mínimos</option>
+              <option>2 a 3 salários mínimos</option>
+              <option>Acima de 3 salários</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-trabalho">
+            <i class="cf-dd-item-ico fas fa-briefcase"></i>
+            <span class="cf-dd-item-lbl" id="lbl-trabalho">Situação de trabalho</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-trabalho" onchange="cfDdChange(this,'lbl-trabalho','dd-trabalho')">
+              <option value="">Situação de trabalho</option>
+              <option>Empregado(a)</option><option>Desempregado(a)</option>
+              <option>Autônomo(a)</option><option>Aposentado(a)</option><option>Do lar</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-beneficio">
+            <i class="cf-dd-item-ico fas fa-hand-holding-heart"></i>
+            <span class="cf-dd-item-lbl" id="lbl-beneficio">Recebe outro benefício?</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-beneficio" onchange="cfDdChange(this,'lbl-beneficio','dd-beneficio')">
+              <option value="">Recebe outro benefício?</option>
+              <option>Não</option><option>Bolsa Família</option>
+            </select>
+          </div>
+
+          <div class="cf-dd-item" id="dd-necessidade">
+            <i class="cf-dd-item-ico fas fa-star"></i>
+            <span class="cf-dd-item-lbl" id="lbl-necessidade">Principal necessidade no momento</span>
+            <i class="cf-dd-arrow fas fa-chevron-down"></i>
+            <select id="cf-necessidade" onchange="cfDdChange(this,'lbl-necessidade','dd-necessidade')">
+              <option value="">Principal necessidade no momento</option>
+              <option>Alimentação</option>
+              <option>Medicamentos</option>
+              <option>Saúde</option>
+              <option>Apoio espiritual</option>
+              <option>Aconselhamento pastoral</option>
+              <option>Participar de cultos</option>
+              <option>Grupos de oração</option>
+              <option>Apoio para crianças e jovens</option>
+              <option>Visita domiciliar</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="cf-info-card amber">
+        <div class="cf-info-ico"><i class="fas fa-heart-circle-plus"></i></div>
+        <div class="cf-info-body">
+          <div class="cf-info-card-desc">Essas informações ajudam a priorizar o atendimento de forma justa e organizada.</div>
+        </div>
+        <div class="cf-info-card-deco"><i class="fas fa-seedling"></i></div>
+      </div>
+
+    </div><!-- /step-2 -->
+
+
+    <!-- ═══════════════════════════════════════
+         PASSO 3 — Sucesso
+    ═══════════════════════════════════════ -->
+    <div class="cf-step" id="cf-step-3">
+
+      <svg class="cf-leaf-deco" viewBox="0 0 160 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 248 C80 248 8 178 8 104 C8 48 40 8 80 8 C120 8 152 48 152 104 C152 178 80 248 80 248Z" fill="#2d5a1b"/>
+        <line x1="80" y1="8" x2="80" y2="248" stroke="white" stroke-width="1.5" opacity=".35"/>
+        <path d="M80 55 C108 72 134 92 148 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C105 100 126 115 138 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 55 C52 72 26 92 12 118" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+        <path d="M80 90 C55 100 34 115 22 138" stroke="white" stroke-width="1.2" opacity=".25" fill="none"/>
+      </svg>
+
+      <h1 class="cf-title">Cadastro enviado com sucesso</h1>
+      <p class="cf-subtitle">Recebemos sua solicitação de cesta básica com sucesso! Nossa equipe irá analisar as informações e entrará em contato com você pelo WhatsApp ou telefone.</p>
+
+      <!-- Card protocolo -->
+      <div class="cf-success-card">
+        <div class="cf-success-check"><i class="fas fa-check"></i></div>
+        <div class="cf-success-body">
+          <div class="cf-success-title">Solicitação recebida</div>
+          <div class="cf-success-row">
+            <i class="fas fa-file-lines"></i>
+            <span class="cf-success-lbl">Protocolo:</span>
+            <span class="cf-success-val" id="cf-protocolo">CS-2026-0000</span>
+          </div>
+          <div class="cf-success-row">
+            <i class="fas fa-calendar"></i>
+            <span class="cf-success-lbl">Data do envio:</span>
+            <span class="cf-success-val" id="cf-data-envio">--/--/----</span>
+          </div>
+          <div class="cf-success-row">
+            <i class="fas fa-clock"></i>
+            <span class="cf-success-lbl">Status atual:</span>
+            <span class="cf-status-badge">Em análise</span>
+          </div>
+        </div>
+        <div class="cf-info-card-deco" style="font-size:2.5rem"><i class="fas fa-basket-shopping"></i></div>
+      </div>
+
+      <!-- Próximos passos -->
+      <div class="cf-list-card">
+        <div class="cf-list-card-title">
+          <i class="fas fa-list-check"></i> Próximos passos
+        </div>
+        <div class="cf-list-item">
+          <div class="cf-list-ico"><i class="fas fa-clipboard-check"></i></div>
+          <div class="cf-list-body">
+            <div class="cf-list-title">1. Análise do cadastro</div>
+            <div class="cf-list-desc">Nossa equipe irá verificar as informações enviadas.</div>
+          </div>
+          <i class="cf-list-arrow fas fa-chevron-right"></i>
+        </div>
+        <div class="cf-list-item">
+          <div class="cf-list-ico"><i class="fas fa-phone-volume"></i></div>
+          <div class="cf-list-body">
+            <div class="cf-list-title">2. Contato da equipe</div>
+            <div class="cf-list-desc">Podemos entrar em contato para confirmar dados ou solicitar informações adicionais.</div>
+          </div>
+          <i class="cf-list-arrow fas fa-chevron-right"></i>
+        </div>
+        <div class="cf-list-item">
+          <div class="cf-list-ico"><i class="fas fa-gift"></i></div>
+          <div class="cf-list-body">
+            <div class="cf-list-title">3. Liberação do benefício</div>
+            <div class="cf-list-desc">Se aprovado, você receberá orientações sobre como e quando retirar sua cesta básica.</div>
+          </div>
+          <i class="cf-list-arrow fas fa-chevron-right"></i>
+        </div>
+      </div>
+
+      <!-- Guarde o protocolo -->
+      <div class="cf-alert-card">
+        <div class="cf-alert-ico"><i class="fas fa-bookmark"></i></div>
+        <div class="cf-alert-txt">Guarde seu número de protocolo. Ele será necessário para acompanhar sua solicitação.</div>
+      </div>
+
+      <!-- Acompanhar solicitação -->
+      <a href="#" class="cf-acompanhar" onclick="return false">
+        <div class="cf-acompanhar-ico"><i class="fas fa-eye"></i></div>
+        <span class="cf-acompanhar-txt">Acompanhar solicitação</span>
+        <i class="fas fa-chevron-right" style="color:#ccc;font-size:.72rem"></i>
+      </a>
+
+    </div><!-- /step-3 -->
+
+  </main>
+
+  <!-- Barra inferior fixa -->
+  <div class="cf-bottom-bar">
+    <div class="cf-bar-left">
+      <div class="cf-bar-ico"><i class="fas fa-clipboard-list" id="cf-bar-ico"></i></div>
+      <div>
+        <div class="cf-bar-title" id="cf-bar-title">Etapa 1 concluída parcialmente</div>
+        <div class="cf-bar-sub"   id="cf-bar-sub">Preencha os campos obrigatórios para continuar.</div>
+      </div>
+    </div>
+    <div class="cf-bar-btns">
+      <button class="cf-btn-back" id="cf-btn-back" type="button" style="display:none" aria-label="Voltar">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </button>
+      <button class="cf-btn-next" id="cf-btn-next" type="button">
+        Próxima etapa <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase / Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/services/firebase.js?v=5"></script>
+
+  <!-- App central (navbar, loader, toast) -->
+  <script src="js/app.js"></script>
+
+  <script>
+    var CF = { passo: 1 };
+
+    /* Atualiza label + classe do dropdown de família */
+    function cfDdChange(sel, lblId, wrapId) {
+      var lbl  = document.getElementById(lblId);
+      var wrap = document.getElementById(wrapId);
+      if (lbl && sel.value) {
+        lbl.textContent = sel.options[sel.selectedIndex].text;
+      }
+      if (wrap) {
+        wrap.classList.toggle('filled', !!sel.value);
+      }
+    }
+
+    /* Máscaras */
+    function cfMaskCpf(v) {
+      return v.replace(/\D/g,'').substring(0,11)
+        .replace(/(\d{3})(\d)/,'$1.$2')
+        .replace(/(\d{3})(\d)/,'$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    }
+
+    function cfMaskTel(v) {
+      var d = v.replace(/\D/g,'').substring(0,11);
+      return d.length <= 10
+        ? d.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3')
+        : d.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+    }
+
+    function cfMaskCep(v) {
+      return v.replace(/\D/g,'').substring(0,8).replace(/(\d{5})(\d{0,3})/,'$1-$2');
+    }
+
+    document.getElementById('cf-tel').addEventListener('input', function() {
+      this.value = cfMaskTel(this.value);
+    });
+
+    document.getElementById('cf-cep').addEventListener('input', function() {
+      this.value = cfMaskCep(this.value);
+      var digits = this.value.replace(/\D/g,'');
+      if (digits.length === 8) cfBuscarCep(digits);
+    });
+
+    /* ViaCEP */
+    function cfBuscarCep(cep) {
+      fetch('https://viacep.com.br/ws/' + cep + '/json/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.erro) return;
+          var end    = document.getElementById('cf-endereco');
+          var bairro = document.getElementById('cf-bairro');
+          var cidade = document.getElementById('cf-cidade');
+          var uf     = document.getElementById('cf-uf');
+          if (end && d.logradouro) end.value = d.logradouro;
+          if (bairro && d.bairro) bairro.value = d.bairro;
+          if (cidade && d.localidade) cidade.value = d.localidade;
+          if (uf && d.uf) {
+            for (var i = 0; i < uf.options.length; i++) {
+              if (uf.options[i].text === d.uf) { uf.selectedIndex = i; break; }
+            }
+          }
+        })
+        .catch(function() {});
+    }
+
+    /* Toast simples */
+    function cfToast(msg) {
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:108px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:50px;font-size:.84rem;z-index:9999;font-family:DM Sans,sans-serif;white-space:nowrap';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function() { t.remove(); }, 3000);
+    }
+
+    /* Validações */
+    function cfValidar1() {
+      var nome = (document.getElementById('cf-nome').value || '').trim();
+      var tel  = (document.getElementById('cf-tel').value  || '').replace(/\D/g,'');
+      if (nome.length < 3) { cfToast('Informe o nome completo.'); return false; }
+      if (tel.length < 10) { cfToast('Informe um telefone válido.'); return false; }
+      return true;
+    }
+
+    function cfValidar2() {
+      var cidade = (document.getElementById('cf-cidade').value || '').trim();
+      var bairro = (document.getElementById('cf-bairro').value || '').trim();
+      if (!cidade) { cfToast('Informe a cidade.'); return false; }
+      if (!bairro) { cfToast('Informe o bairro.'); return false; }
+      return true;
+    }
+
+    function cfValor(id) {
+      var el = document.getElementById(id);
+      return el ? (el.value || '').trim() : '';
+    }
+
+    function cfNumeroPessoas(valor) {
+      var m = String(valor || '').match(/\d+/);
+      return m ? parseInt(m[0], 10) : 1;
+    }
+
+    function cfEnderecoCompleto() {
+      return [
+        cfValor('cf-endereco'),
+        cfValor('cf-numero') ? 'nº ' + cfValor('cf-numero') : '',
+        cfValor('cf-complemento'),
+        cfValor('cf-bairro'),
+        cfValor('cf-cidade') + (cfValor('cf-uf') ? ' - ' + cfValor('cf-uf') : '')
+      ].filter(Boolean).join(', ');
+    }
+
+    function cfGerarProtocolo() {
+      var now = new Date();
+      var data = now.getFullYear().toString() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0');
+      return 'SOL-' + data + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+    }
+
+    async function cfSalvarSolicitacaoFamilia() {
+      if (!window.DoaVidaSync || typeof DoaVidaSync.addFamilia !== 'function') {
+        throw new Error('Firebase indisponível.');
+      }
+      var protocolo = CF.protocolo || cfGerarProtocolo();
+      CF.protocolo = protocolo;
+      var payload = {
+        protocolo: protocolo,
+        responsavel: cfValor('cf-nome'),
+        nome: cfValor('cf-nome'),
+        telefone: cfValor('cf-tel'),
+        estado_civil: cfValor('cf-estado-civil'),
+        sexo: cfValor('cf-sexo'),
+        cep: cfValor('cf-cep'),
+        endereco: cfEnderecoCompleto(),
+        logradouro: cfValor('cf-endereco'),
+        numero: cfValor('cf-numero'),
+        complemento: cfValor('cf-complemento'),
+        bairro: cfValor('cf-bairro'),
+        cidade: cfValor('cf-cidade'),
+        uf: cfValor('cf-uf'),
+        referencia: cfValor('cf-referencia'),
+        pessoas: cfNumeroPessoas(cfValor('cf-pessoas')),
+        pessoas_texto: cfValor('cf-pessoas'),
+        criancas: cfValor('cf-criancas'),
+        idosos: cfValor('cf-idosos'),
+        deficiencia: cfValor('cf-deficiencia'),
+        renda_texto: cfValor('cf-renda'),
+        trabalho: cfValor('cf-trabalho'),
+        beneficio: cfValor('cf-beneficio'),
+        necessidade: cfValor('cf-necessidade') || 'Cesta básica',
+        status: 'em-analise',
+        prioridade: 'media',
+        origem: 'cesta-form',
+        created_at: new Date().toISOString()
+      };
+      return DoaVidaSync.addFamilia(payload);
+    }
+
+    async function cfEnviarSolicitacao() {
+      if (!cfValidar2()) return;
+      var btn = document.getElementById('cf-btn-next');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Enviando... <i class="fas fa-spinner fa-spin"></i>';
+      }
+      try {
+        await cfSalvarSolicitacaoFamilia();
+        cfIrPasso(3);
+      } catch (err) {
+        cfToast('Não foi possível enviar. Verifique a conexão e tente novamente.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          if (CF.passo !== 3) {
+            btn.innerHTML = 'Próxima etapa <i class="fas fa-arrow-right"></i>';
+          }
+        }
+      }
+    }
+
+    /* Atualiza barras de progresso e barra inferior */
+    function cfUpdateUI(n) {
+      /* Barra de progresso */
+      document.getElementById('cf-etapa-label').textContent = n < 3 ? 'Etapa ' + n + ' de 3' : 'Concluído';
+      for (var i = 1; i <= 3; i++) {
+        var bar = document.getElementById('cfbar-' + i);
+        bar.className = 'cf-pbar' + (i < n ? ' done' : i === n ? ' current' : '');
+      }
+      /* Bottom bar */
+      var title = document.getElementById('cf-bar-title');
+      var sub   = document.getElementById('cf-bar-sub');
+      var ico   = document.getElementById('cf-bar-ico');
+      var btnB  = document.getElementById('cf-btn-back');
+      var btnN  = document.getElementById('cf-btn-next');
+
+      if (n === 1) {
+        title.textContent    = 'Etapa 1 concluída parcialmente';
+        sub.textContent      = 'Preencha os campos obrigatórios para continuar.';
+        ico.className        = 'fas fa-clipboard-list';
+        btnB.style.display   = 'none';
+        btnN.innerHTML       = 'Próxima etapa <i class="fas fa-arrow-right"></i>';
+      } else if (n === 2) {
+        title.textContent    = 'Etapa 2 de 3';
+        sub.textContent      = 'Informe endereço e composição familiar.';
+        ico.className        = 'fas fa-map-location-dot';
+        btnB.style.display   = '';
+        btnN.innerHTML       = 'Próxima etapa <i class="fas fa-arrow-right"></i>';
+      } else {
+        title.textContent    = 'Cadastro concluído';
+        sub.textContent      = 'Aguardando análise';
+        ico.className        = 'fas fa-clipboard-check';
+        btnB.style.display   = 'none';
+        btnN.innerHTML       = 'Voltar ao início <i class="fas fa-arrow-right"></i>';
+      }
+    }
+
+    /* Navegar entre passos */
+    function cfIrPasso(n) {
+      CF.passo = n;
+      for (var i = 1; i <= 3; i++) {
+        document.getElementById('cf-step-' + i).classList.toggle('active', i === n);
+      }
+      cfUpdateUI(n);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (n === 3) {
+        /* Protocolo e data */
+        var now  = new Date();
+        var ano  = now.getFullYear();
+        var protocolo = CF.protocolo || cfGerarProtocolo();
+        CF.protocolo = protocolo;
+        document.getElementById('cf-protocolo').textContent  = protocolo;
+        document.getElementById('cf-data-envio').textContent =
+          String(now.getDate()).padStart(2,'0') + '/' +
+          String(now.getMonth()+1).padStart(2,'0') + '/' + ano;
+      }
+    }
+
+    document.getElementById('cf-btn-next').addEventListener('click', function() {
+      if (CF.passo === 1) {
+        if (cfValidar1()) cfIrPasso(2);
+      } else if (CF.passo === 2) {
+        cfEnviarSolicitacao();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    document.getElementById('cf-btn-back').addEventListener('click', function() {
+      if (CF.passo > 1) cfIrPasso(CF.passo - 1);
+    });
+  </script>
+</body>
+</html>

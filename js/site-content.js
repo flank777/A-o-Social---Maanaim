@@ -1,4 +1,4 @@
-/*
+﻿/*
   ╔══════════════════════════════════════════════════════════════════════╗
   ║  DoaVida — js/site-content.js                                       ║
   ║  Renderizador dinâmico do site público.                             ║
@@ -6,13 +6,11 @@
   ║                                                                      ║
   ║  USO (no site público — totalmente OPT-IN):                         ║
   ║                                                                      ║
-  ║    <div data-sa-page="index">                                       ║
-  ║      <!-- Conteúdo estático que serve de FALLBACK. -->              ║
-  ║      <!-- Se o renderizador conseguir buscar do banco, ele substitui-->
-  ║    </div>                                                            ║
-  ║    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  ║    <script src="js/services/supabase.js"></script>                  ║
-  ║    <script src="js/site-content.js"></script>                       ║
+  ║    <div data-sa-page="index"> ║
+  ║      <!-- Conteúdo estático que serve de FALLBACK. --> ║
+  ║      <!-- Se o renderizador conseguir buscar do banco, ele substitui--> ║    </div> ║
+  ║    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> ║    <script src="js/services/supabase.js"></script> ║
+  ║    <script src="js/site-content.js"></script> ║
   ║                                                                      ║
   ║  Comportamento:                                                      ║
   ║   • Se Supabase responde com seções publicadas, renderiza dentro    ║
@@ -103,7 +101,7 @@
     return '' +
       '<section class="sc-section sc-hero"' + (bg ? ' style="background-image:url(\'' + bg + '\')"' : '') + '>' +
         '<div class="sc-hero__inner">' +
-          (title    ? '<h1 class="sc-hero__title">'   + title + '</h1>' : '') +
+          (title    ? '<h1 class="sc-hero__title">' + title + '</h1>' : '') +
           (subtitle ? '<p class="sc-hero__subtitle">' + subtitle + '</p>' : '') +
           (cta.label ? '<a class="sc-cta" href="' + escHtml(cta.link || '#') + '">' + escHtml(cta.label) + '</a>' : '') +
         '</div>' +
@@ -426,8 +424,7 @@
         var meta = {
           ua:       navigator.userAgent || '',
           referrer: document.referrer || '',
-          locale:   navigator.language || ''
-        };
+          locale:   navigator.language || '' };
         var ins = await sb.from('site_form_submissions').insert([{
           form_id:  f.id,
           form_key: f.internal_key,

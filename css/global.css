@@ -228,7 +228,7 @@ body {
   background:   transparent;         /* Canvas (#wave-bg) provê o fundo */
   color:        var(--text);         /* Cor do texto padrão */
   font-family:  var(--ff-body);      /* DM Sans */
-  font-weight:  300;                  /* Peso leve (300 = light) */
+  font-weight:  400;                  /* Peso normal (400 = regular) */
   line-height:  1.65;                /* Espaço entre linhas (65% maior que o texto) */
   overflow-x:   hidden;              /* Sem scroll horizontal */
   /*

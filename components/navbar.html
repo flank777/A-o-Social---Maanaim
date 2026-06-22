@@ -1,30 +1,26 @@
-<!--
+﻿<!--
   ╔══════════════════════════════════════════════════════════════════════╗
   ║  DoaVida — components/navbar.html                                   ║
   ║  Ação Social Semear + Comunidade Evangélica Maanaim — Belém, PA     ║
   ╠══════════════════════════════════════════════════════════════════════╣
   ║  ESTA VERSÃO:                                                        ║
-  ║  ✅ Logos REAIS das organizações lado a lado (imagens em base64)    ║
-  ║  ✅ "Seja um Voluntário" no menu desktop e no drawer mobile         ║
-  ║  ✅ Dashboard removido do menu público                               ║
-  ║  ✅ Todos os links atualizados (#mission, #how, #gallery)           ║
+  ║   Logos REAIS das organizações lado a lado (imagens em base64)    ║
+  ║   "Seja um Voluntário" no menu desktop e no drawer mobile         ║
+  ║   Dashboard removido do menu público                               ║
+  ║   Todos os links atualizados (#mission, #how, #gallery)           ║
   ║                                                                      ║
   ║  COMO USAR:                                                          ║
   ║    Copie este bloco diretamente após <body> em qualquer página.     ║
   ║    OU injete via JS: injetarComponente('div-id', 'navbar.html')     ║
   ║                                                                      ║
-  ║  ⚠️  Fragmento HTML — sem <!DOCTYPE>, <html>, <head> ou <body>      ║
+  ║    Fragmento HTML — sem <!DOCTYPE>, <html>, <head> ou <body> ║
   ╚══════════════════════════════════════════════════════════════════════╝
--->
-
-<!-- ═══════════════════════════════════════════════════════════════════
+--> <!-- ═══════════════════════════════════════════════════════════════════
      ESTILOS DO COMPONENTE
      Complementam o global.css com os estilos das logos reais.
      Podem ser movidos para um CSS separado se necessário.
 ═══════════════════════════════════════════════════════════════════ -->
-<style>
-
-  /* ── Navbar com fundo sólido desde o início ──────────────────
+<style> /* ── Navbar com fundo sólido desde o início ──────────────────
      Sobrescreve o #nav do global.css para que a navbar tenha
      fundo escuro mesmo antes do scroll, acomodando as logos.
   ─────────────────────────────────────────────────────────────── */
@@ -577,246 +573,52 @@
     .nav-logo-item { gap: 5px !important; }
   }
 
-</style>
-
-
-<!-- ═══════════════════════════════════════════════════════════════════
+</style> <!-- ═══════════════════════════════════════════════════════════════════
      NAVBAR — Menu de Navegação Principal
      id="nav" → app.js adiciona classe "scrolled" ao rolar
 ═══════════════════════════════════════════════════════════════════ -->
-<nav id="nav" role="navigation" aria-label="Menu principal de navegação">
-  <div class="container">
-
-    <!-- ── LOGOS DAS ORGANIZAÇÕES (lado esquerdo) ───────────── -->
-    <!--
+<nav id="nav" role="navigation" aria-label="Menu principal de navegação"> <div class="container"> <!-- ── LOGOS DAS ORGANIZAÇÕES (lado esquerdo) ───────────── --> <!--
       .nav-brand = link clicável que vai à página inicial.
       Exibe as duas logos (Semear + Maanaim) lado a lado.
       As imagens estão em base64 — funcionam sem servidor externo.
-    -->
-    <a href="index.html"
-       class="nav-brand"
-       aria-label="DoaVida — Ir para a página inicial">
-
-      <!-- LOGO 1: Ação Social Semear ─────────────────────── -->
-      <div class="nav-logo-item semear">
-        <div class="nav-logo-img-wrap">
-          <!--
+    --> <a href="index.html" class="nav-brand" aria-label="DoaVida — Ir para a página inicial"> <!-- LOGO 1: Ação Social Semear ─────────────────────── --> <div class="nav-logo-item semear"> <div class="nav-logo-img-wrap"> <!--
             Imagem em base64: funciona abrindo o HTML diretamente
             no navegador (sem servidor web necessário).
             alt="" pois a informação está no texto ao lado.
-          -->
-          <img src="logo-semear.jpeg"
-               alt="Logo Ação Social Semear"
-               loading="eager" />
-        </div>
-        <div class="nav-logo-texts">
-          <span class="nav-logo-title">Ação Social</span>
-          <span class="nav-logo-sub">Semear</span>
-        </div>
-      </div>
-
-      <!-- Separador visual entre as logos -->
-      <div class="nav-brand-sep" aria-hidden="true"></div>
-
-      <!-- LOGO 2: Comunidade Maanaim ─────────────────────── -->
-      <div class="nav-logo-item maanaim">
-        <div class="nav-logo-img-wrap">
-          <img src="logo-maanaim.jpeg"
-               alt="Logo Comunidade Maanaim"
-               loading="eager" />
-        </div>
-        <div class="nav-logo-texts">
-          <span class="nav-logo-title">Maanaim</span>
-          <span class="nav-logo-sub">Comunidade Evangélica</span>
-        </div>
-      </div>
-
-    </a><!-- fim .nav-brand -->
-
-
-    <!-- ── LINKS DE NAVEGAÇÃO (desktop, ocultos < 1024px) ───── -->
-    <!--
+          --> <img src="logo-semear.jpeg" alt="Logo Ação Social Semear" loading="eager" /> </div> <div class="nav-logo-texts"> <span class="nav-logo-title">Ação Social</span> <span class="nav-logo-sub">Semear</span> </div> </div> <!-- Separador visual entre as logos --> <div class="nav-brand-sep" aria-hidden="true"></div> <!-- LOGO 2: Comunidade Maanaim ─────────────────────── --> <div class="nav-logo-item maanaim"> <div class="nav-logo-img-wrap"> <img src="logo-maanaim.jpeg" alt="Logo Comunidade Maanaim" loading="eager" /> </div> <div class="nav-logo-texts"> <span class="nav-logo-title">Maanaim</span> <span class="nav-logo-sub">Comunidade Evangélica</span> </div> </div> </a><!-- fim .nav-brand --> <!-- ── LINKS DE NAVEGAÇÃO (desktop, ocultos < 1024px) ───── --> <!--
       global.css oculta .nav-links em telas < 1024px.
       Em mobile esses links aparecem na .jello-nav abaixo.
       .nav-links-wrap = container relativo para o pill deslizante.
-    -->
-    <div class="nav-links-wrap">
-      <div class="nav-links-pill" id="nav-links-pill" aria-hidden="true"></div>
-    <ul class="nav-links" role="list">
-
-      <li>
-        <a href="index.html">Início</a>
-      </li>
-
-      <li>
-        <!--
+    --> <div class="nav-links-wrap"> <div class="nav-links-pill" id="nav-links-pill" aria-hidden="true"></div> <ul class="nav-links" role="list"> <li> <a href="index.html">Início</a> </li> <li> <!--
           Link para a página de voluntariado.
           aria-current="page" é adicionado dinamicamente pelo JS
           quando necessário, ou hardcodado em cada página.
-        -->
-        <a href="voluntario.html">Seja um Voluntário</a>
-      </li>
-
-      <!-- Dashboard removido do menu público (acesso só via admin) -->
-
-    </ul><!-- fim .nav-links -->
-    </div><!-- fim .nav-links-wrap -->
-
-
-    <!-- ── CTA PRINCIPAL (desktop) ──────────────────────────── -->
-    <div class="nav-cta">
-      <a href="form.html"
-         class="btn btn-primary btn-sm"
-         style="color:#ffffff;"
-         aria-label="Ir para o formulário de doação">
-        <i class="fas fa-heart" aria-hidden="true"></i>
-        Quero Doar
-      </a>
-    </div>
-
-
-    <!-- ── BOTÃO HAMBURGUER (mobile, visível < 1024px) ──────── -->
-    <!--
+        --> <a href="voluntario.html">Seja um Voluntário</a> </li> <li> <a href="cesta-form.html">Solicitar Cesta</a> </li> <!-- Dashboard removido do menu público (acesso só via admin) --> </ul><!-- fim .nav-links --> </div><!-- fim .nav-links-wrap --> <!-- ── CTA PRINCIPAL (desktop) ──────────────────────────── --> <div class="nav-cta"> <a href="form.html" class="btn btn-primary btn-sm" style="color:#ffffff;" aria-label="Ir para o formulário de doação"> <i class="fas fa-heart" aria-hidden="true"></i> Quero Doar
+      </a> </div> <!-- ── BOTÃO HAMBURGUER (mobile, visível < 1024px) ──────── --> <!--
       global.css mostra .hamburger apenas em telas < 1024px.
       app.js controla o abrir/fechar do drawer ao clicar.
       aria-controls="nav-drawer" → referencia o drawer abaixo.
-    -->
-    <button
-      class="hamburger"
-      id="hamburger-btn"
-      type="button"
-      aria-controls="nav-drawer"
-      aria-expanded="false"
-      aria-label="Abrir menu de navegação"
-    >
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </button>
-
-  </div><!-- fim .container -->
-</nav><!-- fim #nav -->
-
-
-<!-- ═══════════════════════════════════════════════════════════════════
+    --> <button
+      class="hamburger" id="hamburger-btn" type="button" aria-controls="nav-drawer" aria-expanded="false" aria-label="Abrir menu de navegação" > <span aria-hidden="true"></span> <span aria-hidden="true"></span> <span aria-hidden="true"></span> </button> </div><!-- fim .container -->
+</nav><!-- fim #nav --> <!-- ═══════════════════════════════════════════════════════════════════
      DRAWER — Menu Mobile
      app.js adiciona/remove classe "open" ao clicar no hamburguer.
      global.css controla display: none → flex via .nav-drawer.open.
 ═══════════════════════════════════════════════════════════════════ -->
 <div
-  id="nav-drawer"
-  class="nav-drawer"
-  role="dialog"
-  aria-modal="false"
-  aria-label="Menu de navegação mobile"
-  aria-hidden="true"
->
-
-
-
-  <!-- Links de navegação do drawer -->
-  <!-- .nav-drawer-link = estilo definido no global.css -->
-
-  <a href="index.html" class="nav-drawer-link">
-    <i class="fas fa-home" aria-hidden="true"></i>
-    Início
-  </a>
-
-  <a href="form.html" class="nav-drawer-link">
-    <i class="fas fa-box-open" aria-hidden="true"></i>
-    Fazer Doação
-  </a>
-
-  <!-- Seja um Voluntário: destacado em dourado no drawer -->
-  <a href="voluntario.html" class="nav-drawer-link"
-     style="color: var(--gold);">
-    <i class="fas fa-hands-helping" aria-hidden="true"
-       style="color: var(--gold);"></i>
-    Seja um Voluntário
-  </a>
-
-  <!-- Dashboard removido do menu público -->
-
-  <a href="admin.html" class="nav-drawer-link">
-    <i class="fas fa-lock" aria-hidden="true"></i>
-    Admin
-  </a>
-
-  <!-- Separador antes do CTA -->
-  <div style="height:1px; background:var(--border); margin:4px 0;"
-       aria-hidden="true"></div>
-
-  <!-- CTA em destaque (dourado, largura total) -->
-  <a href="form.html"
-     class="btn btn-primary"
-     style="text-align:center; justify-content:center;
-            width:100%; margin-top:4px;"
-     aria-label="Ir para o formulário de doação">
-    <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
-    Quero Fazer uma Doação
-  </a>
-
-</div><!-- fim #nav-drawer -->
-
-
-<!-- ═══════════════════════════════════════════════════════════════════
+  id="nav-drawer" class="nav-drawer" role="dialog" aria-modal="false" aria-label="Menu de navegação mobile" aria-hidden="true"
+> <!-- Links de navegação do drawer --> <!-- .nav-drawer-link = estilo definido no global.css --> <a href="index.html" class="nav-drawer-link"> <i class="fas fa-home" aria-hidden="true"></i> Início
+  </a> <a href="form.html" class="nav-drawer-link"> <i class="fas fa-box-open" aria-hidden="true"></i> Fazer Doação
+  </a> <a href="cesta-form.html" class="nav-drawer-link"> <i class="fas fa-basket-shopping" aria-hidden="true"></i> Solicitar Cesta Básica
+  </a> <!-- Seja um Voluntário: destacado em dourado no drawer --> <a href="voluntario.html" class="nav-drawer-link" style="color: var(--gold);"> <i class="fas fa-hands-helping" aria-hidden="true" style="color: var(--gold);"></i> Seja um Voluntário
+  </a> <!-- Dashboard removido do menu público --> <a href="admin.html" class="nav-drawer-link"> <i class="fas fa-lock" aria-hidden="true"></i> Admin
+  </a> <!-- Separador antes do CTA --> <div style="height:1px; background:var(--border); margin:4px 0;" aria-hidden="true"></div> <!-- CTA em destaque (dourado, largura total) --> <a href="form.html" class="btn btn-primary" style="text-align:center; justify-content:center;
+            width:100%; margin-top:4px;" aria-label="Ir para o formulário de doação"> <i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Quero Fazer uma Doação
+  </a> </div><!-- fim #nav-drawer --> <!-- ═══════════════════════════════════════════════════════════════════
      JELLO SLIDING TAB NAVIGATION — Mobile (fixada no rodapé)
      Visível apenas em telas < 1024px.
      .jello-pill desliza sob o item ativo com efeito jello.
      Lógica em js/app.js → inicializarJelloNav()
 ═══════════════════════════════════════════════════════════════════ -->
-<nav class="jello-nav" id="jello-nav" aria-label="Navegação rápida">
-  <div class="jello-track" id="jello-track">
-
-    <!-- Pill deslizante — posicionado via JS -->
-    <div class="jello-pill" id="jello-pill" aria-hidden="true"></div>
-
-    <!-- Item 0: Início -->
-    <a href="index.html" class="jello-item" data-jello-index="0" aria-label="Início">
-      <div class="jello-icon">
-        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <polyline class="icon-home-roof" points="3,9.5 11,3 19,9.5"/>
-          <path d="M5 9.5V19a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1V9.5"/>
-        </svg>
-      </div>
-      <span>Início</span>
-    </a>
-
-    <!-- Item 2: Doar — CTA central, pill verde -->
-    <a href="form.html" class="jello-item is-cta" data-jello-index="2" aria-label="Fazer Doação">
-      <div class="jello-icon">
-        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path class="icon-box-lid" d="M4 7h14l-1.5-4h-11z"/>
-          <path d="M4 7v11a1 1 0 001 1h12a1 1 0 001-1V7"/>
-          <line x1="11" y1="7" x2="11" y2="19"/>
-        </svg>
-      </div>
-      <span>Doar</span>
-    </a>
-
-    <!-- Item 3: Voluntário -->
-    <a href="voluntario.html" class="jello-item" data-jello-index="3" aria-label="Seja um Voluntário">
-      <div class="jello-icon">
-        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="11" cy="6" r="3"/>
-          <path class="icon-hand" d="M6 19v-2a5 5 0 0110 0v2"/>
-          <path d="M2 14c1-2 3-3 5-2"/>
-          <path d="M20 14c-1-2-3-3-5-2"/>
-        </svg>
-      </div>
-      <span>Voluntário</span>
-    </a>
-
-    <!-- Item 4: Admin -->
-    <a href="admin.html" class="jello-item" data-jello-index="4" aria-label="Área administrativa">
-      <div class="jello-icon">
-        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <rect x="4" y="11" width="14" height="9" rx="2"/>
-          <path class="icon-lock-shackle" d="M7 11V8a4 4 0 018 0v3"/>
-        </svg>
-      </div>
-      <span>Admin</span>
-    </a>
-
-  </div><!-- fim .jello-track -->
+<nav class="jello-nav" id="jello-nav" aria-label="Navegação rápida"> <div class="jello-track" id="jello-track"> <!-- Pill deslizante — posicionado via JS --> <div class="jello-pill" id="jello-pill" aria-hidden="true"></div> <!-- Item 0: Início --> <a href="index.html" class="jello-item" data-jello-index="0" aria-label="Início"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <polyline class="icon-home-roof" points="3,9.5 11,3 19,9.5"/> <path d="M5 9.5V19a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1V9.5"/> </svg> </div> <span>Início</span> </a> <!-- Item 1: Cesta Básica --> <a href="cesta-form.html" class="jello-item" data-jello-index="1" aria-label="Solicitar Cesta Básica"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <path d="M3 7h16l-1.5 11H4.5z"/> <path d="M8 7V5a3 3 0 016 0v2"/> <circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/> <circle cx="13" cy="13" r="1" fill="currentColor" stroke="none"/> </svg> </div> <span>Cesta</span> </a> <!-- Item 2: Doar — CTA central, pill verde --> <a href="form.html" class="jello-item is-cta" data-jello-index="2" aria-label="Fazer Doação"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <path class="icon-box-lid" d="M4 7h14l-1.5-4h-11z"/> <path d="M4 7v11a1 1 0 001 1h12a1 1 0 001-1V7"/> <line x1="11" y1="7" x2="11" y2="19"/> </svg> </div> <span>Doar</span> </a> <!-- Item 3: Voluntário --> <a href="voluntario.html" class="jello-item" data-jello-index="3" aria-label="Seja um Voluntário"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <circle cx="11" cy="6" r="3"/> <path class="icon-hand" d="M6 19v-2a5 5 0 0110 0v2"/> <path d="M2 14c1-2 3-3 5-2"/> <path d="M20 14c-1-2-3-3-5-2"/> </svg> </div> <span>Voluntário</span> </a> <!-- Item 4: Admin --> <a href="admin.html" class="jello-item" data-jello-index="4" aria-label="Área administrativa"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <rect x="4" y="11" width="14" height="9" rx="2"/> <path class="icon-lock-shackle" d="M7 11V8a4 4 0 018 0v3"/> </svg> </div> <span>Admin</span> </a> </div><!-- fim .jello-track -->
 </nav><!-- fim .jello-nav -->

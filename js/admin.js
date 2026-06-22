@@ -1,10 +1,10 @@
-/*
+﻿/*
   ╔══════════════════════════════════════════════════════════════════════╗
   ║  DoaVida — js/admin.js  v4.0                                        ║
   ║  Painel Administrativo — lógica completa                            ║
   ╠══════════════════════════════════════════════════════════════════════╣
   ║                                                                      ║
-  ║  📚 O QUE É ESTE ARQUIVO?                                           ║
+  ║   O QUE É ESTE ARQUIVO?                                           ║
   ║                                                                      ║
   ║  admin.js controla TUDO que acontece no painel administrativo.      ║
   ║  É o "cérebro" do admin: lê dados do api.js, monta as telas,       ║
@@ -15,27 +15,26 @@
   ║    js/app.js  → showToast(), escHtml(), abrirModal(), fecharModal() ║
   ║                                                                      ║
   ║  BUGS CORRIGIDOS NESTA VERSÃO (v4.0):                               ║
-  ║  ✅ BUG 1 — renderAlimentos: 'foods-grid' → 'foods-admin-grid'     ║
-  ║  ✅ BUG 2 — renderGraficoBarras: 'food-chart' → 'foods-chart'      ║
-  ║  ✅ BUG 3 — configurarUploadFoto: IDs corretos do HTML             ║
-  ║             'photo-upload-input' → 'photo-file-input'              ║
-  ║             'photo-upload-preview' → 'photo-preview'               ║
-  ║  ✅ BUG 4 — configurarFotoToggle: IDs corretos                     ║
-  ║             'btn-foto-upload' → 'btn-photo-upload'                 ║
-  ║             'btn-foto-url'    → 'btn-photo-url'                    ║
-  ║             'photo-area-upload' → 'photo-upload-area'              ║
-  ║             'photo-area-url'    → 'photo-url-area'                 ║
-  ║  ✅ BUG 5 — salvarFoto: 'photo-url' → 'photo-url-input'           ║
-  ║  ✅ BUG 6 — configurarWhatsApp: IDs corretos                       ║
-  ║             'wa-template-select' → 'wa-template'                   ║
-  ║             'wa-preview' → 'wa-preview-text'                       ║
-  ║  ✅ BUG 7 — adicionarDestinatario: 'wa-recipient-input' → 'wa-phone-input'
-  ║  ✅ BUG 8 — renderWALogs: 'wa-logs-tbody' → 'wa-logs-list'        ║
+  ║   BUG 1 — renderAlimentos: 'foods-grid' → 'foods-admin-grid' ║
+  ║   BUG 2 — renderGraficoBarras: 'food-chart' → 'foods-chart' ║
+  ║   BUG 3 — configurarUploadFoto: IDs corretos do HTML             ║
+  ║             'photo-upload-input' → 'photo-file-input' ║
+  ║             'photo-upload-preview' → 'photo-preview' ║
+  ║   BUG 4 — configurarFotoToggle: IDs corretos                     ║
+  ║             'btn-foto-upload' → 'btn-photo-upload' ║
+  ║             'btn-foto-url' → 'btn-photo-url' ║
+  ║             'photo-area-upload' → 'photo-upload-area' ║
+  ║             'photo-area-url' → 'photo-url-area' ║
+  ║   BUG 5 — salvarFoto: 'photo-url' → 'photo-url-input' ║
+  ║   BUG 6 — configurarWhatsApp: IDs corretos                       ║
+  ║             'wa-template-select' → 'wa-template' ║
+  ║             'wa-preview' → 'wa-preview-text' ║
+  ║   BUG 7 — adicionarDestinatario: 'wa-recipient-input' → 'wa-phone-input' ║   BUG 8 — renderWALogs: 'wa-logs-tbody' → 'wa-logs-list' ║
   ║                                                                      ║
   ║  NOVIDADES:                                                          ║
-  ║  🆕 Sistema de Tarefas completo (aba Tarefas)                       ║
-  ║  🆕 Envio de tarefa por WhatsApp com 1 clique                       ║
-  ║  🆕 Filtros por status, tipo e responsável                          ║
+  ║   Sistema de Tarefas completo (aba Tarefas)                       ║
+  ║   Envio de tarefa por WhatsApp com 1 clique                       ║
+  ║   Filtros por status, tipo e responsável                          ║
   ╚══════════════════════════════════════════════════════════════════════╝
 */
 
@@ -51,7 +50,7 @@
 var AdminState = {
   waRecipients: [] /* números WhatsApp dos destinatários da aba WA */,
   pendingPhotos: [] /* arquivos de foto aguardando upload            */,
-  photoMode: "upload" /* modo atual: 'upload' (arquivo) ou 'url'      */,
+  photoMode: "upload" /* modo atual: 'upload' (arquivo) ou 'url' */,
   chartInstance: null /* instância do gráfico Chart.js (evita recriar)*/,
 };
 
@@ -61,13 +60,13 @@ var AdminState = {
 */
 var WA_TEMPLATES = {
   agradecimento:
-    "Olá! 🌱\n\nEm nome da Ação Social Semear, agradecemos sua doação de alimentos.\n\nSua generosidade transforma vidas em Belém, PA!\n\nQue Deus abençoe você! 💛",
+    "Olá! \n\nEm nome da Ação Social Semear, agradecemos sua doação de alimentos.\n\nSua generosidade transforma vidas em Belém, PA!\n\nQue Deus abençoe você! ",
   confirmacao:
-    "Olá! ✅\n\nSua doação foi confirmada. Nossa equipe passará em breve.\n\nObrigado pela solidariedade! 🙏",
+    "Olá! \n\nSua doação foi confirmada. Nossa equipe passará em breve.\n\nObrigado pela solidariedade! ",
   campanha:
-    "Olá! 🙏\n\nA Ação Social Semear está arrecadando alimentos para famílias em Belém.\n\nQualquer quantidade ajuda: arroz, feijão, óleo...\n\nAcesse e doe: [link]\n\nGratos! 💛",
+    "Olá! \n\nA Ação Social Semear está arrecadando alimentos para famílias em Belém.\n\nQualquer quantidade ajuda: arroz, feijão, óleo...\n\nAcesse e doe: [link]\n\nGratos! ",
   lembrete:
-    "Olá! 🌱\n\nPassando para lembrar da sua doação prometida. Qualquer quantidade é muito bem-vinda!\n\nObrigado 🙏",
+    "Olá! \n\nPassando para lembrar da sua doação prometida. Qualquer quantidade é muito bem-vinda!\n\nObrigado ",
 };
 
 /* Mapa de status dos voluntários com cores para os badges */
@@ -81,18 +80,18 @@ var STATUS_VOL = {
 
 /* Mapa de categorias dos pedidos de oração */
 var CAT_ORACAO = {
-  familia: { label: "Família", emoji: "👨‍👩‍👧", cor: "#f48fb1" },
-  espiritual: { label: "Espiritual", emoji: "🕊️", cor: "#ce93d8" },
-  saude: { label: "Saúde", emoji: "💚", cor: "#80cbc4" },
-  outros: { label: "Outros", emoji: "💛", cor: "#e8c96a" },
+  familia: { label: "Família", emoji: "‍‍", cor: "#f48fb1" },
+  espiritual: { label: "Espiritual", emoji: "", cor: "#ce93d8" },
+  saude: { label: "Saúde", emoji: "", cor: "#80cbc4" },
+  outros: { label: "Outros", emoji: "", cor: "#e8c96a" },
 };
 
 /* Mapa de tipos e status de tarefas */
 var TIPOS_TAREFA = {
-  organizacao: { label: "Organização", emoji: "📦", cor: "#e8c96a" },
-  entrega: { label: "Entrega", emoji: "🚚", cor: "#64b5f6" },
-  atendimento: { label: "Atendimento", emoji: "🤝", cor: "#81c784" },
-  espiritual: { label: "Espiritual", emoji: "🙏", cor: "#ce93d8" },
+  organizacao: { label: "Organização", emoji: "", cor: "#e8c96a" },
+  entrega: { label: "Entrega", emoji: "", cor: "#64b5f6" },
+  atendimento: { label: "Atendimento", emoji: "", cor: "#81c784" },
+  espiritual: { label: "Espiritual", emoji: "", cor: "#ce93d8" },
 };
 
 var STATUS_TAREFA = {
@@ -229,8 +228,7 @@ function _bioMostrarOverlay() {
     'Validando credenciais…',
     'Consultando permissões…',
     'Confirmando acesso administrativo…',
-    'Protegendo sessão…'
-  ];
+    'Protegendo sessão…' ];
   var idx = 0;
   var pct = 0;
 
@@ -361,7 +359,7 @@ function tentarLogin() {
 
       _bioAtualizarMensagem('Abrindo painel…');
 
-      /* ✅ Sucesso — abre painel após a animação */
+      /*  Sucesso — abre painel após a animação */
       _bioOverlaySucesso(function () {
         _loginEmAndamento = false;
         _bioFecharOverlay();
@@ -437,18 +435,17 @@ function _mostrarStatusFirebase() {
     'font-family:var(--font-mono,monospace)', 'display:flex', 'align-items:center',
     'gap:10px', 'box-shadow:0 4px 16px rgba(0,0,0,.18)',
     'background:' + (ok ? '#1A3312' : '#8A1818'),
-    'color:#F4F0E6', 'max-width:92vw'
-  ].join(';');
+    'color:#F4F0E6', 'max-width:92vw' ].join(';');
 
   if (ok) {
-    banner.innerHTML = '☁️ <strong>Firebase ativo</strong> — dados sincronizados entre dispositivos' +
-      '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:#F4F0E6;cursor:pointer;font-size:.9rem;margin-left:6px">✕</button>';
+    banner.innerHTML = ' <strong>Firebase ativo</strong> — dados sincronizados entre dispositivos' +
+      '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:#F4F0E6;cursor:pointer;font-size:.9rem;margin-left:6px"></button>';
     setTimeout(function () { if (banner.parentElement) banner.remove(); }, 6000);
   } else {
-    banner.innerHTML = '⚠️ <strong>Modo local</strong> — dados NÃO sincronizados. ' +
+    banner.innerHTML = ' <strong>Modo local</strong> — dados NÃO sincronizados. ' +
       '<button id="btn-migrar-firebase" style="background:#E8C96A;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.78rem;color:#1A1A18;font-weight:600;margin-left:8px">' +
       'Enviar para o Firebase</button>' +
-      '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:#F4F0E6;cursor:pointer;font-size:.9rem;margin-left:4px">✕</button>';
+      '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:#F4F0E6;cursor:pointer;font-size:.9rem;margin-left:4px"></button>';
     setTimeout(function () {
       var btn = document.getElementById('btn-migrar-firebase');
       if (!btn) return;
@@ -457,11 +454,11 @@ function _mostrarStatusFirebase() {
         btn.disabled = true;
         DoaVidaSync.migrarLocalParaFirestore().then(function (r) {
           if (r.ok) {
-            showToast('✅ ' + r.migrados + ' alimento(s) enviado(s) ao Firebase!', 'success');
+            showToast(' ' + r.migrados + ' alimento(s) enviado(s) ao Firebase!', 'success');
             banner.remove();
             renderAlimentos();
           } else {
-            showToast('❌ ' + (r.msg || 'Falha na migração'), 'error');
+            showToast(' ' + (r.msg || 'Falha na migração'), 'error');
             btn.textContent = 'Tentar novamente';
             btn.disabled = false;
           }
@@ -803,77 +800,8 @@ function _db2AnimNum(el, valorFinal) {
   requestAnimationFrame(tick);
 }
 
-/* Renderiza feed de atividade recente */
-function _db2RenderActivity(doacoes) {
-  var el = document.getElementById('db2-activity-list');
-  if (!el) return;
-  var statusColor = { pendente:'#f9a825', confirmado:'#81c784', entregue:'#4db6ac', cancelado:'#e57373', coleta:'#64b5f6' };
-  var gradients = [
-    'linear-gradient(135deg,#e8c96a,#b5973e)',
-    'linear-gradient(135deg,#64b5f6,#1565c0)',
-    'linear-gradient(135deg,#81c784,#2e7d32)',
-    'linear-gradient(135deg,#ce93d8,#7b1fa2)',
-    'linear-gradient(135deg,#f48fb1,#c62828)',
-    'linear-gradient(135deg,#f9a825,#e65100)'
-  ];
-  var ultimas = (doacoes || []).slice(0, 7);
-  if (ultimas.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--text2);font-size:.8rem"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.3"></i>Nenhuma doação registrada</div>';
-    return;
-  }
-  el.innerHTML = ultimas.map(function(d, i) {
-    var nome = d.name || d.nome || 'Anônimo';
-    var inicial = nome.charAt(0).toUpperCase();
-    var status = (d.status || 'pendente').toLowerCase();
-    var cor = statusColor[status] || '#888';
-    var kg = parseFloat(d.total_kg || d.amount || 0);
-    var alimento = d.food || d.alimento || '';
-    var data = d.created_at ? new Date(d.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '';
-    var gi = nome.charCodeAt(0) % gradients.length;
-    var statusLabel = { pendente:'⏳', confirmado:'✅', entregue:'📦', cancelado:'❌', coleta:'🚚' };
-    return '<div class="db2-act-item">' +
-      '<div class="db2-act-avatar" style="background:' + gradients[gi] + '">' + inicial + '</div>' +
-      '<div class="db2-act-info">' +
-        '<div class="db2-act-name">' + escHtml(nome) + '</div>' +
-        '<div class="db2-act-meta">' + escHtml(alimento) + (kg > 0 ? ' · ' + kg + 'kg' : '') + (data ? ' · ' + data : '') + '</div>' +
-      '</div>' +
-      '<span class="db2-act-badge" style="background:' + cor + '20;color:' + cor + '">' + (statusLabel[status]||'') + ' ' + status + '</span>' +
-    '</div>';
-  }).join('');
-}
 
 /* Renderiza barras de progresso por alimento com avatar (img ou emoji) */
-function _db2RenderFoodsProgress(alimentos) {
-  var el = document.getElementById('db2-foods-progress');
-  if (!el) return;
-  var itens = (alimentos || []).slice(0, 5);
-  if (itens.length === 0) { el.innerHTML = '<div style="color:var(--text2);font-size:.8rem;padding:12px 0">Nenhum alimento cadastrado</div>'; return; }
-  var cores = ['#e8c96a','#81c784','#64b5f6','#ce93d8','#f9a825'];
-  el.innerHTML = itens.map(function(a, i) {
-    var nome = a.name || a.nome || '';
-    var kg   = parseFloat(a.kg || a.estoque || 0);
-    var meta = parseFloat(a.goal || a.meta || 1);
-    var pct  = meta > 0 ? Math.min(100, Math.round(kg / meta * 100)) : 0;
-    var cor  = cores[i % cores.length];
-
-    /* Avatar: usa imagem do banco (campo img) ou emoji como fallback */
-    var avatarHtml = a.img
-      ? '<img src="' + escHtml(a.img) + '" alt="' + escHtml(nome) + '" ' +
-        'style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" ' +
-        'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'inline\'">' +
-        '<span style="display:none;font-size:1.1rem;">' + (a.emoji||'🥫') + '</span>'
-      : '<span style="font-size:1.1rem;">' + (a.emoji||'🥫') + '</span>';
-
-    return '<div class="db2-food-row">' +
-      '<div class="db2-food-row-hd" style="display:flex;align-items:center;gap:8px;">' +
-        avatarHtml +
-        '<span class="db2-food-name">' + escHtml(nome) + '</span>' +
-        '<span class="db2-food-pct" style="margin-left:auto;">' + kg + '/' + meta + 'kg · ' + pct + '%</span>' +
-      '</div>' +
-      '<div class="db2-food-bar"><div class="db2-food-fill" style="width:' + pct + '%;background:' + cor + '"></div></div>' +
-    '</div>';
-  }).join('');
-}
 
 /* Gráfico de linha / área — timeline de doações por período */
 function _db2RenderTimeline(doacoes) {
@@ -932,8 +860,7 @@ function _db2RenderTimeline(doacoes) {
             borderWidth: 2,
             pointRadius: 0,
             pointHoverRadius: 5,
-            pointHoverBackgroundColor: '#e8c96a'
-          },
+            pointHoverBackgroundColor: '#e8c96a' },
           {
             label: 'KG',
             data: kgs,
@@ -945,8 +872,7 @@ function _db2RenderTimeline(doacoes) {
             pointRadius: 0,
             pointHoverRadius: 5,
             pointHoverBackgroundColor: '#81c784',
-            yAxisID: 'y2'
-          }
+            yAxisID: 'y2' }
         ]
       },
       options: {
@@ -1001,8 +927,6 @@ async function _db2Render() {
   };
 
   _db2RenderStats(stats, vols, doacoes, oracoes);
-  _db2RenderActivity(doacoes);
-  _db2RenderFoodsProgress(alimentos);
   _db2RenderTimeline(doacoes);
   _atualizarDbaStats(stats, doacoes);
   try { _renderOvDoacoesChart(); } catch(e) {}
@@ -1115,7 +1039,7 @@ window.previewFotoSite = previewFotoSite;
 function salvarFotoSite(num) {
   var input = document.getElementById("input-foto" + num);
   if (!input || !input.value.trim()) {
-    showToast("⚠️ Cole uma URL de imagem válida.", "error");
+    showToast(" Cole uma URL de imagem válida.", "error");
     return;
   }
   var fotos = FOTOS_PADRAO;
@@ -1133,7 +1057,7 @@ function salvarFotoSite(num) {
   if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
     DoaVidaSync.setConfig('doavida_missao_fotos', json).catch(function(){});
   }
-  showToast("✅ Foto " + num + " salva! Reflete em todos os dispositivos.", "success");
+  showToast(" Foto " + num + " salva! Reflete em todos os dispositivos.", "success");
 }
 window.salvarFotoSite = salvarFotoSite;
 
@@ -1141,10 +1065,10 @@ window.salvarFotoSite = salvarFotoSite;
   Renderiza o gráfico de barras comparando meta × arrecadado por alimento.
   Usa Chart.js — biblioteca carregada via CDN no admin.html.
 
-  ✅ BUG 2 CORRIGIDO: 'food-chart' → 'foods-chart' (ID correto do HTML)
+   BUG 2 CORRIGIDO: 'food-chart' → 'foods-chart' (ID correto do HTML)
 */
 function renderGraficoBarras(alimentos) {
-  var canvas = document.getElementById("foods-chart"); /* ✅ ID correto */
+  var canvas = document.getElementById("foods-chart"); /*  ID correto */
   if (!canvas || !window.Chart || alimentos.length === 0) return;
 
   /* Destrói instância anterior para evitar erro "Canvas is already in use" */
@@ -1227,7 +1151,6 @@ function renderGraficoBarras(alimentos) {
    antes de recriar (evita erro "Canvas already in use") */
 var _dbChartLinha  = null;
 var _dbChartRosca  = null;
-var _dbChartCestas = null;
 var _dbPeriodoAtual = 7; /* período padrão do gráfico de linha */
 
 /*
@@ -1268,10 +1191,6 @@ async function renderDashboard() {
   _dbRenderGraficoLinha(doacoes, _dbPeriodoAtual);
   _dbRenderGraficoRosca(alimentos);
   _dbRenderProgresso(alimentos);
-  _dbRenderRanking(doacoes);
-  _dbRenderTimeline(doacoes);
-  _dbRenderRecentTable(doacoes);
-  _dbRenderCestasFormadas(formadas, calcCestas, modelo.length === 0);
 
   /* Atualiza os cards circulares do painel dba-stats-row */
   _atualizarDbaStats(stats, doacoes);
@@ -1339,8 +1258,7 @@ function _dbRenderMetricas(stats) {
         '<div class="metric-label">' +
         c.label +
         "</div>" +
-        "</div>"
-      );
+        "</div>" );
     })
     .join("");
 
@@ -1543,8 +1461,7 @@ function _dbRenderGraficoRosca(alimentos) {
                 ctx.parsed +
                 "kg (" +
                 Math.round((ctx.parsed / total) * 100) +
-                "%)"
-              );
+                "%)" );
             },
           },
         },
@@ -1582,228 +1499,31 @@ function _dbRenderProgresso(alimentos) {
     return;
   }
 
-  el.innerHTML = alimentos
-    .map(function (a) {
-      var kg = parseFloat(a.kg) || 0;
-      var meta = parseFloat(a.goal) || 0;
-      var pct = meta > 0 ? Math.min(Math.round((kg / meta) * 100), 100) : 0;
-      var cor = pct >= 100 ? "#4CAF50" : "#e8c96a";
-      return (
-        '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">' +
-        '<span style="font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);">' +
-        escHtml(a.emoji || "📦") + " " + escHtml(a.name) +
-        '</span>' +
-        '<span style="font-size:.72rem;font-weight:700;color:' + cor + ';">' + pct + '%</span>' +
-        '</div>' +
-        '<div style="background:rgba(255,255,255,.08);border-radius:4px;height:5px;">' +
-        '<div data-target="' + pct + '" style="height:100%;border-radius:4px;width:0%;background:' + cor + ';transition:width .5s ease;"></div>' +
-        '</div>' +
-        '<div style="font-size:.65rem;color:rgba(255,255,255,.35);margin-top:3px;">' +
-        kg + 'kg / ' + meta + 'kg' +
-        '</div>' +
-        '</div>'
-      );
-    })
-    .join("");
+  var cores = ['#e8c96a','#81c784','#64b5f6','#ce93d8','#f9a825','#4db6ac'];
+  el.innerHTML = alimentos.map(function(a, i) {
+    var nome = a.name || a.nome || '';
+    var kg   = parseFloat(a.kg || a.estoque || 0);
+    var meta = parseFloat(a.goal || a.meta || 1);
+    var pct  = meta > 0 ? Math.min(100, Math.round(kg / meta * 100)) : 0;
+    var cor  = cores[i % cores.length];
 
-  /* Anima as barras com pequeno delay */
-  setTimeout(function () {
-    el.querySelectorAll(".food-progress-fill[data-target]").forEach(
-      function (bar) {
-        bar.style.width = bar.getAttribute("data-target") + "%";
-      },
-    );
-  }, 200);
-}
+    var imgHtml = a.img
+      ? '<img src="' + escHtml(a.img) + '" alt="' + escHtml(nome) + '" ' +
+        'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">' +
+        '<span class="db2-food-emoji" style="display:none">' + escHtml(a.emoji || '') + '</span>' : '<span class="db2-food-emoji">' + escHtml(a.emoji || '') + '</span>';
 
-/* ── Ranking dos maiores doadores ──────────────────────────────── */
-function _dbRenderRanking(doacoes) {
-  var el = document.getElementById("dba-donors-list");
-  if (!el) return;
-
-  if (doacoes.length === 0) {
-    el.innerHTML =
-      '<div class="empty-state" style="padding:32px 16px;"><i class="fas fa-trophy"></i><p>Nenhuma doação registrada.</p></div>';
-    return;
-  }
-
-  /* Agrupa por nome de doador */
-  var mapa = {};
-  doacoes.forEach(function (d) {
-    var nome = d.name || "Anônimo";
-    if (!mapa[nome]) mapa[nome] = { nome: nome, totalKg: 0, qtd: 0 };
-    mapa[nome].totalKg += parseFloat(d.total_kg || d.amount) || 0;
-    mapa[nome].qtd++;
-  });
-
-  var ranking = Object.values(mapa)
-    .sort(function (a, b) {
-      return b.totalKg - a.totalKg;
-    })
-    .slice(0, 8);
-
-  el.innerHTML = ranking
-    .map(function (d, i) {
-      return (
-        '<div class="dba-donor-row">' +
-        '<div class="dba-donor-rank">' + (i + 1) + '</div>' +
-        '<div class="dba-donor-name">' + escHtml(d.nome) +
-          '<div style="font-size:.65rem;font-weight:400;color:rgba(255,255,255,.4);">' + d.qtd + ' doação(ões)</div>' +
-        '</div>' +
-        '<div class="dba-donor-kg">' + d.totalKg.toFixed(1) + 'kg</div>' +
-        '</div>'
-      );
-    })
-    .join("");
-}
-
-/* ── Timeline de atividade recente ─────────────────────────────── */
-function _dbRenderTimeline(doacoes) {
-  var el = document.getElementById("dba-activity-list");
-  if (!el) return;
-
-  if (doacoes.length === 0) {
-    el.innerHTML =
-      '<div class="empty-state" style="padding:32px 16px;"><i class="fas fa-history"></i><p>Nenhuma atividade ainda.</p></div>';
-    return;
-  }
-
-  el.innerHTML = doacoes
-    .slice(0, 8)
-    .map(function (d) {
-      var kg = parseFloat(d.total_kg || d.amount || 0).toFixed(1);
-      return (
-        '<div class="dba-activity-item">' +
-        '<div class="dba-activity-dot" aria-hidden="true"></div>' +
-        '<div>' +
-        '<div class="dba-activity-text"><strong>' + escHtml(d.name || "Anônimo") + '</strong>' +
-          ' doou ' + kg + 'kg de ' + escHtml(d.food || "alimentos") +
-        '</div>' +
-        '<div class="dba-activity-time">' + _dbTempoRelativo(d.created_at) + '</div>' +
-        '</div>' +
-        '</div>'
-      );
-    })
-    .join("");
-}
-
-/* ── Cestas básicas formadas: KPIs + gráfico de barras + tabela ── */
-function _dbRenderCestasFormadas(formadas, calcCestas, semModelo) {
-  var totalLotes  = formadas.length;
-  var totalCestas = formadas.reduce(function(s, f) { return s + (parseInt(f.quantidade) || 0); }, 0);
-  var totalKg     = formadas.reduce(function(s, f) { return s + (parseFloat(f.total_kg)  || 0); }, 0);
-  var possíveis   = (calcCestas && calcCestas.total > 0) ? calcCestas.total : 0;
-
-  var elLotes     = document.getElementById('dba-cestas-lotes');
-  var elTotal     = document.getElementById('dba-cestas-total');
-  var elKg        = document.getElementById('dba-cestas-kg');
-  var elPossiveis = document.getElementById('dba-cestas-possiveis');
-  if (elLotes)     elLotes.textContent     = totalLotes;
-  if (elTotal)     elTotal.textContent     = totalCestas;
-  if (elKg)        elKg.textContent        = totalKg > 0 ? totalKg.toFixed(1) + ' kg' : '0 kg';
-  if (elPossiveis) {
-    elPossiveis.textContent = semModelo ? '—' : possíveis;
-    elPossiveis.title = semModelo
-      ? 'Configure o modelo de cesta na aba Cestas para ver este dado'
-      : possíveis + ' cestas montáveis com o estoque atual';
-  }
-
-  /* Gráfico de barras: cestas formadas nos últimos 6 meses */
-  var agora  = new Date();
-  var labels = [];
-  var vals   = [];
-  for (var i = 5; i >= 0; i--) {
-    var ref = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
-    labels.push(ref.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
-    var soma = formadas
-      .filter(function(f) {
-        var dt = new Date(f.created_at);
-        return dt.getFullYear() === ref.getFullYear() && dt.getMonth() === ref.getMonth();
-      })
-      .reduce(function(s, f) { return s + (parseInt(f.quantidade) || 0); }, 0);
-    vals.push(soma);
-  }
-
-  var canvas = document.getElementById('dba-cestas-bar-chart');
-  if (canvas && window.Chart) {
-    if (_dbChartCestas) { _dbChartCestas.destroy(); _dbChartCestas = null; }
-    _dbChartCestas = new Chart(canvas.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Cestas formadas',
-          data: vals,
-          backgroundColor: 'rgba(16,185,129,0.65)',
-          borderColor: '#10b981',
-          borderWidth: 1,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(ctx) { return ctx.raw + ' cesta(s)'; }
-            }
-          }
-        },
-        scales: {
-          x: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: 'rgba(255,255,255,0.45)', font: { size: 11 } }
-          },
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: 'rgba(255,255,255,0.45)', font: { size: 11 }, precision: 0 }
-          }
-        }
-      }
-    });
-  }
-
-  /* Tabela */
-  var tbody = document.getElementById('dba-cestas-tbody');
-  if (!tbody) return;
-
-  if (totalLotes === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:28px 16px;">' +
-      '<div style="color:rgba(255,255,255,.35);font-size:0.85rem;line-height:1.7;">' +
-      '<i class="fas fa-box-open" style="font-size:1.6rem;display:block;margin-bottom:10px;opacity:.4;"></i>' +
-      'Nenhum lote de cestas registrado ainda.<br>' +
-      '<span style="font-size:0.78rem;opacity:.7;">Para registrar, vá em <strong style="color:rgba(255,255,255,.55);">Cestas</strong> no menu lateral, configure o modelo e clique em <strong style="color:rgba(255,255,255,.55);">Formar Cestas</strong>.</span>' +
-      '</div></td></tr>';
-    return;
-  }
-
-  var sorted = formadas.slice().sort(function(a, b) {
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
-
-  tbody.innerHTML = sorted.map(function(f) {
-    var dt   = new Date(f.created_at);
-    var data = dt.toLocaleDateString('pt-BR');
-    var hora = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    var itens = (f.itens_snapshot || [])
-      .map(function(i) { return (i.emoji || '🥫') + ' ' + escHtml(i.nome) + ' ×' + i.qtd; })
-      .join(' · ');
-    var kg = f.total_kg ? parseFloat(f.total_kg).toFixed(1) + ' kg' : '—';
-    return '<tr>' +
-      '<td><span style="font-weight:600;color:#fff;">' + data + '</span>' +
-          '<br><span style="font-size:0.68rem;color:rgba(255,255,255,.38);">' + hora + '</span></td>' +
-      '<td><span class="dba-badge dba-badge-ok">' + (f.quantidade || 0) + ' cesta(s)</span></td>' +
-      '<td style="font-weight:700;color:#10b981;">' + kg + '</td>' +
-      '<td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(itens) + '">' +
-        (itens || '<span style="color:rgba(255,255,255,.3)">—</span>') + '</td>' +
-      '<td style="color:rgba(255,255,255,.45);font-style:italic;">' + escHtml(f.observacao || '—') + '</td>' +
-    '</tr>';
+    return '<div class="db2-food-card">' +
+      '<div class="db2-food-img-wrap">' + imgHtml + '</div>' +
+      '<div class="db2-food-body">' +
+        '<div class="db2-food-name" title="' + escHtml(nome) + '">' + escHtml(nome) + '</div>' +
+        '<div class="db2-food-pct">' + kg + '/' + meta + 'kg · ' + pct + '%</div>' +
+        '<div class="db2-food-bar"><div class="db2-food-fill" style="width:' + pct + '%;background:' + cor + '"></div></div>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
+
+
 
 /* ── Filtro de período do gráfico de linha ─────────────────────── */
 async function dbMudarPeriodo(dias, btnEl) {
@@ -1842,28 +1562,6 @@ function _dbAnimarContador(el, valorFinal, sufixo) {
   requestAnimationFrame(step);
 }
 
-/* ── Tabela de últimas doações (dba-recent-body) ───────────────── */
-function _dbRenderRecentTable(doacoes) {
-  var tbody = document.getElementById("dba-recent-body");
-  if (!tbody) return;
-  if (!doacoes || doacoes.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,.3);padding:20px;">Sem doações registradas</td></tr>';
-    return;
-  }
-  var STATUS_COR = { pendente: "#e8c96a", confirmado: "#4CAF50", entregue: "#64b5f6", cancelado: "#ef5350" };
-  tbody.innerHTML = doacoes.slice(0, 8).map(function(d) {
-    var status = d.status || "pendente";
-    var cor = STATUS_COR[status] || "#e8c96a";
-    var kg = parseFloat(d.total_kg || d.amount || 0).toFixed(1);
-    var entrega = d.delivery_type === "pickup" ? "Retirada" : (d.delivery_type || "—");
-    return '<tr>' +
-      '<td>' + escHtml(d.name || "Anônimo") + '</td>' +
-      '<td>' + kg + 'kg</td>' +
-      '<td>' + escHtml(entrega) + '</td>' +
-      '<td><span style="color:' + cor + ';font-size:.75rem;font-weight:600;text-transform:capitalize;">' + escHtml(status) + '</span></td>' +
-      '</tr>';
-  }).join('');
-}
 
 /* ── Switch de período do gráfico de linha (chamado pelo HTML) ──── */
 /* HTML chama dbaSwitchPeriod('7d'|'30d'|'12m', btn) */
@@ -1898,8 +1596,7 @@ function _dbTempoRelativo(iso) {
 
 /* ══════════════════════════════════════════════════════════════════════
    SEÇÃO 7 — ALIMENTOS (aba 2)
-   ✅ BUG 1 CORRIGIDO: 'foods-grid' → 'foods-admin-grid'
-   ══════════════════════════════════════════════════════════════════════ */
+    BUG 1 CORRIGIDO: 'foods-grid' → 'foods-admin-grid' ══════════════════════════════════════════════════════════════════════ */
 
 /* Cache local dos alimentos do Supabase (para uso síncrono em abrirModalAlimento) */
 var _alimentosAdminCache = [];
@@ -1935,7 +1632,24 @@ async function renderAlimentos() {
     return;
   }
 
-  grid.innerHTML = alimentos
+  /* ── Card especial: Cesta Completa ── */
+  var cestaImgUrl = localStorage.getItem('doavida_cesta_img') || 'img/cesta-basica.jpg';
+  var cestaCardHtml =
+    '<div class="food-admin-card" style="border:2px solid var(--gold);position:relative;">' +
+      '<div style="position:absolute;top:6px;left:6px;background:var(--gold);color:#1A3312;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:10px;z-index:2;letter-spacing:.04em;">CESTA</div>' +
+      '<div class="food-admin-img">' +
+        '<img src="' + cestaImgUrl + '" alt="Cesta Completa" onerror="this.style.display=\'none\'" />' +
+        '<div class="food-admin-img-actions">' +
+          '<button class="btn-icon" onclick="abrirModalCestaImg()" title="Editar imagem" aria-label="Editar imagem da cesta"><i class="fas fa-pen"></i></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="food-admin-body">' +
+        '<div class="food-admin-name">Cesta Completa</div>' +
+        '<div class="food-admin-stats"><span><i class="fas fa-box-open"></i> Todos os itens disponíveis</span></div>' +
+      '</div>' +
+    '</div>';
+
+  grid.innerHTML = cestaCardHtml + alimentos
     .map(function (food) {
       var id = escHtml(food.id || food.name || "");
       /* Calcula a porcentagem da meta atingida */
@@ -1953,8 +1667,7 @@ async function renderAlimentos() {
             escHtml(food.img) +
             '" alt="' +
             escHtml(food.name) +
-            '" />'
-          : '<span aria-hidden="true">' + (food.emoji || "🥫") + "</span>") +
+            '" />' : '<span aria-hidden="true">' + (food.emoji || "") + "</span>") +
         /* Botões de ação sobrepostos na imagem */
         '<div class="food-admin-img-actions">' +
         '<button class="btn-icon" onclick="abrirModalAlimento(\'' +
@@ -1988,8 +1701,7 @@ async function renderAlimentos() {
         (food.families
           ? '<span><i class="fas fa-users"></i> ' +
             food.families +
-            " famílias</span>"
-          : "") +
+            " famílias</span>" : "") +
         "</div>" +
         /* Barra de progresso */
         '<div class="food-admin-progress">' +
@@ -2005,8 +1717,7 @@ async function renderAlimentos() {
         pct +
         "% da meta atingida</p>" +
         "</div>" +
-        "</div>"
-      );
+        "</div>" );
     })
     .join("");
 }
@@ -2082,7 +1793,7 @@ function abrirModalAlimento(id) {
       var meta = parseFloat(food.goal) || 0;
       if (metaAlerta) {
         if (meta > 0 && kg >= meta) {
-          metaAlerta.textContent = "⛔ Meta atingida — arrecadação bloqueada automaticamente.";
+          metaAlerta.textContent = " Meta atingida — arrecadação bloqueada automaticamente.";
           metaAlerta.style.display = "block";
         } else {
           metaAlerta.style.display = "none";
@@ -2122,11 +1833,11 @@ async function salvarAlimento() {
   var meta = parseFloat(getVal("food-goal"));
 
   if (!nome) {
-    showToast("⚠️ Nome é obrigatório.", "error");
+    showToast(" Nome é obrigatório.", "error");
     return;
   }
   if (isNaN(meta) || meta <= 0) {
-    showToast("⚠️ Meta deve ser maior que 0.", "error");
+    showToast(" Meta deve ser maior que 0.", "error");
     return;
   }
 
@@ -2180,11 +1891,11 @@ async function salvarAlimento() {
     if (editId) {
       await _salvarComFallback(dados, editId);
       alimentoId = editId;
-      showToast("✅ Alimento atualizado!", "success");
+      showToast(" Alimento atualizado!", "success");
     } else {
       var novo = await _salvarComFallback(dados, null);
       alimentoId = novo && novo.id ? novo.id : null;
-      showToast("✅ Alimento cadastrado!", "success");
+      showToast(" Alimento cadastrado!", "success");
     }
 
     /* Sincroniza item no modelo da cesta */
@@ -2211,7 +1922,7 @@ async function salvarAlimento() {
     }
 
   } catch (e) {
-    showToast("❌ Erro ao salvar: " + e.message, "error");
+    showToast(" Erro ao salvar: " + e.message, "error");
     return;
   }
 
@@ -2229,13 +1940,13 @@ function _foodImgHandleFiles(files) {
   var arquivo = files[0];
 
   if (!window.DoaVidaCloudinary) {
-    showToast('❌ Cloudinary não carregado.', 'error');
+    showToast(' Cloudinary não carregado.', 'error');
     return;
   }
 
   var validacao = DoaVidaCloudinary.validar(arquivo);
   if (!validacao.ok) {
-    showToast('⚠️ ' + validacao.erro, 'error');
+    showToast(' ' + validacao.erro, 'error');
     return;
   }
 
@@ -2262,11 +1973,11 @@ function _foodImgHandleFiles(files) {
     if (prevImg) prevImg.src = resultado.url;
     if (wrap)    wrap.style.display = 'none';
 
-    showToast('✅ Imagem enviada!', 'success');
+    showToast(' Imagem enviada!', 'success');
   }).catch(function (e) {
     if (wrap) wrap.style.display = 'none';
     if (area) area.style.display = 'block';
-    showToast('❌ Falha no upload: ' + (e.message || e), 'error');
+    showToast(' Falha no upload: ' + (e.message || e), 'error');
   });
 }
 window._foodImgHandleFiles = _foodImgHandleFiles;
@@ -2293,9 +2004,13 @@ window._foodImgRemover = _foodImgRemover;
 function _atualizarLabelsUnidade(unidade) {
   var u = unidade || "kg";
 
-  /* Label "Já Arrecadado" */
+  /* Label "Já Arrecadado" (rótulo) e suffixes dentro dos inputs */
   var kgLabel = document.getElementById("food-kg-label-unit");
   if (kgLabel) kgLabel.textContent = "(" + u + ")";
+  var kgSuffix = document.getElementById("food-kg-suffix");
+  if (kgSuffix) kgSuffix.textContent = u;
+  var goalSuffix = document.getElementById("food-goal-suffix");
+  if (goalSuffix) goalSuffix.textContent = u;
 
   /* Label, placeholder e hint do campo "Peso por Unidade" */
   var pesoLabelUnit = document.getElementById("food-peso-label-unit");
@@ -2308,123 +2023,149 @@ function _atualizarLabelsUnidade(unidade) {
       pesoInput.step        = "0.001";
       pesoInput.placeholder = "Ex: 5 para saco de 5kg, 1 para pacote de 1kg";
     }
-    if (pesoHint) pesoHint.innerHTML = '📌 Peso de <strong>uma unidade</strong> do pacote (ex: 5 para "Arroz 5kg").';
+    if (pesoHint) pesoHint.innerHTML = ' Peso de <strong>uma unidade</strong> do pacote (ex: 5 para "Arroz 5kg").';
   } else if (u === "L") {
     if (pesoLabelUnit) pesoLabelUnit.textContent = "L";
     if (pesoInput) {
       pesoInput.step        = "0.001";
       pesoInput.placeholder = "Ex: 1 para garrafa de 1L, 0.5 para 500mL";
     }
-    if (pesoHint) pesoHint.innerHTML = '📌 Volume de <strong>uma unidade</strong> (ex: 1 para garrafa de 1L).';
+    if (pesoHint) pesoHint.innerHTML = ' Volume de <strong>uma unidade</strong> (ex: 1 para garrafa de 1L).';
   } else if (u === "g") {
     if (pesoLabelUnit) pesoLabelUnit.textContent = "g";
     if (pesoInput) {
       pesoInput.step        = "1";
       pesoInput.placeholder = "Ex: 200 para pacote de 200g, 500 para pacote de 500g";
     }
-    if (pesoHint) pesoHint.innerHTML = '📌 Peso de <strong>uma unidade</strong> em gramas (ex: 200 para pacote de 200g). O sistema converte automaticamente para kg.';
+    if (pesoHint) pesoHint.innerHTML = ' Peso de <strong>uma unidade</strong> em gramas (ex: 200 para pacote de 200g). O sistema converte automaticamente para kg.';
   }
 }
 window._atualizarLabelsUnidade = _atualizarLabelsUnidade;
+
+/* Formata um valor em kg para exibição usando a unidade do item */
+function _fmtAmt(kgVal, unidade) {
+  var u = (unidade || 'kg').trim().toLowerCase();
+  function br(x) {
+    return (x % 1 === 0 ? String(Math.round(x)) : x.toFixed(1)).replace('.', ',');
+  }
+  if (u === 'g') {
+    var g = Math.round(kgVal * 1000);
+    return g >= 1000 ? br(g / 1000) + ' kg' : g + ' g';
+  }
+  if (u === 'l') {
+    if (kgVal < 1) return Math.round(kgVal * 1000) + ' mL';
+    return br(kgVal) + ' L';
+  }
+  if (kgVal > 0 && kgVal < 1) return Math.round(kgVal * 1000) + ' g';
+  return br(kgVal) + ' kg';
+}
 
 function atualizarInfoCestaModal() {
   /* Atualiza labels de unidade */
   var unidadeChecked = document.querySelector('input[name="food-unidade"]:checked');
   _atualizarLabelsUnidade(unidadeChecked ? unidadeChecked.value : "kg");
+
   var infoPanel = document.getElementById("food-modal-cesta-info");
   if (!infoPanel) return;
 
-  /* Lê dados do alimento atualmente sendo editado */
-  var alimentoId   = getVal("food-edit-id")             || null;
+  /* Lê valores do modal */
+  var alimentoId   = getVal("food-edit-id")          || null;
   var cestaQtd     = parseInt(getVal("food-cesta-qtd")) || 0;
-  var pesoRawModal = parseFloat(getVal("food-peso"))    || 0;
+  var pesoRawModal = parseFloat(getVal("food-peso"))  || 0;
   var unidadeModal = (document.querySelector('input[name="food-unidade"]:checked') || {}).value || "kg";
-  /* Sempre em kg para o cálculo — gramas precisam ser convertidas */
-  var peso         = (unidadeModal === "g") ? pesoRawModal / 1000 : pesoRawModal;
-  var kg           = parseFloat(getVal("food-kg"))      || 0;
-  var meta         = parseFloat(getVal("food-goal"))    || 0;
-  var nome        = getVal("food-name")                         || "este alimento";
+  var peso         = (unidadeModal === "g") ? pesoRawModal / 1000 : pesoRawModal; /* sempre em kg */
+  var kg           = parseFloat(getVal("food-kg"))    || 0; /* já em kg no BD */
+  var meta         = parseFloat(getVal("food-goal"))  || 0; /* já em kg no BD */
+  var nome         = getVal("food-name")              || "este alimento";
 
-  /* Atualiza alerta de meta */
+  /* Alerta de meta atingida no campo */
   var metaAlerta = document.getElementById("food-meta-alerta");
   if (metaAlerta) {
     if (meta > 0 && kg >= meta) {
-      metaAlerta.textContent = "⛔ Meta atingida — arrecadação bloqueada automaticamente.";
+      metaAlerta.textContent = "Meta atingida — arrecadação bloqueada automaticamente.";
       metaAlerta.style.display = "block";
     } else {
       metaAlerta.style.display = "none";
     }
   }
 
-  /* Se não participa da cesta, mostra mensagem simples */
+  /* Estado vazio: alimento não configurado para a cesta */
   if (cestaQtd === 0) {
     infoPanel.innerHTML =
-      '<div class="food-modal-cesta-info-row">' +
-      '<i class="fas fa-info-circle" style="color:var(--text2)"></i>' +
-      '<span style="color:var(--text2);font-size:0.82rem">Este alimento não está configurado para a cesta básica. ' +
-      'Defina a quantidade por cesta acima para ativá-lo.</span>' +
+      '<div style="padding:12px 16px;display:flex;align-items:center;gap:8px;color:var(--text2);font-size:0.8rem;">' +
+      '<i class="fas fa-info-circle" style="opacity:.6;flex-shrink:0"></i>' +
+      '<span>Defina a quantidade por cesta acima para ativar este painel.</span>' +
       '</div>';
     return;
   }
 
-  /* Cálculo de participação */
-  var unidadesDisp   = peso > 0 ? Math.floor(kg / peso)         : 0;
+  /* Cálculos */
+  var unidadesDisp    = peso > 0 ? Math.floor(kg / peso) : 0;
   var cestasPossiveis = cestaQtd > 0 ? Math.floor(unidadesDisp / cestaQtd) : 0;
+  var calc            = _cestasCache && _cestasCache.calculo ? _cestasCache.calculo : null;
+  var ehLimitante     = calc && calc.limitante && calc.limitante.alimento_id === alimentoId;
+  var pctNum          = meta > 0 ? Math.min(100, (kg / meta) * 100) : 0;
+  var pctFmt          = pctNum.toFixed(1).replace('.', ',');
+  var faltam          = meta > 0 && kg < meta ? (meta - kg) : 0;
+  var cheio           = meta > 0 && kg >= meta;
 
-  /* Total possível de cestas com o estoque GLOBAL (usa cache se disponível) */
-  var calc = _cestasCache && _cestasCache.calculo ? _cestasCache.calculo : null;
-  var totalCestas = calc ? calc.total : cestasPossiveis;
-  var ehLimitante = calc && calc.limitante && calc.limitante.alimento_id === alimentoId;
+  /* === Monta HTML === */
+  var html = '<div class="fci">';
 
-  /* Porcentagem de consumo da meta */
-  var pctMeta = meta > 0 ? Math.min(100, (kg / meta) * 100).toFixed(1) : 0;
-
-  /* Monta HTML do painel */
-  var html = "";
-
-  /* Linha 1 — Participação */
+  /* — Cabeçalho: cestas possíveis — */
   html +=
-    '<div class="food-modal-cesta-info-row">' +
-    '<span class="food-modal-cesta-info-label">📦 Participação na Cesta</span>' +
-    '<span class="food-modal-cesta-info-value">' +
-    '<strong>' + cestaQtd + '</strong> unidade(s) de ' +
-    escHtml(nome) + ' por cesta' +
-    (ehLimitante ? ' <span class="badge-limitante">⚠️ item limitante</span>' : '') +
-    '</span>' +
+    '<div class="fci-headline">' +
+    '<div class="fci-hl-left">' +
+    '<span class="fci-num' + (cestasPossiveis === 0 ? ' fci-num--zero' : '') + '">' + cestasPossiveis + '</span>' +
+    '<span class="fci-num-sub">cestas possíveis<br>com este item</span>' +
+    '</div>' +
+    (ehLimitante ? '<span class="fci-lim-badge"> item limitante</span>' : '') +
     '</div>';
 
-  /* Linha 2 — Cálculo Automático */
+  /* — Barra de meta (só se meta configurada) — */
+  if (meta > 0) {
+    html +=
+      '<div class="fci-meta">' +
+      '<div class="fci-meta-head">' +
+      '<span class="fci-meta-title">Meta de arrecadação</span>' +
+      '<span class="fci-meta-pct">' + pctFmt + '%</span>' +
+      '</div>' +
+      '<div class="fci-meta-track">' +
+      '<div class="fci-meta-fill' + (cheio ? ' fci-meta-fill--cheio' : '') + '" style="width:' + pctNum.toFixed(1) + '%"></div>' +
+      '</div>' +
+      '<div class="fci-meta-sub">' +
+      '<span>' + _fmtAmt(kg, 'kg') + ' arrecadados</span>' +
+      (cheio
+        ? '<span class="fci-meta-sub--danger">Meta atingida — bloqueado</span>' : '<span>faltam ' + _fmtAmt(faltam, 'kg') + '</span>') +
+      '</div>' +
+      '</div>';
+  }
+
+  /* — Grid de stats — */
   html +=
-    '<div class="food-modal-cesta-info-row">' +
-    '<span class="food-modal-cesta-info-label">📊 Cálculo Automático</span>' +
-    '<div class="food-modal-cesta-info-value">' +
-    '<div class="food-modal-calculo-step">' +
-    '<span>' + kg.toFixed(2) + ' kg ÷ ' + peso.toFixed(3) + ' kg/un = ' +
-    '<strong>' + unidadesDisp + ' unidades</strong></span>' +
+    '<div class="fci-stats">' +
+    '<div class="fci-stat">' +
+    '<span class="fci-stat-val">' + _fmtAmt(kg, 'kg') + '</span>' +
+    '<span class="fci-stat-lbl">Arrecadado</span>' +
     '</div>' +
-    '<div class="food-modal-calculo-step">' +
-    '<span>' + unidadesDisp + ' un ÷ ' + cestaQtd + ' por cesta = ' +
-    '<strong>' + cestasPossiveis + ' cestas possíveis</strong> com este item</span>' +
+    '<div class="fci-stat">' +
+    '<span class="fci-stat-val">' + unidadesDisp + '</span>' +
+    '<span class="fci-stat-lbl">Unidades</span>' +
     '</div>' +
+    '<div class="fci-stat">' +
+    '<span class="fci-stat-val">' + (meta > 0 ? _fmtAmt(meta, 'kg') : '—') + '</span>' +
+    '<span class="fci-stat-lbl">Meta</span>' +
     '</div>' +
     '</div>';
 
-  /* Linha 3 — Meta */
+  /* — Rodapé: resumo de participação — */
   html +=
-    '<div class="food-modal-cesta-info-row">' +
-    '<span class="food-modal-cesta-info-label">🎯 Meta de Arrecadação</span>' +
-    '<div class="food-modal-cesta-info-value">' +
-    '<div style="display:flex;align-items:center;gap:8px;">' +
-    '<div class="food-modal-meta-bar-wrap">' +
-    '<div class="food-modal-meta-bar-fill" style="width:' + pctMeta + '%"></div>' +
-    '</div>' +
-    '<span><strong>' + pctMeta + '%</strong> (' + kg.toFixed(1) + ' / ' + meta.toFixed(1) + ' kg)</span>' +
-    '</div>' +
-    (meta > 0 && kg >= meta
-      ? '<div style="color:#e55a5a;font-size:0.78rem;margin-top:4px">⛔ Meta atingida — doação bloqueada</div>'
-      : '') +
-    '</div>' +
+    '<div class="fci-foot">' +
+    '<strong>' + cestaQtd + '</strong> und. de <strong>' + escHtml(nome) + '</strong> por cesta' +
+    (peso > 0 ? ' · ' + _fmtAmt(peso, unidadeModal) + ' por unidade' : '') +
     '</div>';
+
+  html += '</div>';
 
   infoPanel.innerHTML = html;
 }
@@ -2442,9 +2183,9 @@ async function confirmarExclusaoAlimento(id) {
     }
     /* Remove o alimento */
     await DoaVidaSync.deleteAlimento(id);
-    showToast("🗑️ Alimento excluído.", "info");
+    showToast(" Alimento excluído.", "info");
   } catch (e) {
-    showToast("❌ Erro ao excluir: " + e.message, "error");
+    showToast(" Erro ao excluir: " + e.message, "error");
     return;
   }
   renderAlimentos();
@@ -2471,10 +2212,7 @@ window.confirmarExclusaoAlimento = confirmarExclusaoAlimento;
 
   PARÂMETROS:
   • d       {object}  → objeto de doação vindo do localStorage (api.js)
-  • simples {boolean} → true = versão compacta para "Visão Geral"
-                        false = versão completa para aba "Doações"
-
-  CAMPOS RENDERIZADOS (versão completa):
+  • simples {boolean} → true = versão compacta para "Visão Geral" false = versão completa para aba "Doações" CAMPOS RENDERIZADOS (versão completa):
   • Nome (header bold)
   • Badge de status (header direita)
   • Telefone clicável → WhatsApp
@@ -2490,7 +2228,7 @@ function _montarCardDoacao(d, simples) {
 
   /* ── Link de WhatsApp (telefone clicável) ── */
   var foneHtml = fone
-    ? '<a href="https://wa.me/55' +
+    ? '<a href="whatsapp://send?phone=55' +
       fone +
       '" target="_blank" rel="noopener" ' +
       'class="card-mob-link" onclick="event.stopPropagation();" ' +
@@ -2499,8 +2237,7 @@ function _montarCardDoacao(d, simples) {
       '">' +
       '<i class="fab fa-whatsapp" aria-hidden="true"></i> ' +
       escHtml(d.phone) +
-      "</a>"
-    : '<span style="color:var(--text2);">—</span>';
+      "</a>" : '<span style="color:var(--text2);">—</span>';
 
   /* ── Texto da forma de entrega (código → label legível) ── */
   var labelEntrega = DoaVidaAPI._labelEntrega
@@ -2523,8 +2260,7 @@ function _montarCardDoacao(d, simples) {
 
   /* ── Entrega: só na versão completa ── */
   var entregaHtml = simples
-    ? ""
-    : '<div class="card-mob-row">' +
+    ? "" : '<div class="card-mob-row">' +
       '<span class="card-mob-label">' +
       '<i class="fas fa-truck" aria-hidden="true"></i> ENTREGA' +
       "</span>" +
@@ -2606,8 +2342,7 @@ function _montarCardDoacao(d, simples) {
         '<div class="card-mob-row">' +
         '<span class="card-mob-label"><i class="fas fa-clock" aria-hidden="true"></i> HORÁRIO</span>' +
         '<span class="card-mob-valor">' + _horaApenas + '</span>' +
-        '</div>'
-      );
+        '</div>' );
     })() +
     /* ─── Observações (condicional) ──────────────────────── */
     obsHtml +
@@ -2640,8 +2375,7 @@ async function renderDoacoes() {
   /* ── Estado vazio: mesma mensagem na tabela E nos cards mobile ── */
   var msgVazia =
     busca || filtro
-      ? "Nenhuma doação encontrada."
-      : "Nenhuma doação registrada.";
+      ? "Nenhuma doação encontrada." : "Nenhuma doação registrada.";
 
   if (filtradas.length === 0) {
     /* Tabela (desktop) */
@@ -2684,12 +2418,11 @@ async function renderDoacoes() {
         /* Link WhatsApp clicável se tiver telefone */
         "<td>" +
         (fone
-          ? '<a href="https://wa.me/55' +
+          ? '<a href="whatsapp://send?phone=55' +
             fone +
             '" target="_blank" rel="noopener" style="color:var(--gold);" onclick="event.stopPropagation();">' +
             escHtml(d.phone) +
-            "</a>"
-          : "—") +
+            "</a>" : "—") +
         "</td>" +
         "<td>" +
         escHtml(d.food || "—") +
@@ -2713,8 +2446,7 @@ async function renderDoacoes() {
         '\')" title="Excluir">' +
         '<i class="fas fa-trash"></i></button>' +
         "</div></td>" +
-        "</tr>"
-      );
+        "</tr>" );
     })
     .join("");
 
@@ -2796,8 +2528,7 @@ async function abrirDetalheDoacao(id) {
           '<span class="comp-val" style="font-weight:500;">' + nomeItem + '</span>' +
           /* Exibe "2 un · 2.0 kg" para indicar quantidade e peso corretamente */
           '<span class="comp-val">' + qtyItem + ' un · ' + kgItem + ' kg</span>' +
-          '</div>'
-        );
+          '</div>' );
       })
       .join("");
   } else {
@@ -2820,8 +2551,7 @@ async function abrirDetalheDoacao(id) {
             '<div class="comp-linha">' +
             '<span class="comp-val" style="font-weight:500;">' + escHtml(nome) + '</span>' +
             '<span class="comp-val">' + kgPorItem + ' kg</span>' +
-            '</div>'
-          );
+            '</div>' );
         })
         .join("");
     }
@@ -2838,14 +2568,13 @@ async function abrirDetalheDoacao(id) {
   /* ── Fone ── */
   var fone = (d.phone || "").replace(/\D/g, "");
   var foneHtml = fone
-    ? '<a href="https://wa.me/55' +
+    ? '<a href="whatsapp://send?phone=55' +
       fone +
       '" target="_blank" rel="noopener" ' +
       'style="color:var(--gold);text-decoration:none;">' +
       '<i class="fab fa-whatsapp"></i> ' +
       escHtml(d.phone) +
-      "</a>"
-    : "—";
+      "</a>" : "—";
 
   /* ── Data e Hora separadas ── */
   var dataApenas = "—";
@@ -2861,13 +2590,6 @@ async function abrirDetalheDoacao(id) {
   /* ── Monta o HTML com campos editáveis (Click to Edit) ── */
   var corpo = document.getElementById("detalhe-corpo");
   if (corpo) {
-    /*
-      Estilos inline para os campos editáveis dentro do comprovante.
-      Usamos select e textarea para status, delivery e observações.
-    */
-    var selectStyle = 'style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:var(--cream);font-size:.85rem;cursor:pointer;"';
-    var textareaStyle = 'style="width:100%;min-height:64px;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:var(--cream);font-size:.82rem;resize:vertical;box-sizing:border-box;"';
-
     /* ── Calcula total kg ── */
     var totalKg = 0;
     if (itensArray) {
@@ -2888,8 +2610,7 @@ async function abrirDetalheDoacao(id) {
           '<td style="font-weight:700;letter-spacing:.04em;">' + nome + '</td>' +
           '<td style="text-align:center;">' + qty + ' un</td>' +
           '<td style="text-align:right;font-weight:700;">' + kg + ' kg</td>' +
-          '</tr>'
-        );
+          '</tr>' );
       }).join('');
     } else {
       var nomesFb = (d.food || "").split(",").map(function(s){ return s.trim(); }).filter(Boolean);
@@ -2917,7 +2638,7 @@ async function abrirDetalheDoacao(id) {
             '<img src="logo-semear.jpeg" style="height:64px;width:auto;border-radius:8px;object-fit:contain;" alt="Semear"/>' +
             '<div style="font-size:.62rem;margin-top:4px;">Ação Social<br>Semear</div>' +
           '</div>' +
-          '<span style="font-size:1.2rem;color:#888;">✦</span>' +
+          '<span style="font-size:1.2rem;color:#888;"></span>' +
           '<div style="text-align:center;">' +
             '<img src="logo-maanaim.jpeg" style="height:64px;border-radius:50%;object-fit:cover;" alt="Maanaim"/>' +
             '<div style="font-size:.62rem;margin-top:4px;">Comunidade<br>Maanaim</div>' +
@@ -2979,55 +2700,23 @@ async function abrirDetalheDoacao(id) {
       '</div>' +
       /* ══════════════ FIM DO CUPOM ══════════════ */
 
-      /* ══════════════ CAMPOS EDITÁVEIS DO ADMIN ══════════════ */
-      '<div class="comp-recibo">' +
-        '<div class="comp-bloco">' +
-          '<div class="comp-bloco-title">✏️ Editar Doação</div>' +
-
-          '<div class="comp-linha" style="flex-direction:column;align-items:flex-start;gap:6px;">' +
-            '<span class="comp-label">Forma de Entrega</span>' +
-            '<select id="det-delivery" ' + selectStyle + '>' +
-              '<option value="retirada"' + (d.delivery === "retirada"  ? " selected" : "") + '>🏛️ Retirada na Igreja</option>' +
-              '<option value="coleta"'  + (d.delivery === "coleta"    ? " selected" : "") + '>🚗 Coleta em Casa</option>' +
-              '<option value="evento"'  + (d.delivery === "evento"    ? " selected" : "") + '>🎉 Evento</option>' +
-            '</select>' +
-          '</div>' +
-
-          '<div class="comp-linha" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:10px;">' +
-            '<span class="comp-label">Status</span>' +
-            '<select id="det-status" ' + selectStyle + '>' +
-              '<option value="pendente"'   + (d.status === "pendente"   ? " selected" : "") + '>⏳ Pendente</option>' +
-              '<option value="confirmado"' + (d.status === "confirmado" ? " selected" : "") + '>✅ Confirmado</option>' +
-              '<option value="entregue"'   + (d.status === "entregue"   ? " selected" : "") + '>📦 Entregue</option>' +
-              '<option value="cancelado"'  + (d.status === "cancelado"  ? " selected" : "") + '>❌ Cancelado</option>' +
-            '</select>' +
-          '</div>' +
-
-          '<div class="comp-linha" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:10px;">' +
-            '<span class="comp-label">Observações</span>' +
-            '<textarea id="det-obs" ' + textareaStyle + ' placeholder="Observações ou pedido de oração…">' +
-              escHtml(d.observacao || d.obs || "") +
-            '</textarea>' +
-          '</div>' +
-
-        '</div>' +
-      '</div>'; /* fim campos editáveis */
+      ''; /* fim cupom */
   }
 
   /* ── Botão WhatsApp do doador ── */
   var btnDetWa = document.getElementById("btn-detalhe-wa");
   if (btnDetWa) {
     var foneDetWa = (d.phone || "").replace(/\D/g, "");
-    var statusMapa = { pendente: "⏳ Pendente", confirmado: "✅ Confirmado", entregue: "📦 Entregue", cancelado: "❌ Cancelado" };
+    var statusMapa = { pendente: " Pendente", confirmado: " Confirmado", entregue: " Entregue", cancelado: " Cancelado" };
     var linhasDet = [
-      "🌾 *Ação Social Semear*",
+      " *Ação Social Semear*",
       "*Comprovante de Doação*",
       "",
-      "👤 *Doador*",
+      " *Doador*",
       "Nome: " + (d.name || "—"),
       "Telefone: " + (d.phone || "—"),
       "",
-      "🧺 *Alimentos*",
+      " *Alimentos*",
     ];
 
     /* Usa d.itens (JSONB) para montar o texto com qty e kg corretos por item */
@@ -3051,7 +2740,7 @@ async function abrirDetalheDoacao(id) {
       }
     }
     linhasDet.push("");
-    linhasDet.push("🚚 *Entrega*");
+    linhasDet.push(" *Entrega*");
     linhasDet.push("Forma: " + entregaLabel);
     linhasDet.push("Data: " + dataApenas);
     linhasDet.push("Horário: " + horaApenas);
@@ -3060,50 +2749,21 @@ async function abrirDetalheDoacao(id) {
       linhasDet.push("Obs.: " + d.obs.trim());
     }
     var textoDet = linhasDet.join("\n");
-    btnDetWa.href = "https://wa.me/?text=" + encodeURIComponent(textoDet);
+    btnDetWa.href = "whatsapp://send?text=" + encodeURIComponent(textoDet);
   }
 
-  /* ── Botão "Salvar" — substitui "Editar Status" ── */
+  /* ── Botão "Editar Status" ── */
   var btnEditar = document.getElementById("btn-detalhe-editar");
   if (btnEditar) {
-    /* Clona para remover listeners antigos e evitar duplo-bind */
     var novoBtn = btnEditar.cloneNode(true);
-    novoBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Salvar';
     btnEditar.parentNode.replaceChild(novoBtn, btnEditar);
-    novoBtn.addEventListener("click", salvarEdicaoDoacao);
+    novoBtn.addEventListener("click", function () { abrirEdicaoStatus(id); });
   }
 
   abrirModal("modal-doacao-detalhe");
 }
 window.abrirDetalheDoacao = abrirDetalheDoacao;
 
-/*
-  Salva as alterações feitas no modal de detalhe de doação (Click to Edit).
-  Lê delivery, status e observações dos campos editáveis e salva no Supabase.
-*/
-async function salvarEdicaoDoacao() {
-  var id       = (document.getElementById("det-doacao-id") || {}).value;
-  var delivery = (document.getElementById("det-delivery")  || {}).value;
-  var status   = (document.getElementById("det-status")    || {}).value;
-  var obs      = (document.getElementById("det-obs")       || {}).value || "";
-
-  if (!id) { showToast("⚠️ ID da doação não encontrado.", "error"); return; }
-
-  try {
-    /* Salva os campos editáveis no Supabase */
-    await DoaVidaSync.updateDoacao(id, {
-      delivery:   delivery,
-      status:     status,
-      observacao: obs,
-    });
-    fecharModal("modal-doacao-detalhe");
-    showToast("✅ Doação atualizada!", "success");
-    /* O canal Realtime atualiza a tabela automaticamente */
-  } catch (e) {
-    showToast("❌ Erro ao salvar: " + (e.message || e), "error");
-  }
-}
-window.salvarEdicaoDoacao = salvarEdicaoDoacao;
 
 async function salvarStatusDoacao() {
   var id = getVal("donation-edit-id");
@@ -3114,7 +2774,7 @@ async function salvarStatusDoacao() {
   fecharModal("modal-donation-status");
   renderDoacoes();
   atualizarBadges();
-  showToast("✅ Status atualizado!", "success");
+  showToast(" Status atualizado!", "success");
 }
 window.salvarStatusDoacao = salvarStatusDoacao;
 
@@ -3125,7 +2785,7 @@ async function confirmarExclusaoDoacao(id) {
   renderVisaoGeral(); /* atualiza "Kg Arrecadados" e "Tipos de Alimento" */
   renderDashboard(); /* atualiza gráficos e métricas do dashboard */
   atualizarBadges();
-  showToast("🗑️ Doação excluída.", "info");
+  showToast(" Doação excluída.", "info");
 }
 window.confirmarExclusaoDoacao = confirmarExclusaoDoacao;
 
@@ -3138,13 +2798,12 @@ function _montarCardFamilia(f) {
   var id = escHtml(f.id || "");
   var fone = (f.phone || "").replace(/\D/g, "");
   var foneHtml = fone
-    ? '<a href="https://wa.me/55' +
+    ? '<a href="whatsapp://send?phone=55' +
       fone +
       '" target="_blank" rel="noopener" class="card-mob-link">' +
       '<i class="fab fa-whatsapp"></i> ' +
       escHtml(f.phone) +
-      "</a>"
-    : "—";
+      "</a>" : "—";
   var _famDt = f.created_at ? new Date(f.created_at) : null;
   var _famDataApenas = _famDt ? _famDt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "";
   var _famHoraApenas = _famDt ? _famDt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
@@ -3153,8 +2812,7 @@ function _montarCardFamilia(f) {
       f.pessoas +
       " pessoa" +
       (f.pessoas != 1 ? "s" : "") +
-      "</span>"
-    : "";
+      "</span>" : "";
 
   return (
     '<div class="doacao-card-mob" style="cursor:default;">' +
@@ -3174,20 +2832,17 @@ function _montarCardFamilia(f) {
       ? '<div class="card-mob-row"><span class="card-mob-label"><i class="fas fa-map-marker-alt"></i> Endereço</span>' +
         '<span class="card-mob-valor" style="font-size:.82rem;">' +
         escHtml(f.endereco) +
-        "</span></div>"
-      : "") +
+        "</span></div>" : "") +
     (f.obs
       ? '<div class="card-mob-row"><span class="card-mob-label"><i class="fas fa-sticky-note"></i> Obs.</span>' +
         '<span class="card-mob-valor card-mob-obs">' +
         escHtml(f.obs) +
-        "</span></div>"
-      : "") +
+        "</span></div>" : "") +
     (_famDataApenas
       ? '<div class="card-mob-row"><span class="card-mob-label"><i class="fas fa-calendar-alt"></i> DATA</span>' +
         '<span class="card-mob-valor">' + _famDataApenas + "</span></div>" +
         '<div class="card-mob-row"><span class="card-mob-label"><i class="fas fa-clock"></i> HORÁRIO</span>' +
-        '<span class="card-mob-valor">' + _famHoraApenas + "</span></div>"
-      : "") +
+        '<span class="card-mob-valor">' + _famHoraApenas + "</span></div>" : "") +
     '<div class="card-mob-actions">' +
     '<button class="card-mob-btn" onclick="gerarComprovante(\'' +
     id +
@@ -3202,8 +2857,7 @@ function _montarCardFamilia(f) {
     "')\">" +
     '<i class="fas fa-trash"></i> Excluir</button>' +
     "</div>" +
-    "</div>"
-  );
+    "</div>" );
 }
 
 async function renderFamilias() {
@@ -3222,8 +2876,7 @@ async function renderFamilias() {
 
   if (filtradas.length === 0) {
     var msgFamVazia = busca
-      ? "Nenhuma encontrada."
-      : "Nenhuma família cadastrada.";
+      ? "Nenhuma encontrada." : "Nenhuma família cadastrada.";
     tbody.innerHTML =
       '<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:40px;">' +
       msgFamVazia +
@@ -3249,12 +2902,11 @@ async function renderFamilias() {
         "</strong></td>" +
         "<td>" +
         (fone
-          ? '<a href="https://wa.me/55' +
+          ? '<a href="whatsapp://send?phone=55' +
             fone +
             '" target="_blank" rel="noopener" style="color:var(--gold);" onclick="event.stopPropagation()">' +
             escHtml(f.phone) +
-            "</a>"
-          : "—") +
+            "</a>" : "—") +
         "</td>" +
         '<td style="font-size:.8rem;">' +
         escHtml(f.endereco || "—") +
@@ -3283,8 +2935,7 @@ async function renderFamilias() {
         '\')" title="Excluir">' +
         '<i class="fas fa-trash"></i></button>' +
         "</div></td>" +
-        "</tr>"
-      );
+        "</tr>" );
     })
     .join("");
 
@@ -3356,9 +3007,9 @@ async function renderFamilias() {
     /* Zoom control reposicionado (canto inferior direito) */
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">Carto</a>',
-      subdomains: 'abcd', maxZoom: 19
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP',
+      maxZoom: 19
     }).addTo(map);
 
     _adicionarMarcadoresMapa(map, familias);
@@ -3372,8 +3023,7 @@ function _adicionarMarcadoresMapa(map, familias) {
   /* Ícone circular grande — estilo igual ao screenshot */
   function makeIcon(color, pulso) {
     var pulse = pulso
-      ? '<div style="position:absolute;top:-4px;left:-4px;width:26px;height:26px;border-radius:50%;background:' + color + '44;animation:mapPulse 2s infinite"></div>'
-      : '';
+      ? '<div style="position:absolute;top:-4px;left:-4px;width:26px;height:26px;border-radius:50%;background:' + color + '44;animation:mapPulse 2s infinite"></div>' : '';
     return L.divIcon({
       className: '',
       html: '<div style="position:relative;width:18px;height:18px">' +
@@ -3428,7 +3078,7 @@ function _adicionarMarcadoresMapa(map, familias) {
     }
     var recebeu = f.status === 'entregue';
     var cor = recebeu ? '#81c784' : '#f9a825';
-    var st  = recebeu ? '✅ Recebeu cesta' : '⏳ Aguardando';
+    var st  = recebeu ? ' Recebeu cesta' : ' Aguardando';
     var nome = f.name || f.nome || 'Família';
     var pessoas = parseInt(f.pessoas || 1);
 
@@ -3436,9 +3086,9 @@ function _adicionarMarcadoresMapa(map, familias) {
       .bindPopup(
         '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#1a1a14;min-width:170px;line-height:1.5">' +
         '<div style="font-weight:700;font-size:13px;margin-bottom:4px">' + nome + '</div>' +
-        (f.endereco ? '<div style="color:#555;font-size:11px;margin-bottom:4px">📍 ' + f.endereco + '</div>' : '') +
+        (f.endereco ? '<div style="color:#555;font-size:11px;margin-bottom:4px"> ' + f.endereco + '</div>' : '') +
         '<div style="color:' + cor + ';font-weight:600">' + st + '</div>' +
-        '<div style="color:#777;font-size:11px;margin-top:2px">👥 ' + pessoas + ' pessoa' + (pessoas > 1 ? 's' : '') + '</div>' +
+        '<div style="color:#777;font-size:11px;margin-top:2px"> ' + pessoas + ' pessoa' + (pessoas > 1 ? 's' : '') + '</div>' +
         '</div>',
         { maxWidth: 220 }
       )
@@ -3470,8 +3120,7 @@ function _familyGeoFeedback(tipo, msg) {
     loading: 'background:rgba(100,181,246,.12);border:1px solid rgba(100,181,246,.3);color:#64b5f6;',
     ok:      'background:rgba(129,199,132,.12);border:1px solid rgba(129,199,132,.3);color:#81c784;',
     warn:    'background:rgba(249,168,37,.12);border:1px solid rgba(249,168,37,.3);color:#f9a825;',
-    erro:    'background:rgba(229,115,115,.12);border:1px solid rgba(229,115,115,.3);color:#e57373;'
-  };
+    erro:    'background:rgba(229,115,115,.12);border:1px solid rgba(229,115,115,.3);color:#e57373;' };
   el.style.cssText = 'display:block;margin-top:-8px;margin-bottom:10px;padding:8px 12px;border-radius:8px;font-size:.78rem;line-height:1.4;' + (estilos[tipo] || estilos.warn);
   el.innerHTML = msg;
 }
@@ -3505,7 +3154,7 @@ async function familyBuscarCep() {
     var data = await resp.json();
 
     if (data.erro) {
-      _familyGeoFeedback('erro', '❌ CEP não encontrado. Verifique e tente novamente.');
+      _familyGeoFeedback('erro', ' CEP não encontrado. Verifique e tente novamente.');
       return;
     }
 
@@ -3522,21 +3171,21 @@ async function familyBuscarCep() {
       setVal('family-lat', geo.lat);
       setVal('family-lng', geo.lng);
       _familyGeoFeedback('ok',
-        '📍 <strong>' + escHtml(data.bairro || data.localidade) + '</strong> — ' +
+        ' <strong>' + escHtml(data.bairro || data.localidade) + '</strong> — ' +
         'Lat ' + geo.lat.toFixed(5) + ', Lng ' + geo.lng.toFixed(5) +
         ' <span style="opacity:.6;font-size:.7rem;">via OpenStreetMap</span>');
     } else {
       _familyGeoFeedback('warn',
-        '⚠️ Endereço encontrado pelo CEP, mas sem coordenadas precisas. ' +
+        ' Endereço encontrado pelo CEP, mas sem coordenadas precisas. ' +
         'O marcador usará o bairro aproximado.');
     }
   } catch (e) {
-    _familyGeoFeedback('erro', '❌ Erro ao consultar CEP. Verifique sua conexão.');
+    _familyGeoFeedback('erro', ' Erro ao consultar CEP. Verifique sua conexão.');
   }
 }
 window.familyBuscarCep = familyBuscarCep;
 
-/* Geocodifica diretamente pelo campo de endereço (botão 📍 ou onblur) */
+/* Geocodifica diretamente pelo campo de endereço (botão  ou onblur) */
 async function familyGeocodificarEndereco() {
   var endereco = getVal('family-endereco');
   if (!endereco || endereco.length < 5) return;
@@ -3553,12 +3202,12 @@ async function familyGeocodificarEndereco() {
     var partes = geo.display.split(',');
     var local = (partes[1] || partes[0] || '').trim();
     _familyGeoFeedback('ok',
-      '📍 <strong>' + escHtml(local) + '</strong> — ' +
+      ' <strong>' + escHtml(local) + '</strong> — ' +
       'Lat ' + geo.lat.toFixed(5) + ', Lng ' + geo.lng.toFixed(5) +
       ' <span style="opacity:.6;font-size:.7rem;">via OpenStreetMap</span>');
   } else {
     _familyGeoFeedback('warn',
-      '⚠️ Endereço não encontrado no mapa. ' +
+      ' Endereço não encontrado no mapa. ' +
       'Você pode salvar assim — o marcador usará o bairro aproximado.');
   }
 }
@@ -3596,7 +3245,7 @@ async function abrirModalFamilia(id) {
       /* Mostra coordenadas existentes */
       if (fam.lat && fam.lng) {
         _familyGeoFeedback('ok',
-          '📍 Coordenadas salvas — Lat ' + parseFloat(fam.lat).toFixed(5) +
+          ' Coordenadas salvas — Lat ' + parseFloat(fam.lat).toFixed(5) +
           ', Lng ' + parseFloat(fam.lng).toFixed(5));
       }
     }
@@ -3613,7 +3262,7 @@ async function salvarFamilia() {
   var fone     = getVal('family-phone');
   var endereco = getVal('family-endereco');
   if (!nome || !fone || !endereco) {
-    showToast('⚠️ Nome, WhatsApp e endereço são obrigatórios.', 'error');
+    showToast(' Nome, WhatsApp e endereço são obrigatórios.', 'error');
     return;
   }
 
@@ -3634,7 +3283,7 @@ async function salvarFamilia() {
 
   /* Se não tem coordenadas, tenta geocodificar antes de salvar */
   if (!item.lat && item.endereco) {
-    showToast('🗺️ Localizando endereço…', 'info', 2000);
+    showToast(' Localizando endereço…', 'info', 2000);
     var geo = await _nominatimGeocode(item.endereco);
     if (geo) { item.lat = geo.lat; item.lng = geo.lng; }
   }
@@ -3643,13 +3292,13 @@ async function salvarFamilia() {
     var editId = getVal('family-edit-id');
     if (editId) {
       await DoaVidaSync.updateFamilia(editId, item);
-      showToast('✅ Família atualizada!', 'success');
+      showToast(' Família atualizada!', 'success');
     } else {
       await DoaVidaSync.addFamilia(item);
-      showToast('✅ Família cadastrada!', 'success');
+      showToast(' Família cadastrada!', 'success');
     }
   } catch (e) {
-    showToast('❌ ' + e.message, 'error');
+    showToast(' ' + e.message, 'error');
     return;
   }
   fecharModal('modal-family');
@@ -3663,7 +3312,7 @@ async function confirmarExclusaoFamilia(id) {
   await DoaVidaSync.deleteFamilia(id);
   renderFamilias();
   atualizarBadges();
-  showToast("🗑️ Família excluída.", "info");
+  showToast(" Família excluída.", "info");
 }
 window.confirmarExclusaoFamilia = confirmarExclusaoFamilia;
 
@@ -3673,10 +3322,10 @@ window.confirmarExclusaoFamilia = confirmarExclusaoFamilia;
 
 /* Mapa de labels e cores para cada status da entrega */
 var STATUS_ENTREGA = {
-  pendente:       { label: "⏳ Pendente",       cor: "#e8a838" },
-  em_separacao:   { label: "📦 Em separação",   cor: "#5b8dee" },
-  entregue:       { label: "✅ Entregue",        cor: "#4caf50" },
-  nao_encontrada: { label: "❌ Não encontrada",  cor: "#e55a5a" },
+  pendente:       { label: " Pendente",       cor: "#e8a838" },
+  em_separacao:   { label: " Em separação",   cor: "#5b8dee" },
+  entregue:       { label: " Entregue",        cor: "#4caf50" },
+  nao_encontrada: { label: " Não encontrada",  cor: "#e55a5a" },
 };
 
 async function gerarComprovante(familiaId) {
@@ -3717,7 +3366,7 @@ async function gerarComprovante(familiaId) {
 
     /* ── Dados da família ── */
     '<div class="comp-bloco">' +
-      '<div class="comp-bloco-title">👤 Dados da Família</div>' +
+      '<div class="comp-bloco-title"> Dados da Família</div>' +
       '<div class="comp-linha">' +
         '<span class="comp-label">Nome</span>' +
         '<span class="comp-val">' + escHtml((familia && familia.name) || "—") + '</span>' +
@@ -3730,26 +3379,23 @@ async function gerarComprovante(familiaId) {
         ? '<div class="comp-linha">' +
             '<span class="comp-label">Nº de Pessoas</span>' +
             '<span class="comp-val">' + familia.pessoas + ' pessoa' + (familia.pessoas != 1 ? 's' : '') + '</span>' +
-          '</div>'
-        : '') +
+          '</div>' : '') +
       ((familia && familia.obs && familia.obs.trim())
         ? '<div class="comp-linha" style="align-items:flex-start;">' +
             '<span class="comp-label">Observações</span>' +
             '<span class="comp-val" style="font-size:.78rem;text-align:right;">' + escHtml(familia.obs) + '</span>' +
-          '</div>'
-        : '') +
+          '</div>' : '') +
     '</div>' +
     '<div class="comp-divisor"></div>' +
 
     /* ── Entrega ── */
     '<div class="comp-bloco">' +
-      '<div class="comp-bloco-title">🚚 Entrega</div>' +
+      '<div class="comp-bloco-title"> Entrega</div>' +
       (familia && familia.endereco
         ? '<div class="comp-linha">' +
             '<span class="comp-label">Endereço</span>' +
             '<span class="comp-val">' + escHtml(familia.endereco) + '</span>' +
-          '</div>'
-        : '') +
+          '</div>' : '') +
       '<div class="comp-linha">' +
         '<span class="comp-label">Status</span>' +
         '<span class="comp-status-badge" style="background:' + statusInfo.cor + ';">' +
@@ -3765,10 +3411,10 @@ async function gerarComprovante(familiaId) {
   if (btnWa) {
     var foneWa = (familia && familia.phone ? familia.phone : "").replace(/\D/g, "");
     var linhas = [
-      "🌾 *Ação Social Semear*",
+      " *Ação Social Semear*",
       "*Comprovante de Entrega de Cesta*",
       "",
-      "👤 *Dados da Família*",
+      " *Dados da Família*",
       "Nome: " + ((familia && familia.name) || "—"),
       "Telefone: " + ((familia && familia.phone) || "—"),
     ];
@@ -3779,14 +3425,14 @@ async function gerarComprovante(familiaId) {
       linhas.push("Observações: " + familia.obs.trim());
     }
     linhas.push("");
-    linhas.push("🚚 *Entrega*");
+    linhas.push(" *Entrega*");
     if (familia && familia.endereco) {
       linhas.push("Endereço: " + familia.endereco);
     }
     linhas.push("Status: " + statusInfo.label);
 
     var texto = linhas.join("\n");
-    btnWa.href = "https://wa.me/?text=" + encodeURIComponent(texto);
+    btnWa.href = "whatsapp://send?text=" + encodeURIComponent(texto);
   }
 
   abrirModal("modal-comprovante");
@@ -3801,14 +3447,13 @@ function imprimirComprovante() {
   var status = (document.getElementById('comp-status') || {}).textContent || '';
   var data = (document.getElementById('comp-data') || {}).textContent || '';
   var msg = encodeURIComponent(
-    '✅ *Comprovante de Doação — Ação Social Semear*\n\n' +
-    '👤 Doador: ' + nome + '\n' +
-    '🌾 Alimento: ' + alimento + ' (' + kg + 'kg)\n' +
-    '📦 Status: ' + status + '\n' +
-    '📅 Data: ' + data + '\n\n' +
-    '_Ação Social Semear · Belém, PA_'
-  );
-  window.open('https://wa.me/?text=' + msg, '_blank');
+    ' *Comprovante de Doação — Ação Social Semear*\n\n' +
+    ' Doador: ' + nome + '\n' +
+    ' Alimento: ' + alimento + ' (' + kg + 'kg)\n' +
+    ' Status: ' + status + '\n' +
+    ' Data: ' + data + '\n\n' +
+    '_Ação Social Semear · Belém, PA_' );
+  abrirWhatsApp('whatsapp://send?text=' + encodeURIComponent(msg));
 }
 window.imprimirComprovante = imprimirComprovante;
 
@@ -3895,31 +3540,26 @@ async function renderGaleriaAdmin() {
     var badgeTipo =
       '<span style="position:absolute;top:6px;left:6px;padding:2px 6px;font-size:.65rem;' +
       'font-weight:700;border-radius:4px;letter-spacing:.03em;' +
-      (tipo === 'video'
-        ? 'background:#1A3312;color:#E8C96A;'
-        : 'background:rgba(255,255,255,.85);color:#1A3312;') +
-      '">' + (tipo === 'video' ? '▶ VÍDEO' : '🖼 IMG') + '</span>';
+      (tipo === 'video' ? 'background:#1A3312;color:#E8C96A;' : 'background:rgba(255,255,255,.85);color:#1A3312;') +
+      '">' + (tipo === 'video' ? '▶ VÍDEO' : ' IMG') + '</span>';
 
     /* Badge ativo/inativo */
     var badgeAtivo =
       '<span style="position:absolute;top:6px;right:6px;padding:2px 6px;font-size:.65rem;' +
       'font-weight:700;border-radius:4px;' +
       (ativo
-        ? 'background:#5A8A4A;color:#fff;'
-        : 'background:#771717;color:#fff;') +
+        ? 'background:#5A8A4A;color:#fff;' : 'background:#771717;color:#fff;') +
       '">' + (ativo ? 'ATIVO' : 'INATIVO') + '</span>';
 
     /* Badge categoria capa (hero) */
     var badgeHero = ehHero
       ? '<span style="position:absolute;bottom:6px;left:6px;padding:2px 6px;font-size:.65rem;' +
-        'font-weight:700;border-radius:4px;background:#E8C96A;color:#1A3312;">★ CAPA</span>'
-      : '';
+        'font-weight:700;border-radius:4px;background:#E8C96A;color:#1A3312;"> CAPA</span>' : '';
 
     /* Legenda */
     var legEl = leg
       ? '<div style="padding:4px 8px;font-size:.72rem;color:var(--text2);text-align:left;' +
-        'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + leg + '">' + leg + '</div>'
-      : '<div style="padding:4px 8px;font-size:.72rem;color:var(--text3);font-style:italic;">' + cat + '</div>';
+        'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + leg + '">' + leg + '</div>' : '<div style="padding:4px 8px;font-size:.72rem;color:var(--text3);font-style:italic;">' + cat + '</div>';
 
     /* Botões de ação */
     var acoes =
@@ -3962,8 +3602,7 @@ async function renderGaleriaAdmin() {
       legEl +
       '<div class="gallery-admin-overlay">' + acoes + '</div>' +
       btnExcluirFixo +
-      '</div>'
-    );
+      '</div>' );
   }).join('');
 
   /* Injeta src real quando o card entra no viewport — carrega URL individualmente do banco */
@@ -4016,9 +3655,9 @@ async function galeriaToggleAtivo(id, atualAtivo) {
     await DoaVidaSync.updateFotoGaleria(id, { ativo: novoAtivo });
     _galeriaCache = []; _galeriaUrlCache = {};
     renderGaleriaAdmin();
-    showToast(novoAtivo ? '✅ Item ativado.' : '🔒 Item desativado.', 'info');
+    showToast(novoAtivo ? ' Item ativado.' : ' Item desativado.', 'info');
   } catch (e) {
-    showToast('❌ Erro ao alterar status.', 'error');
+    showToast(' Erro ao alterar status.', 'error');
   }
 }
 window.galeriaToggleAtivo = galeriaToggleAtivo;
@@ -4037,9 +3676,9 @@ async function galeriaSelecionarParaCapa(id) {
       HeroCarousel.reload();
     }
     renderGaleriaAdmin();
-    showToast('★ Item definido como capa!', 'success');
+    showToast(' Item definido como capa!', 'success');
   } catch (e) {
-    showToast('❌ Erro ao definir capa.', 'error');
+    showToast(' Erro ao definir capa.', 'error');
   }
 }
 window.galeriaSelecionarParaCapa = galeriaSelecionarParaCapa;
@@ -4052,7 +3691,7 @@ function galeriaCopiarUrl(url) {
   if (!url) return;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(function () {
-      showToast('📋 URL copiada!', 'info');
+      showToast(' URL copiada!', 'info');
     }).catch(function () {
       _galeriaCopiarFallback(url);
     });
@@ -4069,8 +3708,8 @@ function _galeriaCopiarFallback(url) {
   document.body.appendChild(ta);
   ta.focus();
   ta.select();
-  try { document.execCommand('copy'); showToast('📋 URL copiada!', 'info'); }
-  catch (e) { showToast('⚠️ Não foi possível copiar.', 'warning'); }
+  try { document.execCommand('copy'); showToast(' URL copiada!', 'info'); }
+  catch (e) { showToast(' Não foi possível copiar.', 'warning'); }
   document.body.removeChild(ta);
 }
 
@@ -4099,7 +3738,7 @@ async function galeriaEditar(id) {
   for (var i = 0; i < _galeriaCache.length; i++) {
     if (_galeriaCache[i].id === id) { foto = _galeriaCache[i]; break; }
   }
-  if (!foto) { showToast('⚠️ Item não encontrado.', 'error'); return; }
+  if (!foto) { showToast(' Item não encontrado.', 'error'); return; }
 
   /* Preenche os campos do modal */
   var set = function (elId, val) {
@@ -4148,9 +3787,9 @@ async function galeriaTogglePublico(id, atualPub) {
     await DoaVidaSync.updateFotoGaleria(id, { visibilidade: novaVis });
     _galeriaCache = []; _galeriaUrlCache = {};
     renderGaleriaAdmin();
-    showToast(novaVis === 'publica' ? '👁️ Item público.' : '🔒 Item privado.', 'info');
+    showToast(novaVis === 'publica' ? ' Item público.' : ' Item privado.', 'info');
   } catch (e) {
-    showToast('❌ Erro ao alterar visibilidade.', 'error');
+    showToast(' Erro ao alterar visibilidade.', 'error');
   }
 }
 window.galeriaTogglePublico = galeriaTogglePublico;
@@ -4165,9 +3804,9 @@ async function galeriaExcluir(id) {
     await DoaVidaSync.deleteFotoGaleria(id);
     _galeriaCache = []; _galeriaUrlCache = {};
     renderGaleriaAdmin();
-    showToast('🗑️ Item excluído.', 'info');
+    showToast(' Item excluído.', 'info');
   } catch (e) {
-    showToast('❌ Erro ao excluir item.', 'error');
+    showToast(' Erro ao excluir item.', 'error');
   }
 }
 window.galeriaExcluir = galeriaExcluir;
@@ -4212,7 +3851,7 @@ async function salvarFoto() {
       var urls = raw.split("\n").map(function(u){ return u.trim(); }).filter(Boolean);
 
       if (urls.length === 0) {
-        showToast("⚠️ Informe ao menos uma URL.", "error");
+        showToast(" Informe ao menos uma URL.", "error");
         return;
       }
 
@@ -4228,8 +3867,7 @@ async function salvarFoto() {
           poster_url:  meta.poster_url,
           order_index: meta.order_index,
           ativo:       meta.ativo,
-          visibilidade: meta.publica ? 'publica' : 'privada'
-        });
+          visibilidade: meta.publica ? 'publica' : 'privada' });
         _galeriaConcluir(1, true);
       } else {
         /* ── Modo criação: insere novos itens ── */
@@ -4253,7 +3891,7 @@ async function salvarFoto() {
     } else {
       /* ── Modo Upload: arquivo → Cloudinary → URL → tabela ── */
       if (AdminState.pendingPhotos.length === 0) {
-        showToast("⚠️ Selecione ao menos uma mídia.", "error");
+        showToast(" Selecione ao menos uma mídia.", "error");
         return;
       }
 
@@ -4266,7 +3904,7 @@ async function salvarFoto() {
         try {
           var ehVideo = arquivo.type.startsWith('video/');
 
-          showToast('⬆️ Enviando ' + arquivo.name + '…', 'info');
+          showToast('⬆ Enviando ' + arquivo.name + '…', 'info');
 
           /* Upload para o Cloudinary (gratuito, sem pausar) */
           var resultado = await DoaVidaCloudinary.upload(arquivo, ehVideo ? 'video' : 'image', function(pct) {
@@ -4294,16 +3932,16 @@ async function salvarFoto() {
         } catch (e) {
           var msgErro = e.message || String(e);
           console.error('[Ação Social] Erro ao fazer upload de', arquivo.name, ':', msgErro);
-          showToast('❌ Erro em ' + arquivo.name + ': ' + msgErro, 'error');
+          showToast(' Erro em ' + arquivo.name + ': ' + msgErro, 'error');
           erros++;
         }
       }
 
       if (feitos > 0) _galeriaConcluir(feitos);
-      if (erros > 0)  showToast('⚠️ ' + erros + ' arquivo(s) falharam no upload.', 'warning');
+      if (erros > 0)  showToast(' ' + erros + ' arquivo(s) falharam no upload.', 'warning');
     }
   } catch (e) {
-    showToast('❌ Erro ao salvar: ' + (e.message || e), 'error');
+    showToast(' Erro ao salvar: ' + (e.message || e), 'error');
     console.error('[Ação Social] salvarFoto:', e);
   } finally {
     if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = 'Salvar'; }
@@ -4340,20 +3978,18 @@ function _galeriaConcluir(qtd, editando) {
   renderGaleriaAdmin();
   showToast(
     editando
-      ? '✅ Item atualizado com sucesso!'
-      : '✅ ' + qtd + ' item(ns) adicionado(s)!',
-    'success'
-  );
+      ? ' Item atualizado com sucesso!' : ' ' + qtd + ' item(ns) adicionado(s)!',
+    'success' );
 }
 
 /*
   Configura a área de drag-and-drop e seleção de arquivos.
-  ✅ BUGS 3 E 4 CORRIGIDOS: todos os IDs ajustados para o HTML correto
+   BUGS 3 E 4 CORRIGIDOS: todos os IDs ajustados para o HTML correto
 */
 function configurarUploadFoto() {
-  var area = document.getElementById("photo-upload-area"); /* ✅ correto */
-  var fileInput = document.getElementById("photo-file-input"); /* ✅ correto */
-  var preview = document.getElementById("photo-preview"); /* ✅ correto */
+  var area = document.getElementById("photo-upload-area"); /*  correto */
+  var fileInput = document.getElementById("photo-file-input"); /*  correto */
+  var preview = document.getElementById("photo-preview"); /*  correto */
   if (!area || !fileInput) return;
 
   /* Clicar na área → abre o seletor de arquivos */
@@ -4396,13 +4032,13 @@ function configurarUploadFoto() {
       var ehVideo  = file.type.startsWith('video/');
 
       if (!ehImagem && !ehVideo) {
-        showToast("⚠️ " + file.name + " não é imagem nem vídeo aceito.", "warning");
+        showToast(" " + file.name + " não é imagem nem vídeo aceito.", "warning");
         return;
       }
       /* Valida tamanho */
       var limite = ehVideo ? TAMANHO_MAX_VIDEO : TAMANHO_MAX_IMG;
       if (file.size > limite) {
-        showToast("⚠️ " + file.name + " excede " + (limite / 1024 / 1024) + "MB.", "error");
+        showToast(" " + file.name + " excede " + (limite / 1024 / 1024) + "MB.", "error");
         return;
       }
 
@@ -4419,7 +4055,7 @@ function configurarUploadFoto() {
         if (ehVideo) {
           var objUrl = URL.createObjectURL(file);
           div.innerHTML = '<video src="' + objUrl + '" muted playsinline preload="metadata" style="width:100%;max-height:120px;object-fit:cover;"></video>' +
-                          '<span style="font-size:0.7rem;color:var(--text2);">🎬 ' + escHtml(file.name) + '</span>';
+                          '<span style="font-size:0.7rem;color:var(--text2);"> ' + escHtml(file.name) + '</span>';
         } else {
           var reader = new FileReader();
           reader.onload = (function(d){ return function(ev) {
@@ -4435,14 +4071,14 @@ function configurarUploadFoto() {
 
 /*
   Alterna entre as abas "Upload" e "URL" no modal de foto.
-  ✅ BUG 4 CORRIGIDO: IDs ajustados para o HTML
+   BUG 4 CORRIGIDO: IDs ajustados para o HTML
 */
 function configurarFotoToggle() {
-  var btnUpload = document.getElementById("btn-photo-upload"); /* ✅ correto */
-  var btnUrl = document.getElementById("btn-photo-url"); /* ✅ correto */
+  var btnUpload = document.getElementById("btn-photo-upload"); /*  correto */
+  var btnUrl = document.getElementById("btn-photo-url"); /*  correto */
   var areaUpload =
-    document.getElementById("photo-upload-area"); /* ✅ correto */
-  var areaUrl = document.getElementById("photo-url-area"); /* ✅ correto */
+    document.getElementById("photo-upload-area"); /*  correto */
+  var areaUrl = document.getElementById("photo-url-area"); /*  correto */
   if (!btnUpload || !btnUrl) return;
 
   btnUpload.addEventListener("click", function () {
@@ -4475,13 +4111,12 @@ function _montarCardVoluntario(v) {
   var tipo = escHtml(v.tipo_label || v.tipoLabel || v.tipo || "—");
   var data = formatarDataCurta(v.created_at);
   var foneHtml = fone
-    ? '<a href="https://wa.me/55' +
+    ? '<a href="whatsapp://send?phone=55' +
       fone +
       '" target="_blank" rel="noopener" class="card-mob-link">' +
       '<i class="fab fa-whatsapp"></i> ' +
       escHtml(v.telefone) +
-      "</a>"
-    : escHtml(v.telefone || "—");
+      "</a>" : escHtml(v.telefone || "—");
 
   /* Botões condicionais por status */
   var botoes = "";
@@ -4550,8 +4185,7 @@ function _montarCardVoluntario(v) {
     '<div class="card-mob-actions">' +
     botoes +
     "</div>" +
-    "</div>"
-  );
+    "</div>" );
 }
 
 async function renderVoluntarios() {
@@ -4581,8 +4215,7 @@ async function renderVoluntarios() {
     tbody.innerHTML =
       '<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:48px 24px;">' +
       (filtroTipo || filtroStatus
-        ? "Nenhum voluntário com estes filtros."
-        : "Nenhum voluntário. Cadastros chegam via " +
+        ? "Nenhum voluntário com estes filtros." : "Nenhum voluntário. Cadastros chegam via " +
           '<a href="voluntario.html" style="color:var(--gold);">voluntario.html</a>.') +
       "</td></tr>";
     var elR = document.getElementById("vol-resumo-status");
@@ -4601,13 +4234,12 @@ async function renderVoluntarios() {
 
       /* Link WhatsApp clicável */
       var linkWA = fone
-        ? '<a href="https://wa.me/55' +
+        ? '<a href="whatsapp://send?phone=55' +
           fone +
           '" target="_blank" rel="noopener" ' +
           'style="color:#25d366;"><i class="fab fa-whatsapp"></i> ' +
           tel +
-          "</a>"
-        : tel;
+          "</a>" : tel;
 
       /* Botões de ação rápida baseados no status atual */
       var botoes = "";
@@ -4667,8 +4299,7 @@ async function renderVoluntarios() {
         '<td><div class="table-actions">' +
         botoes +
         "</div></td>" +
-        "</tr>"
-      );
+        "</tr>" );
     })
     .join("");
 
@@ -4677,8 +4308,7 @@ async function renderVoluntarios() {
   if (mobileListVol) {
     mobileListVol.innerHTML =
       filtrados.length === 0
-        ? '<p style="text-align:center;color:var(--text2);padding:32px 16px;">Nenhum voluntário com estes filtros.</p>'
-        : filtrados
+        ? '<p style="text-align:center;color:var(--text2);padding:32px 16px;">Nenhum voluntário com estes filtros.</p>' : filtrados
             .map(function (v) {
               return _montarCardVoluntario(v);
             })
@@ -4721,8 +4351,7 @@ async function renderVoluntarios() {
           ';opacity:.8;">' +
           cfg.label +
           "</span>" +
-          "</div>"
-        );
+          "</div>" );
       })
       .join("");
   }
@@ -4748,28 +4377,27 @@ function badgeStatusVol(status) {
     "11;" +
     'border-radius:100px;padding:3px 10px;">' +
     cfg.label +
-    "</span>"
-  );
+    "</span>" );
 }
 
 /* Ações rápidas */
 /* Atalhos de status rápido — agora passam objeto ao invés de string */
 async function volMarcarEmContato(id) {
   await DoaVidaSync.updateVoluntario(id, { status: "em-contato" });
-  showToast("📞 Marcado como Em Contato.", "info", 3000);
+  showToast(" Marcado como Em Contato.", "info", 3000);
 }
 window.volMarcarEmContato = volMarcarEmContato;
 
 async function volConfirmar(id) {
   await DoaVidaSync.updateVoluntario(id, { status: "confirmado" });
-  showToast("✅ Voluntário confirmado!", "success", 3000);
+  showToast(" Voluntário confirmado!", "success", 3000);
 }
 window.volConfirmar = volConfirmar;
 
 async function volFinalizar(id) {
   if (!confirm("Finalizar este voluntário?")) return;
   await DoaVidaSync.updateVoluntario(id, { status: "finalizado" });
-  showToast("🏁 Finalizado.", "info", 3000);
+  showToast(" Finalizado.", "info", 3000);
 }
 window.volFinalizar = volFinalizar;
 
@@ -4781,7 +4409,7 @@ window.volFinalizar = volFinalizar;
 async function abrirModalVoluntario(id) {
   var lista = await DoaVidaSync.getVoluntarios();
   var v = lista.find(function (x) { return x.id === id; });
-  if (!v) { showToast("❌ Voluntário não encontrado.", "error"); return; }
+  if (!v) { showToast(" Voluntário não encontrado.", "error"); return; }
 
   /* Preenche os campos do modal com os dados atuais */
   setVal("vol-edit-id",     id);
@@ -4808,8 +4436,8 @@ async function salvarVoluntarioCompleto() {
   var help   = (getVal("vol-edit-help")   || "").trim();
   var status = getVal("vol-edit-status");
 
-  if (!id)   { showToast("⚠️ ID inválido.", "error"); return; }
-  if (!nome) { showToast("⚠️ Informe o nome.", "error"); return; }
+  if (!id)   { showToast(" ID inválido.", "error"); return; }
+  if (!nome) { showToast(" Informe o nome.", "error"); return; }
 
   try {
     /* Salva os campos atualizados no Supabase */
@@ -4821,10 +4449,10 @@ async function salvarVoluntarioCompleto() {
       status:     status,
     });
     fecharModal("modal-voluntario-status");
-    showToast("✅ Voluntário atualizado!", "success");
+    showToast(" Voluntário atualizado!", "success");
     /* O Realtime atualiza a tabela automaticamente */
   } catch (e) {
-    showToast("❌ Erro ao salvar: " + (e.message || e), "error");
+    showToast(" Erro ao salvar: " + (e.message || e), "error");
   }
 }
 window.salvarVoluntarioCompleto = salvarVoluntarioCompleto;
@@ -4837,7 +4465,7 @@ async function volExcluir(id) {
   await DoaVidaSync.deleteVoluntario(id);
   renderVoluntarios();
   atualizarBadges();
-  showToast("🗑️ Excluído.", "info");
+  showToast(" Excluído.", "info");
 }
 window.volExcluir = volExcluir;
 
@@ -4858,7 +4486,7 @@ function _montarCardOracao(o) {
   var catCfg =
     typeof CAT_ORACAO !== "undefined" && CAT_ORACAO[o.categoria]
       ? CAT_ORACAO[o.categoria]
-      : { label: o.categoria || "—", emoji: "🙏", cor: "#e8c96a" };
+      : { label: o.categoria || "—", emoji: "", cor: "#e8c96a" };
   var corSt = ePrecisa ? "#f48fb1" : "#81c784";
   var data = formatarDataCurta(o.created_at);
 
@@ -4889,7 +4517,7 @@ function _montarCardOracao(o) {
     "background:" +
     corSt +
     '0d;border-radius:100px;padding:2px 8px;">' +
-    (ePrecisa ? "🙏 Precisa de Oração" : "✅ Orando") +
+    (ePrecisa ? " Precisa de Oração" : " Orando") +
     "</span>";
 
   var btnOracao = ePrecisa
@@ -4897,8 +4525,7 @@ function _montarCardOracao(o) {
       "onclick=\"oracaoMarcarOrando('" +
       id +
       "')\">" +
-      '<i class="fas fa-hands-praying"></i> Marcar Orando</button>'
-    : '<button class="card-mob-btn" style="color:#f48fb1;border-color:#f48fb144;" ' +
+      '<i class="fas fa-hands-praying"></i> Marcar Orando</button>' : '<button class="card-mob-btn" style="color:#f48fb1;border-color:#f48fb144;" ' +
       "onclick=\"oracaoMarcarPrecisa('" +
       id +
       "')\">" +
@@ -4937,8 +4564,7 @@ function _montarCardOracao(o) {
     "')\">" +
     '<i class="fas fa-trash"></i> Excluir</button>' +
     "</div>" +
-    "</div>"
-  );
+    "</div>" );
 }
 
 async function renderOracoes() {
@@ -4966,8 +4592,7 @@ async function renderOracoes() {
   if (filtrados.length === 0) {
     var msgVazia =
       filtroCat || filtroStatus
-        ? "Nenhum pedido com estes filtros."
-        : "🙏 Nenhum pedido ainda.";
+        ? "Nenhum pedido com estes filtros." : " Nenhum pedido ainda.";
     tbody.innerHTML =
       '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:48px;">' +
       msgVazia +
@@ -4992,7 +4617,7 @@ async function renderOracoes() {
       var status = o.status || "precisa-oracao";
       var catCfg = CAT_ORACAO[o.categoria] || {
         label: o.categoria || "—",
-        emoji: "🙏",
+        emoji: "",
         cor: "#e8c96a",
       };
       var ePrecisa = status === "precisa-oracao";
@@ -5025,7 +4650,7 @@ async function renderOracoes() {
         "background:" +
         corSt +
         '0d;border-radius:100px;padding:3px 9px;">' +
-        (ePrecisa ? "🙏 Precisa de Oração" : "✅ Orando") +
+        (ePrecisa ? " Precisa de Oração" : " Orando") +
         "</span>";
 
       var botoes = ePrecisa
@@ -5033,8 +4658,7 @@ async function renderOracoes() {
           "onclick=\"oracaoMarcarOrando('" +
           idEsc +
           '\')" title="Marcar como Orando">' +
-          '<i class="fas fa-hands-praying"></i></button>'
-        : '<button class="btn-icon" style="color:#f48fb1;" ' +
+          '<i class="fas fa-hands-praying"></i></button>' : '<button class="btn-icon" style="color:#f48fb1;" ' +
           "onclick=\"oracaoMarcarPrecisa('" +
           idEsc +
           '\')" title="Voltar para Precisa">' +
@@ -5065,8 +4689,7 @@ async function renderOracoes() {
         botoes +
         "</div>" +
         "</td>" +
-        "</tr>"
-      );
+        "</tr>" );
     })
     .join("");
 
@@ -5077,10 +4700,8 @@ async function renderOracoes() {
       filtrados.length === 0
         ? '<p style="text-align:center;color:var(--text2);padding:32px 16px;">' +
           (filtroCat || filtroStatus
-            ? "Nenhum pedido com estes filtros."
-            : "🙏 Nenhum pedido ainda.") +
-          "</p>"
-        : filtrados
+            ? "Nenhum pedido com estes filtros." : " Nenhum pedido ainda.") +
+          "</p>" : filtrados
             .map(function (o) {
               return _montarCardOracao(o);
             })
@@ -5120,15 +4741,14 @@ function _cardResumo(count, label, cor, onclick) {
     ';opacity:.8;">' +
     label +
     "</span>" +
-    "</div>"
-  );
+    "</div>" );
 }
 
 async function oracaoMarcarOrando(id) {
   await DoaVidaSync.updateOracao(id, "orando");
   renderOracoes();
   atualizarBadges();
-  showToast("🙏 Orando por este pedido!", "success", 3000);
+  showToast(" Orando por este pedido!", "success", 3000);
 }
 window.oracaoMarcarOrando = oracaoMarcarOrando;
 
@@ -5136,7 +4756,7 @@ async function oracaoMarcarPrecisa(id) {
   await DoaVidaSync.updateOracao(id, "precisa-oracao");
   renderOracoes();
   atualizarBadges();
-  showToast('🔄 Voltou para "Precisa de oração".', "info", 3000);
+  showToast(' Voltou para "Precisa de oração".', "info", 3000);
 }
 window.oracaoMarcarPrecisa = oracaoMarcarPrecisa;
 
@@ -5145,7 +4765,7 @@ async function oracaoExcluir(id) {
   await DoaVidaSync.deleteOracao(id);
   renderOracoes();
   atualizarBadges();
-  showToast("🗑️ Pedido excluído.", "info");
+  showToast(" Pedido excluído.", "info");
 }
 window.oracaoExcluir = oracaoExcluir;
 
@@ -5199,8 +4819,7 @@ async function renderTarefas() {
       '<div style="text-align:center;color:var(--text2);padding:60px 24px;">' +
       '<i class="fas fa-tasks" style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:16px;"></i>' +
       (filtroStatus || filtroTipo || filtroResponsavel
-        ? "Nenhuma tarefa com estes filtros."
-        : "Nenhuma tarefa cadastrada ainda.<br>" +
+        ? "Nenhuma tarefa com estes filtros." : "Nenhuma tarefa cadastrada ainda.<br>" +
           '<small style="font-size:.8rem;">Clique em "Nova Tarefa" para começar.</small>') +
       "</div>";
 
@@ -5238,7 +4857,7 @@ function _montarCardTarefa(t) {
   var cfgStatus = STATUS_TAREFA[status] || { label: status, cor: "#e8c96a" };
   var cfgTipo = TIPOS_TAREFA[tipo] || {
     label: tipo,
-    emoji: "📋",
+    emoji: "",
     cor: "#e8c96a",
   };
 
@@ -5338,8 +4957,7 @@ function _montarCardTarefa(t) {
   var infoHtml = infoLinha.length
     ? '<div style="font-size:.78rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;">' +
       infoLinha.join("") +
-      "</div>"
-    : "";
+      "</div>" : "";
 
   return (
     '<div style="' +
@@ -5366,8 +4984,7 @@ function _montarCardTarefa(t) {
     (descricao
       ? '<p style="font-size:.83rem;color:var(--text2);margin:0;">' +
         descricao +
-        "</p>"
-      : "") +
+        "</p>" : "") +
     /* Linha 4: data, horário, local */
     infoHtml +
     /* Linha 5: responsável */
@@ -5377,16 +4994,14 @@ function _montarCardTarefa(t) {
     "</div>" +
     /* Linha 6: observações */
     (obs
-      ? '<div style="font-size:.78rem;color:var(--text2);font-style:italic;">💬 ' +
+      ? '<div style="font-size:.78rem;color:var(--text2);font-style:italic;"> ' +
         obs +
-        "</div>"
-      : "") +
+        "</div>" : "") +
     /* Linha 7: botões de ação */
     '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">' +
     botoes +
     "</div>" +
-    "</div>"
-  );
+    "</div>" );
 }
 
 /*
@@ -5512,7 +5127,7 @@ function _renderTarefasStatusChart(cont) {
           callbacks: {
             label: function(ctx) {
               var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
-              return "  " + ctx.parsed + " tarefa(s)  ·  " + pct + "%";
+              return " " + ctx.parsed + " tarefa(s)  ·  " + pct + "%";
             }
           }
         }
@@ -5532,8 +5147,7 @@ function _renderTarefasTipoChart(tipos) {
     acolhimento: "Acolhimento", atendimento: "Atendimento",
     logistica:   "Logística",   comunicacao: "Comunicação",
     espiritual:  "Espiritual",  financeiro:  "Financeiro",
-    geral:       "Geral"
-  };
+    geral:       "Geral" };
   var keys    = Object.keys(tipos);
   var labels  = keys.map(function(k) { return labelMap[k] || k; });
   var valores = keys.map(function(k) { return tipos[k]; });
@@ -5572,7 +5186,7 @@ function _renderTarefasTipoChart(tipos) {
           callbacks: {
             label: function(ctx) {
               var pct = total > 0 ? Math.round(ctx.parsed.x / total * 100) : 0;
-              return "  " + ctx.parsed.x + " tarefa(s)  ·  " + pct + "%";
+              return " " + ctx.parsed.x + " tarefa(s)  ·  " + pct + "%";
             }
           }
         }
@@ -5652,7 +5266,7 @@ async function tarefaEditar(id) {
     return x.id === id;
   });
   if (!t) {
-    showToast("❌ Tarefa não encontrada.", "error");
+    showToast(" Tarefa não encontrada.", "error");
     return;
   }
 
@@ -5679,7 +5293,7 @@ window.tarefaEditar = tarefaEditar;
 async function salvarTarefa() {
   var tituloVal = getVal("tarefa-titulo");
   if (!tituloVal) {
-    showToast("⚠️ O título é obrigatório.", "error");
+    showToast(" O título é obrigatório.", "error");
     return;
   }
 
@@ -5711,13 +5325,13 @@ async function salvarTarefa() {
     var editId = getVal("tarefa-edit-id");
     if (editId) {
       DoaVidaAPI.updateTarefa(editId, dados);
-      showToast("✅ Tarefa atualizada!", "success");
+      showToast(" Tarefa atualizada!", "success");
     } else {
       DoaVidaAPI.addTarefa(dados);
-      showToast("✅ Tarefa criada!", "success");
+      showToast(" Tarefa criada!", "success");
     }
   } catch (e) {
-    showToast("❌ " + e.message, "error");
+    showToast(" " + e.message, "error");
     return;
   }
 
@@ -5732,7 +5346,7 @@ function tarefaIniciar(id) {
   if (DoaVidaAPI.updateStatusTarefa(id, "em-andamento")) {
     renderTarefas();
     atualizarBadges();
-    showToast("▶️ Tarefa iniciada!", "info", 3000);
+    showToast("▶ Tarefa iniciada!", "info", 3000);
   }
 }
 window.tarefaIniciar = tarefaIniciar;
@@ -5743,7 +5357,7 @@ function tarefaConcluir(id) {
   if (DoaVidaAPI.updateStatusTarefa(id, "concluida")) {
     renderTarefas();
     atualizarBadges();
-    showToast("✅ Tarefa concluída!", "success", 3000);
+    showToast(" Tarefa concluída!", "success", 3000);
   }
 }
 window.tarefaConcluir = tarefaConcluir;
@@ -5754,7 +5368,7 @@ function tarefaExcluir(id) {
   if (DoaVidaAPI.deleteTarefa(id)) {
     renderTarefas();
     atualizarBadges();
-    showToast("🗑️ Tarefa excluída.", "info");
+    showToast(" Tarefa excluída.", "info");
   }
 }
 window.tarefaExcluir = tarefaExcluir;
@@ -5774,15 +5388,15 @@ function _formatarDataBR(dataISO) {
 
 /* ══════════════════════════════════════════════════════════════════════
    SEÇÃO 14 — WHATSAPP (aba 9)
-   ✅ BUGS 6, 7 e 8 CORRIGIDOS: todos os IDs ajustados para o HTML
+    BUGS 6, 7 e 8 CORRIGIDOS: todos os IDs ajustados para o HTML
    ══════════════════════════════════════════════════════════════════════ */
 
 /*
   Configura os eventos da aba de WhatsApp.
-  ✅ BUG 6 CORRIGIDO: 'wa-template-select' → 'wa-template'
+   BUG 6 CORRIGIDO: 'wa-template-select' → 'wa-template'
 */
 function configurarWhatsApp() {
-  var sel = document.getElementById("wa-template"); /* ✅ ID correto */
+  var sel = document.getElementById("wa-template"); /*  ID correto */
   var textarea = document.getElementById("wa-message");
   if (sel) sel.addEventListener("change", atualizarPreviewWA);
   if (textarea) textarea.addEventListener("input", atualizarPreviewWA);
@@ -5790,12 +5404,12 @@ function configurarWhatsApp() {
 
 /*
   Atualiza o preview visual da mensagem.
-  ✅ BUG 6 CORRIGIDO: 'wa-preview' → 'wa-preview-text'
+   BUG 6 CORRIGIDO: 'wa-preview' → 'wa-preview-text'
 */
 function atualizarPreviewWA() {
-  var sel = document.getElementById("wa-template"); /* ✅ ID correto */
+  var sel = document.getElementById("wa-template"); /*  ID correto */
   var textarea = document.getElementById("wa-message");
-  var preview = document.getElementById("wa-preview-text"); /* ✅ ID correto */
+  var preview = document.getElementById("wa-preview-text"); /*  ID correto */
   if (!textarea || !preview) return;
 
   /* Se selecionou um template, preenche o textarea com ele */
@@ -5810,18 +5424,18 @@ window.atualizarPreviewWA = atualizarPreviewWA;
 
 /*
   Adiciona um número à lista de destinatários.
-  ✅ BUG 7 CORRIGIDO: 'wa-recipient-input' → 'wa-phone-input'
+   BUG 7 CORRIGIDO: 'wa-recipient-input' → 'wa-phone-input'
 */
 function adicionarDestinatario() {
-  var inp = document.getElementById("wa-phone-input"); /* ✅ ID correto */
+  var inp = document.getElementById("wa-phone-input"); /*  ID correto */
   var fone = (inp ? inp.value.replace(/\D/g, "") : "").trim();
 
   if (!fone || fone.length < 10) {
-    showToast("⚠️ Número inválido. Use o formato com DDD.", "error");
+    showToast(" Número inválido. Use o formato com DDD.", "error");
     return;
   }
   if (AdminState.waRecipients.includes(fone)) {
-    showToast("⚠️ Número já adicionado.", "warning");
+    showToast(" Número já adicionado.", "warning");
     return;
   }
   AdminState.waRecipients.push(fone);
@@ -5850,8 +5464,7 @@ function renderDestinatarios() {
         i +
         ')" ' +
         'style="background:none;border:none;color:var(--text2);cursor:pointer;padding:0;">' +
-        '<i class="fas fa-times"></i></button></span>'
-      );
+        '<i class="fas fa-times"></i></button></span>' );
     })
     .join("");
 }
@@ -5867,19 +5480,16 @@ function enviarMensagem() {
   var textarea = document.getElementById("wa-message");
   var msg = textarea ? textarea.value.trim() : "";
   if (!msg) {
-    showToast("⚠️ Digite uma mensagem.", "error");
+    showToast(" Digite uma mensagem.", "error");
     return;
   }
   if (AdminState.waRecipients.length === 0) {
-    showToast("⚠️ Adicione pelo menos um destinatário.", "error");
+    showToast(" Adicione pelo menos um destinatário.", "error");
     return;
   }
   AdminState.waRecipients.forEach(function (fone) {
     /* Abre o WhatsApp com a mensagem pré-preenchida */
-    window.open(
-      "https://wa.me/55" + fone + "?text=" + encodeURIComponent(msg),
-      "_blank",
-    );
+    abrirWhatsApp("whatsapp://send?phone=55" + fone + "&text=" + encodeURIComponent(msg));
     DoaVidaAPI.addLog({
       tipo: "manual",
       para: fone,
@@ -5888,7 +5498,7 @@ function enviarMensagem() {
     });
   });
   showToast(
-    "✅ WhatsApp aberto para " +
+    " WhatsApp aberto para " +
       AdminState.waRecipients.length +
       " contato(s)!",
     "success",
@@ -5899,10 +5509,10 @@ window.enviarMensagem = enviarMensagem;
 
 /*
   Renderiza o histórico de mensagens enviadas.
-  ✅ BUG 8 CORRIGIDO: 'wa-logs-tbody' → 'wa-logs-list'
+   BUG 8 CORRIGIDO: 'wa-logs-tbody' → 'wa-logs-list'
 */
 function renderWALogs() {
-  var lista = document.getElementById("wa-logs-list"); /* ✅ ID correto */
+  var lista = document.getElementById("wa-logs-list"); /*  ID correto */
   var logs = DoaVidaAPI.getLogs();
   if (!lista) return;
 
@@ -5937,10 +5547,8 @@ function renderWALogs() {
         "</span>" +
         "</div>" +
         (l.preview
-          ? '<div class="log-preview">' + escHtml(l.preview) + "</div>"
-          : "") +
-        "</div>"
-      );
+          ? '<div class="log-preview">' + escHtml(l.preview) + "</div>" : "") +
+        "</div>" );
     })
     .join("");
 }
@@ -5957,7 +5565,7 @@ function configurarConfiguracoes() {
       DoaVidaAPI.updateWaConfig(
         Object.assign(cfg, { apikey: apiInput.value.trim() }),
       );
-      showToast("✅ APIKEY salva!", "success", 2000);
+      showToast(" APIKEY salva!", "success", 2000);
     });
   }
 
@@ -5967,7 +5575,7 @@ function configurarConfiguracoes() {
       var cfg = DoaVidaAPI.getWaConfig();
       DoaVidaAPI.updateWaConfig(Object.assign(cfg, { ativo: toggle.checked }));
       showToast(
-        toggle.checked ? "✅ Notificações ativas!" : "ℹ️ Desativadas.",
+        toggle.checked ? " Notificações ativas!" : "ℹ Desativadas.",
         "info",
         2000,
       );
@@ -5991,11 +5599,11 @@ function alterarSenha() {
   var nova = getVal("new-password");
   var confirma = getVal("confirm-password");
   if (!atual || !nova || !confirma) {
-    showToast("⚠️ Preencha todos os campos.", "error");
+    showToast(" Preencha todos os campos.", "error");
     return;
   }
   if (nova !== confirma) {
-    showToast("⚠️ As senhas não conferem.", "error");
+    showToast(" As senhas não conferem.", "error");
     return;
   }
   try {
@@ -6005,9 +5613,9 @@ function alterarSenha() {
     if (window.DoaVidaSync && DoaVidaSync.setSenha) {
       DoaVidaSync.setSenha(nova).catch(function(){});
     }
-    showToast("✅ Senha alterada em todos os dispositivos!", "success");
+    showToast(" Senha alterada em todos os dispositivos!", "success");
   } catch (e) {
-    showToast("❌ " + e.message, "error");
+    showToast(" " + e.message, "error");
   }
 }
 window.alterarSenha = alterarSenha;
@@ -6016,20 +5624,20 @@ function adicionarNumeroAdmin() {
   var inp = document.getElementById("admin-phone-input");
   var fone = (inp ? inp.value.replace(/\D/g, "") : "").trim();
   if (!fone || fone.length < 10) {
-    showToast("⚠️ Número inválido.", "error");
+    showToast(" Número inválido.", "error");
     return;
   }
   var cfg = DoaVidaAPI.getWaConfig();
   var phones = Array.isArray(cfg.adminPhone) ? cfg.adminPhone : [];
   if (phones.includes("+55" + fone)) {
-    showToast("⚠️ Já cadastrado.", "warning");
+    showToast(" Já cadastrado.", "warning");
     return;
   }
   phones.push("+55" + fone);
   DoaVidaAPI.updateWaConfig(Object.assign(cfg, { adminPhone: phones }));
   if (inp) inp.value = "";
   renderNumerosAdmin();
-  showToast("✅ Número adicionado!", "success");
+  showToast(" Número adicionado!", "success");
 }
 window.adicionarNumeroAdmin = adicionarNumeroAdmin;
 
@@ -6054,8 +5662,7 @@ function renderNumerosAdmin() {
         i +
         ')" ' +
         'style="background:none;border:none;color:var(--text2);cursor:pointer;">' +
-        '<i class="fas fa-times"></i></button></span>'
-      );
+        '<i class="fas fa-times"></i></button></span>' );
     })
     .join("");
 }
@@ -6066,26 +5673,26 @@ function removerNumeroAdmin(i) {
   phones.splice(i, 1);
   DoaVidaAPI.updateWaConfig(Object.assign(cfg, { adminPhone: phones }));
   renderNumerosAdmin();
-  showToast("🗑️ Número removido.", "info");
+  showToast(" Número removido.", "info");
 }
 window.removerNumeroAdmin = removerNumeroAdmin;
 
 function exportarDados() {
   DoaVidaAPI.baixarExportacao();
-  showToast("📥 Backup gerado!", "success");
+  showToast(" Backup gerado!", "success");
 }
 window.exportarDados = exportarDados;
 
 function confirmarLimpeza() {
   if (
     !confirm(
-      "⚠️ Isso apagará TODOS os dados.\nSenha e sessão serão preservadas.\n\nContinuar?",
+      " Isso apagará TODOS os dados.\nSenha e sessão serão preservadas.\n\nContinuar?",
     )
   )
     return;
   DoaVidaAPI.limparTudo();
   carregarTodosDados();
-  showToast("🗑️ Dados apagados.", "warning", 5000);
+  showToast(" Dados apagados.", "warning", 5000);
 }
 window.confirmarLimpeza = confirmarLimpeza;
 
@@ -6173,10 +5780,8 @@ function _renderHeroListaSupabase(items, container) {
     var url  = escHtml(f.url || '');
     var leg  = escHtml(f.titulo || f.legenda || '');
     var tipo = f.tipo === 'video' ? 'video' : 'imagem';
-    var preview = tipo === 'video'
-      ? '<video src="' + url + '" muted playsinline preload="none" ' +
-        'style="width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;"></video>'
-      : '<img src="' + url + '" alt="' + leg + '" ' +
+    var preview = tipo === 'video' ? '<video src="' + url + '" muted playsinline preload="none" ' +
+        'style="width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;"></video>' : '<img src="' + url + '" alt="' + leg + '" ' +
         'style="width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy" />';
     return (
       '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;' +
@@ -6186,14 +5791,13 @@ function _renderHeroListaSupabase(items, container) {
       '<div style="font-size:.8rem;font-weight:600;color:var(--text1);' +
       'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (leg || '(sem título)') + '</div>' +
       '<div style="font-size:.72rem;color:var(--text2);">' +
-      (tipo === 'video' ? '▶ Vídeo' : '🖼 Imagem') +
+      (tipo === 'video' ? '▶ Vídeo' : ' Imagem') +
       ' · ordem ' + (f.order_index || 0) + '</div>' +
       '</div>' +
       '<button class="btn-icon danger" title="Remover da capa" ' +
       'onclick="galeriaRemoverDaCapa(\'' + escHtml(f.id || '') + '\')" ' +
       'style="flex-shrink:0;"><i class="fas fa-times"></i></button>' +
-      '</div>'
-    );
+      '</div>' );
   }).join('');
 }
 
@@ -6209,9 +5813,9 @@ async function galeriaRemoverDaCapa(id) {
     renderFotosHero();
     renderGaleriaAdmin();
     if (window.HeroCarousel && typeof HeroCarousel.reload === 'function') HeroCarousel.reload();
-    showToast('↩️ Item removido da capa.', 'info');
+    showToast('↩ Item removido da capa.', 'info');
   } catch (e) {
-    showToast('❌ Erro ao remover da capa.', 'error');
+    showToast(' Erro ao remover da capa.', 'error');
   }
 }
 window.galeriaRemoverDaCapa = galeriaRemoverDaCapa;
@@ -6228,7 +5832,7 @@ window.previewFotoHero = previewFotoHero;
 
 function salvarFotosHero() {
   var url1 = ((document.getElementById("hero-foto1-url") || {}).value || "").trim();
-  if (!url1) { showToast("⚠️ Cole a URL da foto do banner.", "error"); return; }
+  if (!url1) { showToast(" Cole a URL da foto do banner.", "error"); return; }
   var atual = {};
   try { atual = JSON.parse(localStorage.getItem("doavida_hero_fotos") || "{}"); } catch (e) {}
   var json = JSON.stringify({ foto1: url1, foto2: atual.foto2 || HERO_FOTOS_PADRAO.foto2, foto3: atual.foto3 || HERO_FOTOS_PADRAO.foto3 });
@@ -6241,14 +5845,14 @@ function salvarFotosHero() {
     }
     Promise.all(tarefas).then(function() {
       gerarBannerConfigJs();
-      showToast("✅ Banner salvo em todos os dispositivos!", "success");
+      showToast(" Banner salvo em todos os dispositivos!", "success");
     }).catch(function() {
       gerarBannerConfigJs();
-      showToast("✅ Banner salvo localmente. (Supabase offline)", "success");
+      showToast(" Banner salvo localmente. (Supabase offline)", "success");
     });
   } else {
     gerarBannerConfigJs();
-    showToast("✅ Banner salvo!", "success");
+    showToast(" Banner salvo!", "success");
   }
 }
 window.salvarFotosHero = salvarFotosHero;
@@ -6259,7 +5863,7 @@ function restaurarFotosHeroPadrao() {
   if (el1) el1.value = HERO_FOTOS_PADRAO.foto1;
   var prev = document.getElementById("hero-foto1-preview");
   if (prev) prev.style.display = "none";
-  showToast("↩️ Foto original restaurada.", "success");
+  showToast("↩ Foto original restaurada.", "success");
 }
 window.restaurarFotosHeroPadrao = restaurarFotosHeroPadrao;
 
@@ -6279,10 +5883,9 @@ function gerarBannerConfigJs() {
     var conteudo = [
       "/* banner-config.js — gerado pelo Admin DoaVida em " + new Date().toLocaleString("pt-BR") + " */",
       "var BANNER_CONFIG = {",
-      "  heroBanner: " + JSON.stringify(heroBannerUrl) + ",",
-      "  volBanner:  " + JSON.stringify(volBannerUrl),
-      "};"
-    ].join("\n");
+      " heroBanner: " + JSON.stringify(heroBannerUrl) + ",",
+      " volBanner:  " + JSON.stringify(volBannerUrl),
+      "};" ].join("\n");
     var blob = new Blob([conteudo], { type: "text/javascript" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -6320,19 +5923,19 @@ window.previewVolBanner = previewVolBanner;
 
 function salvarVolBanner() {
   var url = ((document.getElementById("vol-banner-url") || {}).value || "").trim();
-  if (!url) { showToast("⚠️ Cole a URL da foto do banner.", "error"); return; }
+  if (!url) { showToast(" Cole a URL da foto do banner.", "error"); return; }
   localStorage.setItem("doavida_vol_banner", JSON.stringify({ foto1: url }));
   if (window.DoaVidaSync && DoaVidaSync.setBannerVoluntario) {
     DoaVidaSync.setBannerVoluntario(url).then(function() {
       gerarBannerConfigJs();
-      showToast("✅ Banner salvo em todos os dispositivos!", "success");
+      showToast(" Banner salvo em todos os dispositivos!", "success");
     }).catch(function() {
       gerarBannerConfigJs();
-      showToast("✅ Banner salvo localmente. (Supabase offline)", "success");
+      showToast(" Banner salvo localmente. (Supabase offline)", "success");
     });
   } else {
     gerarBannerConfigJs();
-    showToast("✅ Banner salvo!", "success");
+    showToast(" Banner salvo!", "success");
   }
 }
 window.salvarVolBanner = salvarVolBanner;
@@ -6343,7 +5946,7 @@ function restaurarVolBanner() {
   if (el) el.value = VOL_BANNER_PADRAO;
   var prev = document.getElementById("vol-banner-preview");
   if (prev) prev.style.display = "none";
-  showToast("↩️ Banner original restaurado.", "success");
+  showToast("↩ Banner original restaurado.", "success");
 }
 window.restaurarVolBanner = restaurarVolBanner;
 
@@ -6386,13 +5989,11 @@ window.previewFotoMissao = previewFotoMissao;
 /* Salva as URLs no localStorage */
 function salvarFotosMissao() {
   var url1 = (
-    (document.getElementById("missao-foto1-url") || {}).value || ""
-  ).trim();
+    (document.getElementById("missao-foto1-url") || {}).value || "" ).trim();
   var url2 = (
-    (document.getElementById("missao-foto2-url") || {}).value || ""
-  ).trim();
+    (document.getElementById("missao-foto2-url") || {}).value || "" ).trim();
   if (!url1 && !url2) {
-    showToast("⚠️ Preencha ao menos uma URL.", "error");
+    showToast(" Preencha ao menos uma URL.", "error");
     return;
   }
   var atual = {};
@@ -6406,12 +6007,12 @@ function salvarFotosMissao() {
   var json = JSON.stringify(novas);
   localStorage.setItem("doavida_missao_fotos", json);
   if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
-    showToast("⏳ Salvando no servidor…", "info");
+    showToast(" Salvando no servidor…", "info");
     DoaVidaSync.setConfig('doavida_missao_fotos', json)
-      .then(function () { showToast("✅ Fotos da Missão salvas! Recarregue o site.", "success"); })
-      .catch(function (e) { showToast("❌ Erro ao salvar no servidor: " + (e && e.message ? e.message : "verifique a conexão."), "error"); });
+      .then(function () { showToast(" Fotos da Missão salvas! Recarregue o site.", "success"); })
+      .catch(function (e) { showToast(" Erro ao salvar no servidor: " + (e && e.message ? e.message : "verifique a conexão."), "error"); });
   } else {
-    showToast("⚠️ Salvo localmente (Supabase offline — não refletirá em outros dispositivos).", "warn");
+    showToast(" Salvo localmente (Supabase offline — não refletirá em outros dispositivos).", "warn");
   }
 }
 window.salvarFotosMissao = salvarFotosMissao;
@@ -6427,7 +6028,7 @@ function restaurarFotosMissaoPadrao() {
     var el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
-  showToast("↩️ Fotos originais restauradas.", "success");
+  showToast("↩ Fotos originais restauradas.", "success");
 }
 window.restaurarFotosMissaoPadrao = restaurarFotosMissaoPadrao;
 
@@ -6466,12 +6067,12 @@ function salvarFotosPillars() {
   var json = JSON.stringify(novas);
   localStorage.setItem("doavida_pillars", json);
   if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
-    showToast("⏳ Salvando no servidor…", "info");
+    showToast(" Salvando no servidor…", "info");
     DoaVidaSync.setConfig('doavida_pillars', json)
-      .then(function () { showToast("✅ Pilares salvos! Recarregue o site.", "success"); })
-      .catch(function (e) { showToast("❌ Erro ao salvar no servidor: " + (e && e.message ? e.message : "verifique a conexão."), "error"); });
+      .then(function () { showToast(" Pilares salvos! Recarregue o site.", "success"); })
+      .catch(function (e) { showToast(" Erro ao salvar no servidor: " + (e && e.message ? e.message : "verifique a conexão."), "error"); });
   } else {
-    showToast("⚠️ Salvo localmente (Supabase offline).", "warn");
+    showToast(" Salvo localmente (Supabase offline).", "warn");
   }
 }
 window.salvarFotosPillars = salvarFotosPillars;
@@ -6483,7 +6084,7 @@ function restaurarFotosPillarsPadrao() {
     var w = document.getElementById("pillar" + n + "-preview");
     if (w) w.style.display = "none";
   });
-  showToast("↩️ Fotos originais restauradas.", "success");
+  showToast("↩ Fotos originais restauradas.", "success");
 }
 window.restaurarFotosPillarsPadrao = restaurarFotosPillarsPadrao;
 
@@ -6541,10 +6142,10 @@ async function salvarFotosWhy() {
     }
     await DoaVidaSync.setConfig('doavida_vol_why', payload);
     localStorage.setItem("doavida_vol_why", payload);
-    showToast("✅ Fotos 'Por que ser Voluntário' salvas no Supabase!", "success");
+    showToast(" Fotos 'Por que ser Voluntário' salvas no Supabase!", "success");
   } catch(e) {
     console.error("[salvarFotosWhy] Falha:", e);
-    showToast("⚠️ Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
+    showToast(" Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
   }
 }
 window.salvarFotosWhy = salvarFotosWhy;
@@ -6556,7 +6157,7 @@ function restaurarFotosWhyPadrao() {
     var w = document.getElementById("why" + n + "-preview");
     if (w) w.style.display = "none";
   });
-  showToast("↩️ Fotos originais restauradas.", "success");
+  showToast("↩ Fotos originais restauradas.", "success");
 }
 window.restaurarFotosWhyPadrao = restaurarFotosWhyPadrao;
 
@@ -6615,10 +6216,10 @@ async function salvarFotosContrib() {
     }
     await DoaVidaSync.setConfig('doavida_vol_contrib', payload);
     localStorage.setItem("doavida_vol_contrib", payload);
-    showToast("✅ Fotos 'Como Contribuir' salvas no Supabase!", "success");
+    showToast(" Fotos 'Como Contribuir' salvas no Supabase!", "success");
   } catch(e) {
     console.error("[salvarFotosContrib] Falha:", e);
-    showToast("⚠️ Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
+    showToast(" Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
   }
 }
 window.salvarFotosContrib = salvarFotosContrib;
@@ -6630,7 +6231,7 @@ function restaurarFotosContribPadrao() {
     var w = document.getElementById("contrib" + n + "-preview");
     if (w) w.style.display = "none";
   });
-  showToast("↩️ Fotos originais restauradas.", "success");
+  showToast("↩ Fotos originais restauradas.", "success");
 }
 window.restaurarFotosContribPadrao = restaurarFotosContribPadrao;
 
@@ -6702,16 +6303,16 @@ window.previewFotoVol = previewFotoVol;
 /* Salva capa */
 async function salvarFotosVoluntario() {
   var url = ((document.getElementById("vol-capa-url") || {}).value || "").trim();
-  if (!url) { showToast("⚠️ Preencha a URL da capa.", "error"); return; }
+  if (!url) { showToast(" Preencha a URL da capa.", "error"); return; }
   var payload = JSON.stringify({ capa: url });
   try {
     if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
       await DoaVidaSync.setConfig('doavida_vol_capa', payload);
     }
     localStorage.setItem("doavida_vol_capa", payload);
-    showToast("✅ Capa salva! Abra a página Voluntário para ver.", "success");
+    showToast(" Capa salva! Abra a página Voluntário para ver.", "success");
   } catch(e) {
-    showToast("⚠️ Erro ao salvar no servidor. Tente novamente.", "error");
+    showToast(" Erro ao salvar no servidor. Tente novamente.", "error");
   }
 }
 window.salvarFotosVoluntario = salvarFotosVoluntario;
@@ -6723,7 +6324,7 @@ function restaurarFotosVoluntarioPadrao() {
   if (el) el.value = VOL_CAPA_PADRAO;
   var wrap = document.getElementById("vol-capa-preview");
   if (wrap) wrap.style.display = "none";
-  showToast("↩️ Capa restaurada.", "success");
+  showToast("↩ Capa restaurada.", "success");
 }
 window.restaurarFotosVoluntarioPadrao = restaurarFotosVoluntarioPadrao;
 
@@ -6743,9 +6344,9 @@ async function salvarFotosCards() {
     }
     await DoaVidaSync.setConfig('doavida_vol_contrib', payload);
     localStorage.setItem("doavida_vol_contrib", payload);
-    showToast("✅ Fotos 'Como Contribuir' salvas! Abra a página Voluntário para ver.", "success");
+    showToast(" Fotos 'Como Contribuir' salvas! Abra a página Voluntário para ver.", "success");
   } catch(e) {
-    showToast("⚠️ Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
+    showToast(" Erro: " + (e && e.message ? e.message : "desconhecido"), "error");
   }
 }
 window.salvarFotosCards = salvarFotosCards;
@@ -6759,7 +6360,7 @@ function restaurarFotosCardsPadrao() {
     var wrap = document.getElementById("vol-card" + n + "-preview");
     if (wrap) wrap.style.display = "none";
   });
-  showToast("↩️ Fotos originais restauradas.", "success");
+  showToast("↩ Fotos originais restauradas.", "success");
 }
 window.restaurarFotosCardsPadrao = restaurarFotosCardsPadrao;
 
@@ -6861,14 +6462,14 @@ async function atualizarBadges() {
 /* Badge colorido de status de doação */
 function badgeStatus(status) {
   var mapa = {
-    pendente: { cls: "badge-pending", emoji: "⏳", label: "Pendente" },
-    confirmado: { cls: "badge-confirmed", emoji: "✅", label: "Confirmado" },
-    entregue: { cls: "badge-delivered", emoji: "📦", label: "Entregue" },
-    cancelado: { cls: "badge-cancelled", emoji: "❌", label: "Cancelado" },
+    pendente: { cls: "badge-pending", emoji: "", label: "Pendente" },
+    confirmado: { cls: "badge-confirmed", emoji: "", label: "Confirmado" },
+    entregue: { cls: "badge-delivered", emoji: "", label: "Entregue" },
+    cancelado: { cls: "badge-cancelled", emoji: "", label: "Cancelado" },
   };
   var cfg = mapa[status] || {
     cls: "badge-pending",
-    emoji: "⏳",
+    emoji: "",
     label: status || "Pendente",
   };
   return (
@@ -6878,8 +6479,7 @@ function badgeStatus(status) {
     cfg.emoji +
     " " +
     cfg.label +
-    "</span>"
-  );
+    "</span>" );
 }
 
 /* Formata data ISO para dd/mm/aa HH:mm */
@@ -6919,7 +6519,7 @@ function setVal(id, v) {
    LOG FINAL
    ══════════════════════════════════════════════════════════════════════ */
 console.log(
-  "[DoaVida] admin.js ✅ v4.0 — 8 bugs corrigidos · Tarefas com WA · Galeria · WA funcionais",
+  "[DoaVida] admin.js  v4.0 — 8 bugs corrigidos · Tarefas com WA · Galeria · WA funcionais",
 );
 
 
@@ -6964,7 +6564,7 @@ function _calcularCestas(modelo, alimentos) {
       id:              item.id,
       alimento_id:     item.alimento_id,
       nome:            item.alimento_nome,
-      emoji:           item.alimento_emoji || '🥫',
+      emoji:           item.alimento_emoji || '',
       qtdPorCesta:     qtdPorCesta,
       kgEstoque:       kgEstoque,
       pesoUnitario:    pesoUnitario,
@@ -7033,7 +6633,7 @@ function copiarSQLCestas() {
   if (!el) return;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(el.textContent).then(function () {
-      showToast('📋 SQL copiado! Cole no Supabase → SQL Editor → Run.', 'success');
+      showToast(' SQL copiado! Cole no Supabase → SQL Editor → Run.', 'success');
     });
   }
 }
@@ -7066,21 +6666,24 @@ async function renderCestas() {
     _mostrarBannerSetup(false);
 
     /* Carrega dados em paralelo */
-    var [modelo, alimentos, formadas] = await Promise.all([
+    var [modelo, alimentos, formadas, familias] = await Promise.all([
       DoaVidaSync.getModeloCestaItens(),
       DoaVidaSync.getAlimentos(),
-      DoaVidaSync.getCestasFormadas()
+      DoaVidaSync.getCestasFormadas(),
+      DoaVidaSync.getFamilias ? DoaVidaSync.getFamilias() : Promise.resolve([])
     ]);
 
     _cestasCache.modelo    = modelo;
     _cestasCache.alimentos = alimentos;
     _cestasCache.formadas  = formadas;
+    _cestasCache.familias  = familias;
     _cestasCache.calculo   = _calcularCestas(modelo, alimentos);
 
     _renderCestasResumo();
     _renderCestasConfig();
     _renderCestasEstoque();
     _renderCestasHistorico();
+    _renderCestasFamilias(familias, formadas);
 
     /* Atualiza badge da aba */
     var badge = document.getElementById('badge-cestas');
@@ -7091,47 +6694,63 @@ async function renderCestas() {
     if (_isTabelaMissing(e.message)) {
       _mostrarBannerSetup(true);
     } else {
-      showToast('❌ Erro ao carregar cestas: ' + e.message, 'error');
+      showToast(' Erro ao carregar cestas: ' + e.message, 'error');
     }
   }
 }
 window.renderCestas = renderCestas;
 
-/* ── Resumo: cards de estatísticas ─────────────────────────────────── */
+/* ── Resumo: painel de estatísticas ─────────────────────────────────── */
 function _renderCestasResumo() {
-  var calc    = _cestasCache.calculo;
+  var calc     = _cestasCache.calculo;
   var formadas = _cestasCache.formadas;
   if (!calc) return;
 
   var totalFormadas = formadas.reduce(function (s, f) { return s + (f.quantidade || 0); }, 0);
   var restantes     = Math.max(0, calc.total);
 
-  /* Cards */
+  /* Números */
   _setText('cestas-stat-possiveis', calc.total);
   _setText('cestas-stat-formadas',  totalFormadas);
   _setText('cestas-stat-restantes', restantes);
 
-  if (calc.limitante) {
-    _setText('cestas-stat-limitante', calc.limitante.emoji + ' ' + calc.limitante.nome);
-    _setText('cestas-stat-limitante-sub', calc.limitante.unidadesDisp + ' un. disponíveis / ' + calc.limitante.qtdPorCesta + ' por cesta');
-    _setText('cestas-stat-falta', calc.limitante.faltaParaProx + ' un.');
-  } else if (calc.detalhes.length > 0) {
-    _setText('cestas-stat-limitante', '✅ Equilibrado');
-    _setText('cestas-stat-limitante-sub', 'todos os itens estão proporcionais');
-    _setText('cestas-stat-falta', '—');
-  } else {
-    _setText('cestas-stat-limitante', '—');
-    _setText('cestas-stat-limitante-sub', 'configure a cesta primeiro');
-    _setText('cestas-stat-falta', '—');
-  }
-
-  /* Cor do card de possíveis */
+  /* Card grande: cor baseada na quantidade */
   var cardPoss = document.getElementById('cesta-card-possiveis');
   if (cardPoss) {
-    cardPoss.className = 'cesta-stat-card' + (calc.total === 0 ? ' cesta-card-zero' : calc.total < 5 ? ' cesta-card-warn' : ' cesta-card-ok');
+    cardPoss.className = 'crs-big-card' +
+      (calc.total === 0 ? ' cesta-card-zero' : calc.total < 5 ? ' cesta-card-warn' : ' cesta-card-ok');
   }
 
-  /* Botão Formar Cestas: desabilita se não há cestas possíveis */
+  /* Faixa de limitante / equilibrado */
+  var alertRow = document.getElementById('cesta-card-limitante');
+  if (calc.limitante) {
+    _setText('cestas-stat-limitante',
+      calc.limitante.emoji + ' ' + calc.limitante.nome + ' — item limitante');
+    _setText('cestas-stat-limitante-sub',
+      calc.limitante.unidadesDisp + ' un. em estoque · ' + calc.limitante.qtdPorCesta + ' por cesta');
+    _setText('cestas-stat-falta', calc.limitante.faltaParaProx);
+    if (alertRow) {
+      alertRow.className = 'crs-alert-row';
+      var icon = alertRow.querySelector('.crs-alert-icon i');
+      if (icon) icon.className = 'fas fa-exclamation-triangle';
+    }
+  } else if (calc.detalhes.length > 0) {
+    _setText('cestas-stat-limitante', 'Estoque equilibrado');
+    _setText('cestas-stat-limitante-sub', 'todos os itens estão proporcionais');
+    _setText('cestas-stat-falta', '—');
+    if (alertRow) {
+      alertRow.className = 'crs-alert-row crs-alert--ok';
+      var icon = alertRow.querySelector('.crs-alert-icon i');
+      if (icon) icon.className = 'fas fa-check-circle';
+    }
+  } else {
+    _setText('cestas-stat-limitante', 'Cesta não configurada');
+    _setText('cestas-stat-limitante-sub', 'adicione itens ao modelo de cesta nos alimentos');
+    _setText('cestas-stat-falta', '—');
+    if (alertRow) alertRow.className = 'crs-alert-row';
+  }
+
+  /* Botão Formar Cestas */
   var btnFormar = document.getElementById('btn-formar-cesta');
   if (btnFormar) {
     btnFormar.disabled = calc.total === 0 || calc.detalhes.length === 0;
@@ -7166,7 +6785,7 @@ function _renderCestasConfig() {
     var pct = d.pct || 0;
     var barColor = pct >= 80 ? 'var(--status-confirmed)' : pct >= 40 ? 'var(--status-pending)' : 'var(--status-cancelled)';
     return '<div class="cesta-config-item" data-id="' + item.id + '">' +
-      '<div class="cesta-config-item-emoji">' + escHtml(item.alimento_emoji || '🥫') + '</div>' +
+      '<div class="cesta-config-item-emoji">' + escHtml(item.alimento_emoji || '') + '</div>' +
       '<div class="cesta-config-item-info">' +
         '<div class="cesta-config-item-nome">' + escHtml(item.alimento_nome) + '</div>' +
         '<div class="cesta-config-item-qtd">' + item.quantidade_por_cesta + ' unidade(s) por cesta</div>' +
@@ -7182,39 +6801,54 @@ function _renderCestasConfig() {
   }).join('');
 }
 
-/* ── Estoque por item (coluna direita) ──────────────────────────────── */
+/* ── Estoque por item ────────────────────────────────────────────────── */
 function _renderCestasEstoque() {
   var calc  = _cestasCache.calculo;
   var lista = document.getElementById('cestas-estoque-lista');
   if (!lista) return;
 
   if (!calc || calc.detalhes.length === 0) {
-    lista.innerHTML = '<div class="cesta-estoque-empty"><i class="fas fa-info-circle"></i> Configure os itens da cesta para ver o estoque.</div>';
+    lista.innerHTML =
+      '<div class="cesta-estoque-empty" style="display:flex;align-items:center;gap:10px;padding:18px 16px;' +
+      'background:var(--surface);border:1px solid var(--border);border-radius:12px;' +
+      'color:var(--text2);font-size:.82rem;">' +
+      '<i class="fas fa-info-circle" style="opacity:.5;font-size:1.1rem;flex-shrink:0"></i>' +
+      '<span>Adicione os itens ao modelo de cesta editando cada alimento na aba <strong style="color:var(--cream)">Alimentos</strong>.</span>' +
+      '</div>';
     return;
   }
 
-  /* Ordena: limitante primeiro */
-  var sorted = calc.detalhes.slice().sort(function (a, b) { return a.cestasPossíveis - b.cestasPossíveis; });
+  /* Ordena: limitante primeiro, depois por menos cestas possíveis */
+  var sorted = calc.detalhes.slice().sort(function (a, b) {
+    return a.cestasPossíveis - b.cestasPossíveis;
+  });
+
+  /* Total máximo de cestas (para calcular pct relativa) */
+  var maxCestas = Math.max.apply(null, sorted.map(function(d) { return d.cestasPossíveis; })) || 1;
 
   lista.innerHTML = sorted.map(function (d) {
-    var isLim = calc.limitante && d.alimento_id === calc.limitante.alimento_id;
-    var pct   = d.pct;
-    var barColor = pct >= 80 ? '#4caf50' : pct >= 40 ? '#ffc107' : '#e57373';
+    var isLim    = calc.limitante && d.alimento_id === calc.limitante.alimento_id;
+    var pct      = maxCestas > 0 ? Math.min(100, (d.cestasPossíveis / maxCestas) * 100) : 0;
+    var barColor = isLim ? '#e57373' : (pct >= 80 ? '#4caf50' : pct >= 40 ? '#ffc107' : '#e57373');
+
     return '<div class="cesta-estoque-item' + (isLim ? ' cesta-estoque-limitante' : '') + '">' +
       '<div class="cesta-estoque-header">' +
-        '<span class="cesta-estoque-nome">' + d.emoji + ' ' + escHtml(d.nome) + (isLim ? ' <span class="cesta-badge-limitante">⚠️ Limitante</span>' : '') + '</span>' +
+        '<span class="cesta-estoque-nome">' + escHtml(d.emoji + ' ' + d.nome) +
+          (isLim ? ' <span class="cesta-badge-limitante">Limitante</span>' : '') +
+        '</span>' +
         '<span class="cesta-estoque-cestas">' + d.cestasPossíveis + ' cestas</span>' +
       '</div>' +
-      '<div class="cesta-estoque-stats">' +
-        '<span class="cesta-estoque-stat"><label>Em estoque</label><strong>' + d.unidadesDisp + ' un.</strong></span>' +
-        '<span class="cesta-estoque-stat"><label>Por cesta</label><strong>' + d.qtdPorCesta + ' un.</strong></span>' +
-        '<span class="cesta-estoque-stat"><label>Peso unit.</label><strong>' + d.pesoUnitario + ' kg</strong></span>' +
-        '<span class="cesta-estoque-stat"><label>Estoque (kg)</label><strong>' + d.kgEstoque.toFixed(1) + ' kg</strong></span>' +
-      '</div>' +
       '<div class="cesta-estoque-pbar-wrap">' +
-        '<div class="cesta-estoque-pbar-fill" style="width:' + pct + '%;background:' + barColor + '"></div>' +
+        '<div class="cesta-estoque-pbar-fill" style="width:' + pct.toFixed(1) + '%;background:' + barColor + '"></div>' +
       '</div>' +
-      (d.faltaParaProx > 0 ? '<div class="cesta-estoque-falta">Faltam <strong>' + d.faltaParaProx + ' unidade(s)</strong> para mais 1 cesta</div>' : '') +
+      '<div class="cesta-estoque-stats">' +
+        '<span class="cesta-estoque-stat"><label>Estoque</label><strong>' + d.unidadesDisp + ' un.</strong></span>' +
+        '<span class="cesta-estoque-stat"><label>Por cesta</label><strong>' + d.qtdPorCesta + ' un.</strong></span>' +
+        '<span class="cesta-estoque-stat"><label>Peso/un.</label><strong>' + d.pesoUnitario + ' kg</strong></span>' +
+        '<span class="cesta-estoque-stat"><label>Total kg</label><strong>' + d.kgEstoque.toFixed(1) + ' kg</strong></span>' +
+      '</div>' +
+      (d.faltaParaProx > 0
+        ? '<div class="cesta-estoque-falta">Faltam <strong>' + d.faltaParaProx + ' unidade(s)</strong> para mais 1 cesta</div>' : '') +
     '</div>';
   }).join('');
 }
@@ -7243,7 +6877,7 @@ function _renderCestasHistorico() {
       var dt     = new Date(f.created_at);
       var data   = dt.toLocaleDateString('pt-BR');
       var hora   = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      var itens  = (f.itens_snapshot || []).map(function (i) { return (i.emoji||'🥫') + ' ' + i.nome + ' x' + i.qtd; }).join(', ');
+      var itens  = (f.itens_snapshot || []).map(function (i) { return (i.emoji||'') + ' ' + i.nome + ' x' + i.qtd; }).join(', ');
       return '<tr>' +
         '<td><span class="cestas-hist-data">' + data + '</span><span class="cestas-hist-hora">' + hora + '</span></td>' +
         '<td><span class="cestas-hist-qtd">' + f.quantidade + '</span></td>' +
@@ -7275,15 +6909,130 @@ function _renderCestasHistorico() {
   }
 }
 
+/* ── Progresso por Família ──────────────────────────────────────────── */
+function _renderCestasFamilias(familias, formadas) {
+  var lista   = document.getElementById('cestas-familias-lista');
+  var empty   = document.getElementById('cestas-familias-empty');
+  var kpisEl  = document.getElementById('cestas-familias-kpis');
+  var countEl = document.getElementById('cestas-familias-count');
+  if (!lista) return;
+
+  if (!familias || familias.length === 0) {
+    lista.innerHTML = '';
+    if (empty)  empty.style.display  = 'flex';
+    if (kpisEl) kpisEl.innerHTML = '';
+    if (countEl) countEl.textContent = '0 famílias';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  /* Agrupa cestas por família */
+  var por = {};
+  (formadas || []).forEach(function(f) {
+    var fid = f.familia_id || (f.familias && f.familias.id);
+    if (!fid) return;
+    if (!por[fid]) por[fid] = [];
+    por[fid].push(f);
+  });
+
+  var agora = new Date();
+
+  var enriquecidas = familias.map(function(fam) {
+    var cestas    = por[fam.id] || [];
+    var totalCst  = cestas.reduce(function(s, c) { return s + (parseInt(c.quantidade) || 0); }, 0);
+    var totalKg   = cestas.reduce(function(s, c) { return s + (parseFloat(c.total_kg)  || 0); }, 0);
+    var ultimaDt  = cestas.length > 0
+      ? cestas.reduce(function(max, c) {
+          var d = new Date(c.created_at);
+          return d > max ? d : max;
+        }, new Date(0))
+      : null;
+    var dias = ultimaDt ? Math.floor((agora - ultimaDt) / 86400000) : null;
+    return { fam: fam, cestas: cestas, totalCst: totalCst, totalKg: totalKg, ultimaDt: ultimaDt, dias: dias };
+  });
+
+  /* Ordena: nunca recebeu primeiro, depois por mais dias sem cesta */
+  enriquecidas.sort(function(a, b) {
+    if (a.dias === null && b.dias === null) return 0;
+    if (a.dias === null) return -1;
+    if (b.dias === null) return 1;
+    return b.dias - a.dias;
+  });
+
+  /* KPIs */
+  var comCesta = enriquecidas.filter(function(e) { return e.totalCst > 0; }).length;
+  var semCesta = familias.length - comCesta;
+  var ultimaGeral = formadas && formadas.length > 0
+    ? new Date(formadas.reduce(function(mx, f) {
+        return new Date(f.created_at) > new Date(mx.created_at) ? f : mx;
+      }).created_at).toLocaleDateString('pt-BR')
+    : '—';
+
+  if (countEl) countEl.textContent = familias.length + ' famílias';
+
+  if (kpisEl) {
+    kpisEl.innerHTML =
+      '<div class="cpf-kpi"><span class="cpf-kpi-num">'                   + familias.length + '</span><span class="cpf-kpi-lbl">Cadastradas</span></div>' +
+      '<div class="cpf-kpi"><span class="cpf-kpi-num cpf-ok">'            + comCesta        + '</span><span class="cpf-kpi-lbl">Já receberam</span></div>' +
+      '<div class="cpf-kpi"><span class="cpf-kpi-num cpf-warn">'          + semCesta         + '</span><span class="cpf-kpi-lbl">Aguardando</span></div>' +
+      '<div class="cpf-kpi"><span class="cpf-kpi-num cpf-kpi-date">'      + ultimaGeral      + '</span><span class="cpf-kpi-lbl">Última entrega</span></div>';
+  }
+
+  /* Cartões */
+  lista.innerHTML = enriquecidas.map(function(e) {
+    var fam = e.fam;
+    var cls, lbl, ico;
+    if (e.dias === null)    { cls = 'cpf-status-never';    lbl = 'Nunca recebeu';                                  ico = 'fa-clock'; }
+    else if (e.dias < 30)   { cls = 'cpf-status-ok';       lbl = 'Recebeu há ' + e.dias + ' dia(s)';              ico = 'fa-check-circle'; }
+    else if (e.dias < 90)   { cls = 'cpf-status-warn';     lbl = 'Há ' + Math.floor(e.dias/30) + ' mês sem cesta'; ico = 'fa-exclamation-circle'; }
+    else                    { cls = 'cpf-status-critical';  lbl = 'Há ' + Math.floor(e.dias/30) + ' meses sem cesta'; ico = 'fa-exclamation-triangle'; }
+
+    var fone    = (fam.phone || '').replace(/\D/g, '');
+    var ultimaStr = e.ultimaDt ? e.ultimaDt.toLocaleDateString('pt-BR') : '—';
+
+    return '<div class="cpf-card">' +
+      '<div class="cpf-card-left"><div class="cpf-card-dot ' + cls + '"></div></div>' +
+      '<div class="cpf-card-main">' +
+        '<div class="cpf-card-header">' +
+          '<span class="cpf-card-nome">' + escHtml(fam.name || '—') + '</span>' +
+          (fam.pessoas ? '<span class="cpf-card-pessoas">' + fam.pessoas + ' pessoa(s)</span>' : '') +
+        '</div>' +
+        '<div class="cpf-card-status ' + cls + '"><i class="fas ' + ico + '"></i> ' + lbl + '</div>' +
+        '<div class="cpf-card-stats">' +
+          '<span><label>Cestas</label><strong>' + e.totalCst + '</strong></span>' +
+          '<span><label>Lotes</label><strong>' + e.cestas.length + '</strong></span>' +
+          '<span><label>Total kg</label><strong>' + (e.totalKg > 0 ? e.totalKg.toFixed(1) + ' kg' : '—') + '</strong></span>' +
+          '<span><label>Última</label><strong>' + ultimaStr + '</strong></span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cpf-card-actions">' +
+        (fone ? '<a href="whatsapp://send?phone=55' + fone + '" target="_blank" rel="noopener" class="btn-icon" title="WhatsApp" aria-label="WhatsApp de ' + escHtml(fam.name || '') + '"><i class="fab fa-whatsapp"></i></a>' : '') +
+        '<button type="button" class="btn btn-outline btn-sm cpf-btn-entregar" onclick="abrirFormarCestaParaFamilia(\'' + escHtml(String(fam.id)) + '\')">' +
+          '<i class="fas fa-box-open"></i> Entregar' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function abrirFormarCestaParaFamilia(familiaId) {
+  abrirModalFormarCesta();
+  setTimeout(function() {
+    var sel = document.getElementById('cesta-formar-familia');
+    if (sel) sel.value = familiaId;
+  }, 80);
+}
+window.abrirFormarCestaParaFamilia = abrirFormarCestaParaFamilia;
+
 async function removerCestaItem(id) {
   if (!confirm('Remover este item da configuração da cesta?\n\nO alimento continuará disponível na página de doação.')) return;
   try {
     /* Remove APENAS de modelo_cesta_itens — não afeta a tabela alimentos */
     await DoaVidaSync.deleteModeloCestaItem(id);
-    showToast('✅ Item removido da cesta. O alimento continua na página de doação.', 'success');
+    showToast(' Item removido da cesta. O alimento continua na página de doação.', 'success');
     await renderCestas();
   } catch (e) {
-    showToast('❌ Erro: ' + e.message, 'error');
+    showToast(' Erro: ' + e.message, 'error');
   }
 }
 window.removerCestaItem = removerCestaItem;
@@ -7292,7 +7041,7 @@ window.removerCestaItem = removerCestaItem;
 function abrirModalFormarCesta() {
   var calc = _cestasCache.calculo;
   if (!calc || calc.total === 0) {
-    showToast('⚠️ Não há cestas possíveis com o estoque atual.', 'warning');
+    showToast(' Não há cestas possíveis com o estoque atual.', 'warning');
     return;
   }
 
@@ -7311,6 +7060,18 @@ function abrirModalFormarCesta() {
   var obsEl = document.getElementById('cesta-formar-obs');
   if (qtdEl) { qtdEl.value = 1; qtdEl.max = calc.total; }
   if (obsEl)  obsEl.value = '';
+
+  /* Popula dropdown de famílias */
+  var selFam = document.getElementById('cesta-formar-familia');
+  if (selFam) {
+    var familias = _cestasCache.familias || [];
+    selFam.innerHTML = '<option value="">Distribuição geral (sem família específica)</option>' +
+      familias.map(function(f) {
+        return '<option value="' + escHtml(String(f.id)) + '">' + escHtml(f.name || '—') +
+          (f.pessoas ? ' (' + f.pessoas + ' pessoas)' : '') + '</option>';
+      }).join('');
+    selFam.value = '';
+  }
 
   var prevEl  = document.getElementById('cesta-formar-preview');
   var alerta  = document.getElementById('cesta-formar-alerta');
@@ -7377,7 +7138,7 @@ async function confirmarFormarCesta() {
 
   var qtd = parseInt(qtdEl.value) || 0;
   if (qtd <= 0 || qtd > calc.total) {
-    showToast('⚠️ Quantidade inválida.', 'warning'); return;
+    showToast(' Quantidade inválida.', 'warning'); return;
   }
 
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Formando...'; }
@@ -7397,13 +7158,18 @@ async function confirmarFormarCesta() {
 
     var totalKg = snapshot.reduce(function (s, i) { return s + i.totalKg; }, 0);
 
+    /* Família selecionada (opcional) */
+    var selFam   = document.getElementById('cesta-formar-familia');
+    var familiaId = selFam && selFam.value ? selFam.value : null;
+
     /* Salva o registro */
     await DoaVidaSync.addCestaFormada({
       quantidade:     qtd,
       observacao:     obsEl ? obsEl.value.trim() : '',
       itens_snapshot: snapshot,
       total_kg:       totalKg,
-      formado_por:    'admin'
+      formado_por:    'admin',
+      familia_id:     familiaId
     });
 
     /* Desconta o estoque de cada alimento —
@@ -7418,13 +7184,13 @@ async function confirmarFormarCesta() {
     }));
 
     fecharModal('modal-formar-cesta');
-    showToast('🎉 ' + qtd + ' cesta(s) formada(s) com sucesso!', 'success');
+    showToast(' ' + qtd + ' cesta(s) formada(s) com sucesso!', 'success');
     await renderCestas();
     /* Atualiza aba de alimentos se estiver visível */
     renderAlimentos();
 
   } catch (e) {
-    showToast('❌ Erro ao formar cesta: ' + e.message, 'error');
+    showToast(' Erro ao formar cesta: ' + e.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-layer-group"></i> Confirmar Formação'; }
   }
@@ -7435,10 +7201,10 @@ async function excluirCestaFormada(id) {
   if (!confirm('Excluir este registro do histórico? O estoque NÃO será restaurado.')) return;
   try {
     await DoaVidaSync.deleteCestaFormada(id);
-    showToast('✅ Registro excluído.', 'success');
+    showToast(' Registro excluído.', 'success');
     await renderCestas();
   } catch (e) {
-    showToast('❌ Erro: ' + e.message, 'error');
+    showToast(' Erro: ' + e.message, 'error');
   }
 }
 window.excluirCestaFormada = excluirCestaFormada;
@@ -7552,7 +7318,7 @@ function renderOvMiniLists() {
         prayList.innerHTML = oracoes.slice(0,4).map(function(p) {
           var ini = (p.nome || 'A').charAt(0).toUpperCase();
           var cor = p.status === 'orando' ? '#81c784' : '#f9a825';
-          var st = p.status === 'orando' ? '✅ Orando' : '🙏 Precisa';
+          var st = p.status === 'orando' ? ' Orando' : ' Precisa';
           return '<div class="ov-list-item"><div class="ov-list-avatar" style="background:' + cor + '22;color:' + cor + '">' + ini + '</div>' +
             '<div><div class="ov-list-name">' + escHtml(p.nome || 'Anônimo') + '</div><div class="ov-list-sub">' + escHtml(p.categoria || '') + '</div></div>' +
             '<div style="font-size:.68rem;color:' + cor + ';font-weight:700;white-space:nowrap">' + st + '</div></div>';
@@ -7574,7 +7340,7 @@ function renderOvMiniLists() {
           var cor = recebeu ? '#81c784' : '#f9a825';
           return '<div class="ov-list-item"><div class="ov-list-avatar" style="background:' + cor + '22;color:' + cor + '">' + ini + '</div>' +
             '<div><div class="ov-list-name">' + escHtml(f.name || f.nome || '') + '</div><div class="ov-list-sub">' + (f.pessoas || 0) + ' pessoas</div></div>' +
-            '<div style="font-size:.68rem;color:' + cor + ';font-weight:700">' + (recebeu ? '✅' : '⏳') + '</div></div>';
+            '<div style="font-size:.68rem;color:' + cor + ';font-weight:700">' + (recebeu ? '' : '') + '</div></div>';
         }).join('');
       }
     }
@@ -7622,8 +7388,7 @@ function renderFoodsAreaChart() {
             borderWidth: 1.5,
             borderRadius: 6,
             borderSkipped: false,
-            type: 'bar'
-          }
+            type: 'bar' }
         ]
       },
       options: opts
@@ -7691,7 +7456,7 @@ function renderDonationsStatusChart(doacoesData) {
       callbacks: {
         label: function(ctx) {
           var pct = total > 0 ? Math.round(ctx.parsed.y / total * 100) : 0;
-          return '  ' + ctx.parsed.y + ' doação(ões)  ·  ' + pct + '%';
+          return ' ' + ctx.parsed.y + ' doação(ões)  ·  ' + pct + '%';
         }
       }
     };
@@ -7772,9 +7537,9 @@ function renderFamiliesChartAndMap() {
     window._belemMapInstance = map;
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; Carto',
-      subdomains: 'abcd', maxZoom: 19
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP',
+      maxZoom: 19
     }).addTo(map);
 
     var fams3 = DoaVidaAPI.getFamilias ? DoaVidaAPI.getFamilias() : [];
@@ -7843,7 +7608,7 @@ function renderVolunteersChart(volsData) {
       callbacks: {
         label: function(ctx) {
           var pct = total > 0 ? Math.round(ctx.parsed.x / total * 100) : 0;
-          return '  ' + ctx.parsed.x + ' voluntário(s)  ·  ' + pct + '%';
+          return ' ' + ctx.parsed.x + ' voluntário(s)  ·  ' + pct + '%';
         }
       }
     };
@@ -7941,7 +7706,7 @@ function renderVolTipoChart(volsData) {
             callbacks: {
               label: function(ctx) {
                 var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
-                return '  ' + ctx.parsed + ' voluntário(s)  ·  ' + pct + '%';
+                return ' ' + ctx.parsed + ' voluntário(s)  ·  ' + pct + '%';
               }
             }
           }
@@ -8034,7 +7799,7 @@ function renderPrayersCharts(oracoesData) {
                 callbacks: {
                   label: function(ctx) {
                     var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
-                    return '  ' + ctx.parsed + ' pedido(s)  ·  ' + pct + '%';
+                    return ' ' + ctx.parsed + ' pedido(s)  ·  ' + pct + '%';
                   }
                 }
               }
@@ -8085,7 +7850,7 @@ function renderPrayersCharts(oracoesData) {
           padding: 12,
           cornerRadius: 10,
           callbacks: {
-            label: function(ctx) { return '  ' + ctx.parsed.y + ' pedido(s)'; }
+            label: function(ctx) { return ' ' + ctx.parsed.y + ' pedido(s)'; }
           }
         };
         opts.animation = { duration: 600, easing: 'easeOutQuart' };
@@ -8146,7 +7911,7 @@ function _renderOvDoacoesChart() {
   _charts['ovDoacoesStatus'] = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: ['⏳ Pendente', '✅ Confirmado', '📦 Entregue', '🚚 Coleta', '❌ Cancelado'],
+      labels: [' Pendente', ' Confirmado', ' Entregue', ' Coleta', ' Cancelado'],
       datasets: [{
         data: [counts.pendente, counts.confirmado, counts.entregue, counts.coleta, counts.cancelado],
         backgroundColor: ['rgba(249,168,37,.8)','rgba(129,199,132,.8)','rgba(77,182,172,.8)','rgba(100,181,246,.8)','rgba(229,115,115,.8)'],
@@ -8180,7 +7945,7 @@ function _renderOvVolChart(vols) {
   _charts['ovVolStatus'] = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: ['🆕 Novo', '📞 Em contato', '✅ Confirmado', '🤝 Participando', '🏁 Finalizado'],
+      labels: [' Novo', ' Em contato', ' Confirmado', ' Participando', ' Finalizado'],
       datasets: [{
         data: [counts.novo, counts['em-contato'], counts.confirmado, counts.participando, counts.finalizado],
         backgroundColor: ['rgba(232,201,106,.8)','rgba(100,181,246,.8)','rgba(129,199,132,.8)','rgba(206,147,216,.8)','rgba(144,164,174,.8)'],
@@ -8275,7 +8040,7 @@ function iniciarSincronizacaoRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'doacoes' }, function(payload) {
       if (payload.eventType === 'INSERT') {
         var nome = (payload.new && payload.new.name) ? payload.new.name : 'alguém';
-        showToast('🎉 Nova doação de ' + nome + '!', 'success', 6000);
+        showToast(' Nova doação de ' + nome + '!', 'success', 6000);
         _mostrarNotifAdmin('doacoes', 'Nova doação de ' + nome);
       }
       /* Atualiza a aba de doações e os badges numéricos do menu */
@@ -8292,7 +8057,7 @@ function iniciarSincronizacaoRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'voluntarios' }, function(payload) {
       if (payload.eventType === 'INSERT') {
         var nomeVol = (payload.new && payload.new.name) ? payload.new.name : 'novo voluntário';
-        showToast('🙌 Novo voluntário: ' + nomeVol + '!', 'success', 6000);
+        showToast(' Novo voluntário: ' + nomeVol + '!', 'success', 6000);
         _mostrarNotifAdmin('voluntarios', 'Novo voluntário: ' + nomeVol);
       }
       _debouncedRenderVoluntarios();
@@ -8301,7 +8066,7 @@ function iniciarSincronizacaoRealtime() {
     /* ── Orações: pedido registrado junto com a doação ── */
     .on('postgres_changes', { event: '*', schema: 'public', table: 'oracoes' }, function(payload) {
       if (payload.eventType === 'INSERT') {
-        showToast('🙏 Novo pedido de oração recebido!', 'info', 6000);
+        showToast(' Novo pedido de oração recebido!', 'info', 6000);
       }
       _debouncedRenderOracoes();
     })
@@ -8318,13 +8083,13 @@ function iniciarSincronizacaoRealtime() {
       var label = document.getElementById('db2-realtime-label');
 
       if (status === 'SUBSCRIBED') {
-        console.log('[DoaVida] ✅ Realtime ativo — qualquer mudança no banco atualiza o painel automaticamente');
+        console.log('[DoaVida]  Realtime ativo — qualquer mudança no banco atualiza o painel automaticamente');
         if (badge) { badge.className = 'db2-rt-badge online'; }
         if (dot)   { dot.className   = 'db2-rt-dot pulse'; }
         if (label) { label.textContent = 'Ao vivo'; }
 
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        console.warn('[DoaVida] ⚠️ Realtime com problema (' + status + '):', err);
+        console.warn('[DoaVida]  Realtime com problema (' + status + '):', err);
         if (badge) { badge.className = 'db2-rt-badge offline'; }
         if (dot)   { dot.className   = 'db2-rt-dot'; }
         if (label) { label.textContent = 'Sem conexão'; }
@@ -8370,7 +8135,7 @@ function _uploadParaInput(inputId, aceitar) {
     /* Limites: 20 MB para imagem, 200 MB para vídeo */
     var limite = arquivo.type.startsWith('video/') ? 200 * 1024 * 1024 : 20 * 1024 * 1024;
     if (arquivo.size > limite) {
-      showToast('❌ Arquivo muito grande. Máx: ' +
+      showToast(' Arquivo muito grande. Máx: ' +
         (arquivo.type.startsWith('video/') ? '200 MB (vídeo)' : '20 MB (imagem)'), 'error');
       return;
     }
@@ -8383,7 +8148,7 @@ function _uploadParaInput(inputId, aceitar) {
     var valorAnterior      = input.value;
     var placeholderAnterior = input.placeholder;
     input.value       = '';
-    input.placeholder = '⏳ Fazendo upload…';
+    input.placeholder = ' Fazendo upload…';
     input.disabled    = true;
 
     DoaVidaSync.uploadImagemGaleria(arquivo, nomeUnico)
@@ -8393,14 +8158,14 @@ function _uploadParaInput(inputId, aceitar) {
         input.disabled    = false;
         /* Dispara evento para preview automático reagir, se houver */
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        showToast('✅ Upload concluído! Cole para salvar.', 'success');
+        showToast(' Upload concluído! Cole para salvar.', 'success');
       })
       .catch(function (err) {
         input.value       = valorAnterior;
         input.placeholder = placeholderAnterior;
         input.disabled    = false;
         var msg = (err && err.message) ? err.message : 'Tente novamente.';
-        showToast('❌ Falha no upload: ' + msg, 'error');
+        showToast(' Falha no upload: ' + msg, 'error');
       });
   });
 
@@ -8531,14 +8296,14 @@ window.previewVideoAcao = previewVideoAcao;
 /* Pré-visualiza a capa/poster no admin */
 function previewVideoAcaoPoster() {
   var url = ((document.getElementById('video-acao-poster-url') || {}).value || '').trim();
-  if (!url) { showToast('⚠️ Cole a URL da imagem de capa.', 'warn'); return; }
+  if (!url) { showToast(' Cole a URL da imagem de capa.', 'warn'); return; }
 
   var wrap = document.getElementById('video-acao-poster-preview');
   var img  = document.getElementById('video-acao-poster-preview-img');
   if (!wrap || !img) return;
 
   img.src = url;
-  img.onerror = function() { showToast('⚠️ Imagem não carregou — verifique a URL.', 'warn'); };
+  img.onerror = function() { showToast(' Imagem não carregou — verifique a URL.', 'warn'); };
   wrap.style.display = '';
 }
 window.previewVideoAcaoPoster = previewVideoAcaoPoster;
@@ -8546,17 +8311,17 @@ window.previewVideoAcaoPoster = previewVideoAcaoPoster;
 /* Salva a URL do vídeo no Supabase */
 function salvarVideoAcao() {
   var url = ((document.getElementById('video-acao-url') || {}).value || '').trim();
-  if (!url) { showToast('⚠️ Cole a URL do vídeo.', 'error'); return; }
+  if (!url) { showToast(' Cole a URL do vídeo.', 'error'); return; }
 
   localStorage.setItem('doavida_video_acao', url);
 
   if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
-    showToast('⏳ Salvando vídeo…', 'info');
+    showToast(' Salvando vídeo…', 'info');
     DoaVidaSync.setConfig('doavida_video_acao', url)
-      .then(function() { showToast('✅ Vídeo salvo! Recarregue o site para ver.', 'success'); })
-      .catch(function(e) { showToast('❌ Erro: ' + (e && e.message ? e.message : 'verifique a conexão.'), 'error'); });
+      .then(function() { showToast(' Vídeo salvo! Recarregue o site para ver.', 'success'); })
+      .catch(function(e) { showToast(' Erro: ' + (e && e.message ? e.message : 'verifique a conexão.'), 'error'); });
   } else {
-    showToast('⚠️ Salvo localmente (Supabase offline).', 'warn');
+    showToast(' Salvo localmente (Supabase offline).', 'warn');
   }
 }
 window.salvarVideoAcao = salvarVideoAcao;
@@ -8567,14 +8332,105 @@ function salvarVideoAcaoPoster() {
   localStorage.setItem('doavida_video_acao_poster', url);
 
   if (window.DoaVidaSync && typeof DoaVidaSync.setConfig === 'function') {
-    showToast('⏳ Salvando capa…', 'info');
+    showToast(' Salvando capa…', 'info');
     DoaVidaSync.setConfig('doavida_video_acao_poster', url || '')
-      .then(function() { showToast('✅ Capa salva! Recarregue o site para ver.', 'success'); })
-      .catch(function(e) { showToast('❌ Erro ao salvar capa: ' + (e && e.message ? e.message : 'verifique a conexão.'), 'error'); });
+      .then(function() { showToast(' Capa salva! Recarregue o site para ver.', 'success'); })
+      .catch(function(e) { showToast(' Erro ao salvar capa: ' + (e && e.message ? e.message : 'verifique a conexão.'), 'error'); });
   } else {
-    showToast('✅ Capa salva localmente.', 'success');
+    showToast(' Capa salva localmente.', 'success');
   }
 }
 window.salvarVideoAcaoPoster = salvarVideoAcaoPoster;
 
 window.iniciarSincronizacaoRealtime = iniciarSincronizacaoRealtime;
+
+/* ══════════════════════════════════════════════════════════════════════
+   IMAGEM DA CESTA COMPLETA
+   Permite trocar a foto exibida no card "Cesta Completa" do formulário.
+   A URL é salva em localStorage (doavida_cesta_img) e lida pelo form.js.
+   ══════════════════════════════════════════════════════════════════════ */
+
+function abrirModalCestaImg() {
+  var modal = document.getElementById('modal-cesta-img');
+  if (!modal) return;
+
+  /* Preenche o preview com a imagem atual */
+  var urlAtual = localStorage.getItem('doavida_cesta_img') || 'img/cesta-basica.jpg';
+  var prevImg = document.getElementById('cesta-img-preview-img');
+  var prevWrap = document.getElementById('cesta-img-preview');
+  var urlInput = document.getElementById('cesta-img-url-input');
+  var uploadArea = document.getElementById('cesta-img-upload-area');
+
+  if (prevImg) prevImg.src = urlAtual;
+  if (prevWrap) prevWrap.style.display = 'block';
+  if (uploadArea) uploadArea.style.display = 'none';
+  if (urlInput) urlInput.value = urlAtual !== 'img/cesta-basica.jpg' ? urlAtual : '';
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+window.abrirModalCestaImg = abrirModalCestaImg;
+
+function fecharModalCestaImg() {
+  var modal = document.getElementById('modal-cesta-img');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+window.fecharModalCestaImg = fecharModalCestaImg;
+
+function salvarImgCesta() {
+  var urlInput = document.getElementById('cesta-img-url-input');
+  var prevImg  = document.getElementById('cesta-img-preview-img');
+  var url = (urlInput && urlInput.value.trim()) || (prevImg && prevImg.src) || '';
+
+  if (!url) {
+    showToast(' Informe uma URL ou faça upload de uma imagem.', 'warning');
+    return;
+  }
+
+  localStorage.setItem('doavida_cesta_img', url);
+  fecharModalCestaImg();
+  renderAlimentos();
+  showToast(' Imagem da cesta atualizada!', 'success');
+}
+window.salvarImgCesta = salvarImgCesta;
+
+function _cestaImgHandleFiles(files) {
+  if (!files || files.length === 0) return;
+  var arquivo = files[0];
+
+  if (!window.DoaVidaCloudinary) {
+    showToast(' Cloudinary não disponível.', 'error');
+    return;
+  }
+
+  var validacao = DoaVidaCloudinary.validar(arquivo);
+  if (!validacao.ok) {
+    showToast(' ' + validacao.erro, 'error');
+    return;
+  }
+
+  var bar  = document.getElementById('cesta-img-progress-bar');
+  var wrap = document.getElementById('cesta-img-progress-wrap');
+  var area = document.getElementById('cesta-img-upload-area');
+  if (wrap) wrap.style.display = 'block';
+  if (area) area.style.display = 'none';
+
+  DoaVidaCloudinary.upload(arquivo, 'image', function(pct) {
+    if (bar) bar.style.width = pct + '%';
+  }).then(function(resultado) {
+    var prevImg  = document.getElementById('cesta-img-preview-img');
+    var prevWrap = document.getElementById('cesta-img-preview');
+    var urlInput = document.getElementById('cesta-img-url-input');
+    if (prevImg)  prevImg.src = resultado.url;
+    if (prevWrap) prevWrap.style.display = 'block';
+    if (urlInput) urlInput.value = resultado.url;
+    if (wrap) wrap.style.display = 'none';
+    showToast(' Imagem enviada!', 'success');
+  }).catch(function(e) {
+    if (wrap) wrap.style.display = 'none';
+    if (area) area.style.display = 'block';
+    showToast(' Falha no upload: ' + (e.message || e), 'error');
+  });
+}
+window._cestaImgHandleFiles = _cestaImgHandleFiles;

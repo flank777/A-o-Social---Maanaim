@@ -1,0 +1,1339 @@
+/*
+ * admin-redesign.css — DoaVida Admin v6.0
+ * Componentes novos: KPI v2, kanban, tabelas avançadas, painéis laterais,
+ * filtros de período, charts layout, prayer cards, goals tracker.
+ * Depende de: admin-dark.css (tokens CSS)
+ */
+
+/* ═══════════════════════════════════════════════
+   A. KPI CARDS v2 — layout plano com ícone colorido
+══════════════════════════════════════════════ */
+
+.adm-kpi-row-v2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+  .adm-kpi-row-v2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 540px) {
+  .adm-kpi-row-v2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+
+.adm-kpi-v2 {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  padding: 20px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.adm-kpi-v2:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.30);
+  transform: translateY(-2px);
+}
+
+.adm-kpi-v2-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--kpi-bg, rgba(124,58,237,0.18));
+  color: var(--kpi-color, var(--adm-purple2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.adm-kpi-v2-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adm-kpi-v2-num {
+  font-size: 1.80rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-kpi-v2-label {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: var(--adm-text2);
+  margin-top: 4px;
+}
+
+.adm-kpi-v2-sub {
+  font-size: 0.68rem;
+  color: var(--adm-muted);
+  margin-top: 1px;
+}
+
+.adm-kpi-v2-trend {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.adm-kpi-v2-trend.up {
+  background: rgba(16,185,129,0.15);
+  color: #10b981;
+}
+
+.adm-kpi-v2-trend.down {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+.adm-kpi-v2-trend.neutral {
+  background: rgba(255,255,255,0.08);
+  color: var(--adm-muted);
+}
+
+/* Sparkline canvas inside KPI card */
+.adm-kpi-v2-sparkline {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 80px;
+  height: 36px;
+  opacity: 0.40;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   B. CHARTS LAYOUT — linha com gráfico grande + pequeno
+══════════════════════════════════════════════ */
+
+.adm-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1150px) {
+  .adm-charts-row { grid-template-columns: 1fr; }
+}
+
+.adm-chart-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.adm-chart-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--adm-border2);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.adm-chart-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-chart-sub {
+  font-size: 0.72rem;
+  color: var(--adm-muted);
+  margin-top: 2px;
+}
+
+.adm-chart-body {
+  padding: 16px 20px 20px;
+  position: relative;
+}
+
+.adm-chart-body canvas {
+  max-height: 240px;
+}
+
+/* Period filter pills — inside chart header */
+.adm-period-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.adm-period-pill {
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--adm-border);
+  background: none;
+  color: var(--adm-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+
+.adm-period-pill:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--adm-text2);
+}
+
+.adm-period-pill.active {
+  background: var(--adm-purple-bg);
+  border-color: rgba(124,58,237,0.40);
+  color: var(--adm-purple2);
+}
+
+/* Donut chart legend */
+.adm-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.adm-donut-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.adm-donut-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.adm-donut-legend-label {
+  font-size: 0.78rem;
+  color: var(--adm-text2);
+  flex: 1;
+}
+
+.adm-donut-legend-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════
+   C. ATIVIDADES RECENTES + METAS
+══════════════════════════════════════════════ */
+
+.adm-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+@media (max-width: 1100px) {
+  .adm-bottom-row { grid-template-columns: 1fr; }
+}
+
+.adm-activity-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.adm-activity-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--adm-border2);
+}
+
+.adm-activity-title {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-activity-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.adm-activity-table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--adm-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: rgba(124,58,237,0.06) !important;
+  border-bottom: 1px solid var(--adm-border2);
+}
+
+.adm-activity-table td {
+  padding: 11px 16px;
+  font-size: 0.80rem;
+  color: var(--adm-text2) !important;
+  border-bottom: 1px solid var(--adm-border2);
+  vertical-align: middle;
+}
+
+.adm-activity-table tbody tr:last-child td { border-bottom: none; }
+
+.adm-activity-table tbody tr:hover td {
+  background: rgba(255,255,255,0.025) !important;
+}
+
+.adm-at-name {
+  font-weight: 600;
+  color: #fff !important;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-at-time {
+  font-size: 0.70rem;
+  color: var(--adm-muted) !important;
+}
+
+/* Goals card */
+.adm-goals-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.adm-goals-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--adm-border2);
+}
+
+.adm-goals-title {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-goals-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.adm-goal-item {}
+
+.adm-goal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.adm-goal-label {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: var(--adm-text2);
+}
+
+.adm-goal-pct {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-goal-bar {
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+}
+
+.adm-goal-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: var(--fill-color, var(--adm-purple));
+  transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+}
+
+.adm-goal-sub {
+  font-size: 0.68rem;
+  color: var(--adm-muted);
+  margin-top: 5px;
+}
+
+/* ═══════════════════════════════════════════════
+   D. PERIOD FILTER BAR — topo das abas analytics
+══════════════════════════════════════════════ */
+
+.adm-period-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0 16px;
+  flex-wrap: wrap;
+}
+
+.adm-period-bar-label {
+  font-size: 0.72rem;
+  color: var(--adm-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-right: 4px;
+}
+
+.adm-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 16px;
+  flex-wrap: wrap;
+}
+
+.adm-filter-bar .modal-select {
+  width: auto !important;
+  min-width: 140px;
+  padding: 8px 32px 8px 12px !important;
+  font-size: 0.80rem !important;
+  height: 36px;
+  border-radius: 10px !important;
+}
+
+.adm-filter-search {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.adm-filter-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--adm-muted);
+  font-size: 0.76rem;
+  pointer-events: none;
+}
+
+.adm-filter-search input {
+  width: 100%;
+  padding: 8px 12px 8px 32px !important;
+  font-size: 0.80rem !important;
+  height: 36px;
+  border-radius: 10px !important;
+}
+
+/* ═══════════════════════════════════════════════
+   E. ENHANCED TABLE — tabela com badges de prioridade
+══════════════════════════════════════════════ */
+
+.adm-tbl-wrap {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.adm-tbl-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--adm-border2);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adm-tbl-title {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-tbl-actions { display: flex; gap: 8px; }
+
+.adm-tbl-scroll { overflow-x: auto; }
+
+.adm-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.adm-tbl th {
+  padding: 11px 16px !important;
+  font-size: 0.66rem !important;
+  font-weight: 700 !important;
+  color: var(--adm-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  background: rgba(124,58,237,0.06) !important;
+  border-bottom: 1px solid var(--adm-border2) !important;
+  white-space: nowrap;
+}
+
+.adm-tbl td {
+  padding: 12px 16px !important;
+  font-size: 0.80rem !important;
+  color: var(--adm-text2) !important;
+  border-bottom: 1px solid var(--adm-border2) !important;
+  vertical-align: middle;
+}
+
+.adm-tbl tbody tr:last-child td { border-bottom: none !important; }
+
+.adm-tbl tbody tr:hover td { background: rgba(255,255,255,0.025) !important; }
+
+.adm-tbl .col-name { font-weight: 600; color: #fff !important; white-space: normal; min-width: 140px; }
+.adm-tbl .col-mono { font-family: 'Space Mono', monospace; font-size: 0.72rem; }
+
+/* Priority badges */
+.adm-badge-urgente {
+  background: rgba(239,68,68,0.18) !important;
+  color: #f87171 !important;
+}
+.adm-badge-alta {
+  background: rgba(245,158,11,0.18) !important;
+  color: #fbbf24 !important;
+}
+.adm-badge-media {
+  background: rgba(59,130,246,0.18) !important;
+  color: #60a5fa !important;
+}
+.adm-badge-baixa {
+  background: rgba(16,185,129,0.18) !important;
+  color: #34d399 !important;
+}
+
+/* Status mini-dot */
+.adm-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.adm-dot-green  { background: var(--adm-green); }
+.adm-dot-amber  { background: var(--adm-amber); }
+.adm-dot-red    { background: var(--adm-red); }
+.adm-dot-blue   { background: var(--adm-blue); }
+.adm-dot-purple { background: var(--adm-purple2); }
+.adm-dot-muted  { background: var(--adm-muted); }
+
+/* ═══════════════════════════════════════════════
+   F. DETAIL SIDE PANEL — painel deslizante lateral
+══════════════════════════════════════════════ */
+
+.adm-with-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.adm-with-panel.panel-open {
+  grid-template-columns: 1fr 320px;
+}
+
+@media (max-width: 1100px) {
+  .adm-with-panel.panel-open { grid-template-columns: 1fr; }
+}
+
+.adm-side-panel {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: none;
+}
+
+.adm-with-panel.panel-open .adm-side-panel { display: block; }
+
+.adm-side-panel-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--adm-border2);
+}
+
+.adm-side-panel-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-side-panel-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: var(--adm-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: background 0.2s;
+}
+
+.adm-side-panel-close:hover { background: rgba(255,255,255,0.12); }
+
+.adm-side-panel-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adm-panel-field {}
+
+.adm-panel-field-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--adm-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.adm-panel-field-value {
+  font-size: 0.82rem;
+  color: var(--adm-text2);
+  line-height: 1.5;
+}
+
+.adm-panel-field-value.strong { color: #fff; font-weight: 600; }
+
+.adm-panel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-top: 1px solid var(--adm-border2);
+}
+
+.adm-panel-actions .btn { flex: 1; min-width: 80px; font-size: 0.78rem; }
+
+/* ═══════════════════════════════════════════════
+   G. KANBAN BOARD — quadro de tarefas
+══════════════════════════════════════════════ */
+
+.adm-kanban-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0 16px;
+  flex-wrap: wrap;
+}
+
+.adm-kanban-topbar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+}
+
+.adm-kanban-topbar .btn {
+  font-size: 0.78rem;
+  padding: 7px 14px;
+  gap: 6px;
+}
+
+.adm-kanban {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  align-items: flex-start;
+  padding-bottom: 40px;
+}
+
+@media (max-width: 1200px) {
+  .adm-kanban { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .adm-kanban { grid-template-columns: 1fr; }
+}
+
+.adm-kanban-col {
+  background: var(--adm-card2);
+  border: 1px solid var(--adm-border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-kanban-col-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--adm-border2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-kanban-col-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--kdc, var(--adm-muted));
+  flex-shrink: 0;
+}
+
+.adm-kanban-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.08);
+  color: var(--adm-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.adm-kanban-cards {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 120px;
+}
+
+.adm-kanban-empty {
+  text-align: center;
+  color: var(--adm-muted);
+  font-size: 0.74rem;
+  padding: 24px 12px;
+  opacity: 0.60;
+}
+
+.adm-kcard {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.adm-kcard:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+  transform: translateY(-1px);
+}
+
+.adm-kcard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.adm-kcard-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.adm-kcard-desc {
+  font-size: 0.73rem;
+  color: var(--adm-muted);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adm-kcard-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.adm-kcard-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: var(--adm-muted);
+}
+
+.adm-kcard-meta-item i { font-size: 0.70rem; }
+
+.adm-kcard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--adm-border2);
+}
+
+.adm-kcard-assignee {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--adm-text2);
+}
+
+.adm-kcard-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--adm-purple-bg);
+  border: 1px solid rgba(124,58,237,0.30);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: var(--adm-purple2);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.adm-kcard-wa-btn {
+  background: rgba(37,211,102,0.12);
+  border: none;
+  color: #25d366;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+
+.adm-kcard-wa-btn:hover { background: rgba(37,211,102,0.22); }
+
+/* ═══════════════════════════════════════════════
+   H. KANBAN TEAM SUMMARY ROW
+══════════════════════════════════════════════ */
+
+.adm-team-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .adm-team-row { grid-template-columns: 1fr; }
+}
+
+.adm-team-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.adm-team-card-hdr {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--adm-border2);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.adm-team-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adm-team-member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.18s;
+}
+
+.adm-team-member:hover { background: rgba(255,255,255,0.04); }
+
+.adm-team-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--adm-purple-bg);
+  border: 1.5px solid rgba(124,58,237,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--adm-purple2);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.adm-team-info { flex: 1; min-width: 0; }
+
+.adm-team-name {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-team-role {
+  font-size: 0.67rem;
+  color: var(--adm-muted);
+}
+
+.adm-team-tasks {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--adm-purple2);
+}
+
+/* ═══════════════════════════════════════════════
+   I. PRAYER CARDS — pedidos de oração
+══════════════════════════════════════════════ */
+
+.adm-prayer-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+@media (max-width: 1100px) {
+  .adm-prayer-layout { grid-template-columns: 1fr; }
+}
+
+.adm-prayer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adm-prayer-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.adm-prayer-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+  transform: translateY(-1px);
+}
+
+.adm-prayer-card.featured {
+  border-color: rgba(124,58,237,0.40);
+  background: rgba(124,58,237,0.08);
+}
+
+.adm-prayer-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.adm-prayer-body { flex: 1; min-width: 0; }
+
+.adm-prayer-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.adm-prayer-text {
+  font-size: 0.76rem;
+  color: var(--adm-text2);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adm-prayer-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.adm-prayer-date {
+  font-size: 0.68rem;
+  color: var(--adm-muted);
+  margin-left: auto;
+}
+
+/* Prayer featured detail card */
+.adm-prayer-featured-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 16px;
+  overflow: hidden;
+  position: sticky;
+  top: 80px;
+}
+
+.adm-prayer-featured-hdr {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--adm-border2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-prayer-featured-body {
+  padding: 18px;
+}
+
+.adm-prayer-featured-text {
+  font-size: 0.82rem;
+  color: var(--adm-text2);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.adm-prayer-featured-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adm-prayer-featured-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════
+   J. OVERVIEW REALTIME BADGE + SECTION LABEL
+══════════════════════════════════════════════ */
+
+.adm-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--adm-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  margin-bottom: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--adm-border);
+}
+
+/* Realtime badge */
+.adm-rt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.22);
+  border-radius: 100px;
+  padding: 4px 12px 4px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #10b981;
+  margin-bottom: 18px;
+}
+
+.adm-rt-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: rtPulse 2s ease-in-out infinite;
+}
+
+@keyframes rtPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ═══════════════════════════════════════════════
+   K. FAMÍLIAS — mini KPI row horizontal
+══════════════════════════════════════════════ */
+
+.adm-fam-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .adm-fam-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .adm-fam-kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+.adm-fam-kpi {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.adm-fam-kpi-num {
+  font-size: 1.60rem;
+  font-weight: 800;
+  color: var(--kpi-color, #fff);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-fam-kpi-label {
+  font-size: 0.70rem;
+  color: var(--adm-muted);
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════
+   L. DEADLINE ROW — próximos vencimentos
+══════════════════════════════════════════════ */
+
+.adm-deadline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 18px 16px;
+}
+
+.adm-deadline-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--adm-border2);
+}
+
+.adm-deadline-date {
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.adm-deadline-day {
+  font-size: 1.10rem;
+  font-weight: 800;
+  color: var(--adm-purple2);
+  line-height: 1;
+}
+
+.adm-deadline-month {
+  font-size: 0.60rem;
+  color: var(--adm-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.adm-deadline-info { flex: 1; min-width: 0; }
+
+.adm-deadline-task {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-deadline-who {
+  font-size: 0.68rem;
+  color: var(--adm-muted);
+  margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════════
+   M. EXPORT / ACTION ROW
+══════════════════════════════════════════════ */
+
+.adm-section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.adm-section-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adm-section-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   N. RESPONSIVE HELPERS
+══════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .adm-kpi-row-v2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .adm-kpi-v2-num { font-size: 1.50rem; }
+  .adm-charts-row { grid-template-columns: 1fr; }
+  .adm-bottom-row { grid-template-columns: 1fr; }
+  .adm-kanban { grid-template-columns: 1fr; }
+  .adm-prayer-layout { grid-template-columns: 1fr; }
+  .adm-fam-kpi-row { grid-template-columns: 1fr 1fr; }
+  .adm-team-row { grid-template-columns: 1fr; }
+  .adm-section-actions { flex-direction: column; align-items: flex-start; }
+  .adm-period-bar { gap: 6px; }
+}
+
+/* ═══════════════════════════════════════════════
+   O. CHART COLOR OVERRIDES — roxo em vez de verde
+══════════════════════════════════════════════ */
+
+/* Garante que todos os gráficos usam paleta roxa */
+.adm-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+}
+
+.adm-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--adm-text2);
+}
+
+.adm-chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ═══════════════════════════════════════════════
+   P. ORAÇÃO KPI ROW
+══════════════════════════════════════════════ */
+
+.adm-oracao-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1000px) {
+  .adm-oracao-layout { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════
+   Q. VIEW MODE TOGGLE (lista / kanban)
+══════════════════════════════════════════════ */
+
+.adm-view-toggle {
+  display: flex;
+  border: 1px solid var(--adm-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.adm-view-btn {
+  padding: 7px 14px;
+  background: none;
+  border: none;
+  color: var(--adm-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.18s, color 0.18s;
+  font-family: inherit;
+}
+
+.adm-view-btn.active {
+  background: var(--adm-purple-bg);
+  color: var(--adm-purple2);
+}
+
+.adm-view-btn:not(:last-child) {
+  border-right: 1px solid var(--adm-border);
+}

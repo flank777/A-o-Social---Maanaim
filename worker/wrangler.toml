@@ -1,0 +1,32 @@
+# DoaVida — Cloudflare Worker: R2 Upload Proxy
+# Docs: https://developers.cloudflare.com/workers/
+
+name = "doavida-media"
+main = "r2-upload-worker.js"
+compatibility_date = "2024-09-01"
+workers_dev = true
+
+# Expõe o Worker em:
+#   https://doavida-media.<seu-usuario>.workers.dev
+# Após deploy, coloque esse URL em js/services/cloudflare-r2.js (WORKER_URL)
+
+# ── Binding do R2 ──────────────────────────────────────────────────────────────
+# Crie o bucket antes: wrangler r2 bucket create doavida-media
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "doavida-media"
+
+# ── Variáveis públicas ─────────────────────────────────────────────────────────
+# PUBLIC_URL: URL pública do bucket R2
+#   Opção 1 — domínio r2.dev gratuito (habilite na aba do bucket no dashboard):
+#     https://pub-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.r2.dev
+#   Opção 2 — domínio personalizado (recomendado para produção):
+#     https://media.seudominio.com.br
+[vars]
+PUBLIC_URL = "https://pub-COLOQUE_SEU_HASH_AQUI.r2.dev"
+
+# ── Segredo de autenticação (NÃO colocar aqui em texto puro) ──────────────────
+# Depois do deploy, execute no terminal:
+#   wrangler secret put UPLOAD_TOKEN
+# Coloque qualquer string aleatória como token (ex.: openssl rand -hex 32)
+# Depois copie o mesmo valor em js/services/cloudflare-r2.js (UPLOAD_TOKEN)

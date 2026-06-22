@@ -1,418 +1,591 @@
-/* ══════════════════════════════════════════════════════════════════════
-   dona-assuncao.css — Estilos do Chatbot "Dona Assunção"
-   DoaVida · Ação Social Semear + Comunidade Evangélica Maanaim
+/*
+  Chat Dona Assuncao
+  Widget publico da Acao Social Semear.
+*/
 
-   Dona Assunção é uma avozinha simpática e acolhedora que conversa
-   com os visitantes sobre doações, voluntariado e a ação social.
-   Nunca fala sobre código, admin, dados ou doadores.
-   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --dona-green: #238744;
+  --dona-green-dark: #166534;
+  --dona-green-soft: #e9f7ed;
+  --dona-surface: #ffffff;
+  --dona-paper: #fafaf6;
+  --dona-line: rgba(15, 23, 42, 0.1);
+  --dona-text: #111827;
+  --dona-muted: #6b7280;
+  --dona-shadow: 0 24px 70px rgba(15, 23, 42, 0.26);
+}
 
-/* ─── 1. BOTÃO FLUTUANTE (FAB) ────────────────────────────────────── */
-/* Botão redondo fixo no canto inferior direito */
 .dona-fab {
-  position: fixed;                 /* fixo na viewport */
-  bottom: 1.5rem;                  /* distância do fundo */
-  right: 1.5rem;                   /* distância da direita */
-  width: 72px;                     /* largura — ligeiramente maior para mostrar a avó */
-  height: 72px;                    /* altura */
-  border-radius: 50%;              /* formato circular */
-  background: #f5e9c8;             /* fundo amarelo-creme que combina com a ilustração */
-  border: 3px solid var(--gold, #c9a84c); /* borda dourada */
-  cursor: pointer;                 /* cursor de clique */
-  padding: 0;                      /* sem padding — imagem preenche o botão */
-  overflow: hidden;                /* recorta a imagem no círculo */
-  display: flex;                   /* para centralizar a imagem */
-  align-items: flex-end;           /* cola a figura na base do círculo */
-  justify-content: center;
-  box-shadow: 0 4px 18px rgba(201, 168, 76, 0.5); /* sombra dourada */
-  z-index: 7000;                   /* acima do conteúdo, abaixo do modal */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* transição suave */
-  animation: donaPulse 3s infinite; /* pulso para chamar atenção */
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: max(18px, env(safe-area-inset-bottom, 0px));
+  z-index: 30000;
+  width: 66px;
+  height: 66px;
+  border: 0;
+  border-radius: 999px;
+  padding: 3px;
+  cursor: pointer;
+  background: linear-gradient(145deg, #1f8f46, #2fb35a);
+  box-shadow: 0 16px 34px rgba(35, 135, 68, 0.36);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    opacity 0.22s ease;
+  animation: donaFabPulse 4s ease-in-out infinite;
 }
 
-/* Imagem dentro do FAB */
-.dona-fab-img {
-  width: 110%;                     /* um pouco maior que o botão para cortar as bordas brancas */
-  height: 110%;
-  object-fit: contain;             /* mantém proporção */
-  object-position: center bottom;  /* exibe a parte inferior (corpo) encostado */
-  display: block;
-  pointer-events: none;            /* clique passa para o botão */
-}
-
-/* Hover no FAB: amplia e aumenta sombra */
 .dona-fab:hover {
-  transform: scale(1.08);         /* amplia suavemente */
-  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.7); /* sombra mais forte */
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 20px 44px rgba(35, 135, 68, 0.44);
 }
 
-/* Animação de pulso suave */
-@keyframes donaPulse {
-  0%, 100% { box-shadow: 0 4px 16px rgba(201, 168, 76, 0.4); }
-  50%      { box-shadow: 0 4px 24px rgba(201, 168, 76, 0.7); }
-}
-
-/* Esconde o FAB quando o chat está aberto */
 .dona-fab.hidden {
-  display: none;                   /* esconde completamente */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.94);
 }
 
-/* ─── 2. JANELA DO CHAT ───────────────────────────────────────────── */
-/* Container principal do chat */
+.dona-fab__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  background: #eef7ee;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+}
+
+.dona-fab__status {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: #22c55e;
+  border: 3px solid #fff;
+}
+
+.dona-fab__hint {
+  position: absolute;
+  right: 78px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  color: #12311f;
+  background: #fff;
+  border: 1px solid rgba(35, 135, 68, 0.16);
+  border-radius: 999px;
+  padding: 9px 12px;
+  font: 700 0.78rem/1 "DM Sans", Arial, sans-serif;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.dona-fab__hint::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%) rotate(45deg);
+  background: #fff;
+  border-top: 1px solid rgba(35, 135, 68, 0.16);
+  border-right: 1px solid rgba(35, 135, 68, 0.16);
+}
+
+@keyframes donaFabPulse {
+  0%,
+  100% {
+    box-shadow: 0 16px 34px rgba(35, 135, 68, 0.36);
+  }
+  50% {
+    box-shadow: 0 18px 42px rgba(35, 135, 68, 0.5);
+  }
+}
+
 .dona-chat {
-  position: fixed;                 /* fixo na viewport */
-  bottom: 1.5rem;                  /* distância do fundo */
-  right: 1.5rem;                   /* distância da direita */
-  width: 360px;                    /* largura fixa */
-  max-height: 520px;               /* altura máxima */
-  background: #FEFBF4;             /* fundo creme quente — legível e acolhedor */
-  border: 1px solid var(--gold, #c9a84c); /* borda dourada */
-  border-radius: 16px;             /* cantos arredondados */
-  display: none;                   /* escondido por padrão */
-  flex-direction: column;          /* layout vertical */
-  z-index: 7001;                   /* acima do FAB */
-  /* sombra suave em camadas: profundidade sem peso visual */
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 12px 32px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(201, 168, 76, 0.15);
-  animation: donaChatIn 0.3s ease; /* animação de entrada */
-  overflow: hidden;                /* esconde excedente */
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top, 0px));
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: max(18px, env(safe-area-inset-bottom, 0px));
+  z-index: 30001;
+  width: min(430px, calc(100vw - 28px));
+  max-height: min(760px, calc(100dvh - 36px));
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--dona-text);
+  background: var(--dona-surface);
+  border: 1px solid var(--dona-line);
+  border-radius: 20px;
+  box-shadow: var(--dona-shadow);
+  font-family: "DM Sans", Arial, sans-serif;
 }
 
-/* Quando ativo, exibe como flex column */
 .dona-chat.active {
-  display: flex;                   /* ativa exibição */
+  display: flex;
+  animation: donaChatIn 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Animação de entrada do chat */
 @keyframes donaChatIn {
   from {
-    transform: translateY(20px) scale(0.9); /* começa menor e abaixo */
-    opacity: 0;                              /* invisível */
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
   }
   to {
-    transform: translateY(0) scale(1);       /* posição final */
-    opacity: 1;                              /* visível */
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-/* ─── 3. CABEÇALHO DO CHAT ────────────────────────────────────────── */
-/* Barra superior com avatar, nome e botão fechar */
 .dona-chat-header {
-  display: flex;                   /* layout horizontal */
-  align-items: center;             /* alinha verticalmente */
-  gap: 0.75rem;                    /* espaço entre elementos */
-  padding: 0.75rem 1rem;          /* espaçamento interno */
-  background: rgba(201, 168, 76, 0.18); /* fundo dourado mais visível no tema claro */
-  border-bottom: 1px solid rgba(201, 168, 76, 0.35); /* linha divisória mais definida */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 13px;
+  align-items: center;
+  padding: 17px 18px;
+  background: #fff;
+  border-bottom: 1px solid var(--dona-line);
 }
 
-/* Avatar da Dona Assunção (imagem circular no cabeçalho) */
 .dona-avatar {
-  width: 46px;                     /* largura */
-  height: 46px;                    /* altura */
-  border-radius: 50%;              /* circular */
-  background: #f5e9c8;             /* fundo creme combinando com a ilustração */
-  border: 2px solid var(--gold, #c9a84c); /* anel dourado */
-  overflow: hidden;                /* recorta no círculo */
-  display: flex;
-  align-items: flex-end;           /* cola a figura na base */
-  justify-content: center;
-  flex-shrink: 0;                  /* não encolhe */
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #eef7ee;
+  box-shadow: inset 0 0 0 1px rgba(35, 135, 68, 0.12);
 }
 
-/* Imagem dentro do avatar */
-.dona-avatar-img {
-  width: 115%;                     /* levemente maior para preencher bem */
-  height: 115%;
-  object-fit: contain;
-  object-position: center bottom;
+.dona-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  pointer-events: none;
 }
 
-/* Nome e status */
 .dona-info {
-  flex: 1;                         /* ocupa espaço disponível */
+  min-width: 0;
 }
 
-/* Nome "Dona Assunção" */
 .dona-info strong {
-  display: block;                  /* ocupa linha inteira */
-  color: #3d3523;                  /* marrom escuro quente — alto contraste no fundo creme */
-  font-size: 0.95rem;             /* tamanho */
-  font-family: 'Playfair Display', serif; /* fonte elegante */
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #111827;
+  font-size: 1rem;
+  line-height: 1.15;
+  letter-spacing: 0;
 }
 
-/* Status "online" */
-.dona-info span {
-  font-size: 0.75rem;             /* texto pequeno */
-  color: #2d7a1f;                  /* verde escuro — contraste adequado no fundo claro */
+.dona-info strong::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background:
+    linear-gradient(#1fa463, #1fa463),
+    #1fa463;
+  box-shadow: inset 0 0 0 4px #e7f7ee;
 }
 
-/* Botão fechar (X) */
+.dona-info small {
+  display: block;
+  margin-top: 3px;
+  color: var(--dona-muted);
+  font-size: 0.79rem;
+  line-height: 1.25;
+}
+
+.dona-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  color: #1f7a3c;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dona-presence::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #22a447;
+  box-shadow: 0 0 0 4px rgba(34, 164, 71, 0.12);
+}
+
 .dona-close {
-  background: none;                /* sem fundo */
-  border: none;                    /* sem borda */
-  color: #5a4a2e;                  /* marrom médio — visível no fundo dourado claro */
-  font-size: 1.3rem;              /* tamanho */
-  line-height: 1;
-  cursor: pointer;                 /* cursor de clique */
-  padding: 0.3rem 0.5rem;         /* área clicável */
-  border-radius: 6px;
-  transition: color 0.2s ease, background 0.2s ease;
-  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  color: #374151;
+  background: transparent;
+  font-size: 1.08rem;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
-/* Hover no fechar */
 .dona-close:hover {
-  color: var(--gold, #c9a84c);    /* dourado no hover */
-  background: rgba(201, 168, 76, 0.25);
+  color: #111827;
+  background: #f3f4f6;
 }
 
-/* ─── 4. ÁREA DE MENSAGENS ────────────────────────────────────────── */
-/* Container scrollável das mensagens */
 .dona-messages {
-  flex: 1;                         /* ocupa espaço disponível */
-  overflow-y: auto;                /* scroll vertical */
-  padding: 1rem;                   /* espaçamento interno */
-  display: flex;                   /* layout flex */
-  flex-direction: column;          /* empilha mensagens */
-  gap: 0.75rem;                    /* espaço entre mensagens */
-  min-height: 250px;               /* altura mínima */
-  max-height: 350px;               /* altura máxima */
-}
-
-/* ─── 5. BOLHAS DE MENSAGEM ───────────────────────────────────────── */
-/* Mensagem da Dona Assunção (lado esquerdo) */
-.dona-msg {
-  max-width: 85%;                  /* largura máxima */
-  padding: 0.75rem 1rem;          /* espaçamento interno */
-  border-radius: 12px 12px 12px 4px; /* cantos: arredondado exceto inferior-esq */
-  font-size: 0.9rem;              /* tamanho do texto */
-  line-height: 1.5;               /* altura de linha */
-  animation: msgIn 0.3s ease;     /* animação de entrada */
-}
-
-/* Mensagem da Dona (bot) */
-.dona-msg.bot {
-  background: rgba(201, 168, 76, 0.18); /* fundo dourado — visível no tema claro */
-  color: #3d3523;                  /* texto marrom escuro — WCAG AA contra fundo creme */
-  align-self: flex-start;         /* alinha à esquerda */
-  border: 1px solid rgba(201, 168, 76, 0.35); /* borda dourada mais definida */
-}
-
-/* Mensagem do usuário */
-.dona-msg.user {
-  background: var(--sage, #5a8a4a); /* fundo verde */
-  color: #fff;                     /* texto branco */
-  align-self: flex-end;            /* alinha à direita */
-  border-radius: 12px 12px 4px 12px; /* cantos: arredondado exceto inferior-dir */
-}
-
-/* Animação de entrada das mensagens */
-@keyframes msgIn {
-  from { transform: translateY(10px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-/* Indicador de digitação (3 pontinhos) */
-.dona-typing {
-  display: flex;                   /* alinha pontinhos em linha */
-  gap: 4px;                        /* espaço entre pontos */
-  padding: 0.75rem 1rem;          /* espaçamento */
-  align-self: flex-start;         /* lado esquerdo */
-}
-
-/* Cada pontinho */
-.dona-typing span {
-  width: 8px;                      /* largura */
-  height: 8px;                     /* altura */
-  border-radius: 50%;              /* circular */
-  background: var(--gold, #c9a84c); /* cor dourada */
-  animation: typingDot 1.2s infinite; /* animação de pulso */
-}
-
-/* Atraso nos pontinhos (efeito onda) */
-.dona-typing span:nth-child(2) { animation-delay: 0.2s; }
-.dona-typing span:nth-child(3) { animation-delay: 0.4s; }
-
-/* Animação dos pontinhos */
-@keyframes typingDot {
-  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-  30%           { opacity: 1; transform: translateY(-4px); }
-}
-
-/* ─── 6. SUGESTÕES RÁPIDAS ────────────────────────────────────────── */
-/* Botões de sugestão (atalhos de perguntas comuns) */
-.dona-sugestoes {
-  display: flex;                   /* layout horizontal */
-  flex-wrap: wrap;                 /* quebra em várias linhas */
-  gap: 0.5rem;                     /* espaço entre botões */
-  padding: 0 1rem 0.75rem;        /* espaçamento */
-}
-
-/* Cada botão de sugestão */
-.dona-sug-btn {
-  background: rgba(201, 168, 76, 0.15); /* fundo dourado levemente mais opaco */
-  color: #5a3e0a;                  /* marrom escuro quente — contraste 4.5:1 no fundo creme */
-  border: 1px solid rgba(201, 168, 76, 0.4); /* borda dourada mais definida */
-  border-radius: 20px;             /* formato pílula */
-  padding: 0.35rem 0.75rem;       /* espaçamento interno */
-  font-size: 0.8rem;              /* texto pequeno */
-  cursor: pointer;                 /* cursor de clique */
-  transition: all 0.3s ease;       /* transição suave */
-  font-family: 'DM Sans', sans-serif; /* fonte do sistema */
-}
-
-/* Hover nos botões de sugestão */
-.dona-sug-btn:hover {
-  background: var(--gold, #c9a84c); /* fundo dourado sólido */
-  color: #1a1a17;                  /* texto muito escuro — alto contraste */
-}
-
-/* ─── 7. BARRA DE INPUT ───────────────────────────────────────────── */
-/* Área de digitação na parte inferior */
-.dona-input-bar {
-  display: flex;                   /* layout horizontal */
-  gap: 0.5rem;                     /* espaço entre input e botão */
-  padding: 0.75rem 1rem;          /* espaçamento interno */
-  border-top: 1px solid rgba(201, 168, 76, 0.3); /* linha divisória mais visível */
-  background: rgba(201, 168, 76, 0.1); /* fundo levemente dourado — separa do corpo */
-}
-
-/* Campo de texto */
-.dona-input {
-  flex: 1;                         /* ocupa espaço disponível */
-  background: #FFFFFF;             /* fundo branco — máximo contraste para digitação */
-  color: #3d3523;                  /* texto marrom escuro */
-  border: 1px solid rgba(201, 168, 76, 0.4); /* borda dourada sutil */
-  border-radius: 20px;             /* formato pílula */
-  padding: 0.5rem 1rem;           /* espaçamento interno */
-  font-size: 0.9rem;              /* tamanho do texto */
-  font-family: 'DM Sans', sans-serif; /* fonte do sistema */
-  outline: none;                   /* remove outline padrão */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* transição suave */
-}
-
-/* Foco no input */
-.dona-input:focus {
-  border-color: var(--gold, #c9a84c); /* borda dourada mais forte */
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); /* halo dourado suave */
-}
-
-/* Placeholder do input */
-.dona-input::placeholder {
-  color: #9a8a6a;                  /* bege médio — legível mas discreto */
-}
-
-/* Botão de enviar */
-.dona-send {
-  background: var(--gold, #c9a84c); /* fundo dourado */
-  color: var(--bg, #1a1a17);       /* ícone escuro */
-  border: none;                    /* sem borda */
-  border-radius: 50%;              /* circular */
-  width: 38px;                     /* largura fixa */
-  height: 38px;                    /* altura fixa */
-  cursor: pointer;                 /* cursor de clique */
-  display: flex;                   /* para centralizar */
-  align-items: center;             /* centraliza vertical */
-  justify-content: center;         /* centraliza horizontal */
-  font-size: 1rem;                 /* tamanho do ícone */
-  transition: transform 0.3s ease, background 0.3s ease; /* transição suave */
-  flex-shrink: 0;                  /* não encolhe */
-}
-
-/* Hover no enviar */
-.dona-send:hover {
-  transform: scale(1.1);          /* amplia 10% */
-  background: var(--sage2, #7dc063); /* verde no hover */
-}
-
-/* ─── 8. RESPONSIVIDADE ───────────────────────────────────────────── */
-
-/* Mobile: chat ocupa tela toda — gruda no fundo acima do teclado */
-@media (max-width: 480px) {
-  /* Em páginas normais (sem carrinho), o chat ocupa toda a largura
-     e cola no fundo — o browser já posiciona acima do teclado virtual */
-  body:not(.etapa1) .dona-chat {
-    width: auto;      /* auto + left:0 + right:0 = viewport sem scrollbar (evita overflow de 2px) */
-    right: 0;
-    left: 0;
-    bottom: 0;
-    border-radius: 20px 20px 0 0;  /* só cantos superiores arredondados */
-
-    /* dvh = dynamic viewport height — encolhe quando teclado abre */
-    max-height: 85dvh;
-    max-height: 85vh;              /* fallback para browsers sem dvh */
-  }
-
-  /* Área de mensagens: flex:1 para preencher o espaço disponível */
-  .dona-chat .dona-messages {
-    flex: 1;
-    min-height: 80px;
-    max-height: none;              /* sem max-height fixo — usa flex */
-    overflow-y: auto;
-  }
-
-  /* Barra de input: não encolhe e respeita safe area do notch */
-  .dona-chat .dona-input-bar {
-    padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
-    flex-shrink: 0;                /* sempre visível */
-  }
-
-  /* FAB menor no mobile */
-  .dona-fab {
-    width: 60px;
-    height: 60px;
-    bottom: 1rem;
-    right: 1rem;
-  }
-}
-
-/* Scroll suave nas mensagens (evita pulo visual ao receber nova mensagem) */
-.dona-messages {
+  flex: 1;
+  min-height: 0;
+  max-height: 490px;
+  overflow-y: auto;
   scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 12px 12px, rgba(35, 135, 68, 0.035) 0 2px, transparent 2px 22px),
+    var(--dona-paper);
 }
 
-/* ─── 9. FORMULÁRIO DE DOAÇÃO — fora da barra de carrinho ────────── */
-/* Barra de carrinho fica na base, botão Continuar no canto DIREITO.
-   FAB vai para o canto ESQUERDO e ergue acima da barra. */
-body.etapa1 .dona-fab {
-  bottom: calc(70px + 1rem);
-  right: auto;
-  left: 1rem;
+.dona-messages::-webkit-scrollbar {
+  width: 8px;
 }
 
+.dona-messages::-webkit-scrollbar-thumb {
+  background: rgba(17, 24, 39, 0.16);
+  border-radius: 999px;
+}
+
+.dona-msg {
+  max-width: 82%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  animation: donaMsgIn 0.2s ease both;
+}
+
+.dona-msg__bubble {
+  padding: 11px 13px;
+  border-radius: 14px;
+  font-size: 0.91rem;
+  line-height: 1.55;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.dona-msg__time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #8a8f99;
+  font-size: 0.68rem;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.dona-msg.bot {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.dona-msg.bot .dona-msg__bubble {
+  color: #1f2937;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-bottom-left-radius: 5px;
+}
+
+.dona-msg.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.dona-msg.user .dona-msg__bubble {
+  color: #18311f;
+  background: #dcf8d3;
+  border: 1px solid rgba(35, 135, 68, 0.12);
+  border-bottom-right-radius: 5px;
+}
+
+.dona-msg.user .dona-msg__time::after {
+  content: "✓✓";
+  color: #238744;
+  letter-spacing: -2px;
+}
+
+@keyframes donaMsgIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dona-typing {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: max-content;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px 14px 14px 5px;
+  background: #fff;
+}
+
+.dona-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #8fb99a;
+  animation: donaTyping 1.2s infinite ease-in-out;
+}
+
+.dona-typing span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.dona-typing span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes donaTyping {
+  0%,
+  70%,
+  100% {
+    opacity: 0.34;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.dona-actions {
+  display: grid;
+  gap: 8px;
+  align-self: flex-start;
+  width: min(100%, 300px);
+  margin-top: 2px;
+}
+
+.dona-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid rgba(35, 135, 68, 0.72);
+  border-radius: 10px;
+  color: #1f7a3c;
+  background: #fff;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.dona-cta:hover {
+  color: #fff;
+  background: var(--dona-green);
+  transform: translateY(-1px);
+}
+
+.dona-sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 18px 14px;
+  background: var(--dona-paper);
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.dona-sug-btn {
+  border: 1px solid #d6eadb;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #376246;
+  background: #fff;
+  font: 800 0.78rem/1.15 "DM Sans", Arial, sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.dona-sug-btn:hover {
+  border-color: rgba(35, 135, 68, 0.34);
+  background: var(--dona-green-soft);
+  transform: translateY(-1px);
+}
+
+.dona-input-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 18px;
+  background: #fff;
+  border-top: 1px solid var(--dona-line);
+}
+
+.dona-input-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  color: #4b5563;
+  border: 1px solid #edf0f2;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.dona-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  outline: 0;
+  color: var(--dona-text);
+  background: #fff;
+  font: 500 0.9rem/1.2 "DM Sans", Arial, sans-serif;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dona-input:focus {
+  border-color: rgba(35, 135, 68, 0.6);
+  box-shadow: 0 0 0 4px rgba(35, 135, 68, 0.1);
+}
+
+.dona-input::placeholder {
+  color: #9ca3af;
+}
+
+.dona-send {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, var(--dona-green), #2da34e);
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 10px 20px rgba(35, 135, 68, 0.24);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.dona-send:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 12px 26px rgba(35, 135, 68, 0.3);
+}
+
+.dona-send:disabled,
+.dona-input:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+body.etapa1 .dona-fab,
 body.etapa1 .dona-chat {
-  bottom: calc(70px + 1rem);
-  right: auto;
-  left: 1rem;
+  right: calc(280px + 1.5rem);
+  bottom: 1.5rem;
 }
 
-@media (max-width: 480px) {
-  body.etapa1 .dona-fab {
-    bottom: calc(70px + 0.75rem);
-    left: 0.75rem;
-  }
+@media (max-width: 1023px) {
+  body.etapa1 .dona-fab,
   body.etapa1 .dona-chat {
-    bottom: calc(70px + 0.75rem);
-    left: 0.75rem;
-    width: calc(100vw - 1.5rem);
+    right: 18px;
+    bottom: calc(70px + 18px);
   }
 }
 
-/* Desktop (≥1024px): sidebar tem 280px à direita — FAB fica à esquerda dela */
-@media (min-width: 1024px) {
-  body.etapa1 .dona-fab {
-    bottom: 1.5rem;
-    left: auto;
-    right: calc(280px + 1.5rem);
+@media (max-width: 560px) {
+  .dona-fab {
+    width: 62px;
+    height: 62px;
+    right: 14px;
+    bottom: 14px;
   }
+
+  .dona-fab__hint {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    right: 70px;
+    max-width: calc(100vw - 98px);
+    padding: 8px 11px;
+    font-size: 0.74rem;
+  }
+
+  .dona-chat,
   body.etapa1 .dona-chat {
-    bottom: 1.5rem;
-    left: auto;
-    right: calc(280px + 1.5rem);
+    inset: 72px 8px 8px 8px;
+    width: auto;
+    max-height: calc(100dvh - 80px);
+    border-radius: 18px;
+  }
+
+  .dona-chat-header {
+    padding: 14px;
+  }
+
+  .dona-messages {
+    min-height: 280px;
+    max-height: none;
+    padding: 14px;
+  }
+
+  .dona-msg {
+    max-width: 88%;
+  }
+
+  .dona-sugestoes {
+    padding: 10px 14px 12px;
+  }
+
+  .dona-input-bar {
+    padding: 12px 14px max(12px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dona-fab,
+  .dona-chat.active,
+  .dona-msg,
+  .dona-typing span {
+    animation: none;
+  }
+
+  .dona-fab,
+  .dona-send,
+  .dona-sug-btn,
+  .dona-cta {
+    transition: none;
   }
 }

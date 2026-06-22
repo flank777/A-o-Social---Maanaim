@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: dona-assuncao-api
+    runtime: docker
+    rootDir: dona_assuncao_backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-flash-latest
+      - key: FIREBASE_CREDENTIALS
+        sync: false
+      - key: TELEFONE_PRINCIPAL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: RATE_LIMIT_MAX
+        value: "12"
+      - key: RATE_LIMIT_WINDOW
+        value: "60"

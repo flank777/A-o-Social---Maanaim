@@ -1,54 +1,26 @@
-﻿<!doctype html>
-<!--
-  
-    DoaVida  voluntario.html                                          
-    Página: Seja um Voluntário + Pedidos de Oração                     
-    FASES IMPLEMENTADAS:                                               
-    Fase 1  Header com logos duplas + navbar responsiva            
-    Fase 2  Hero: "Seja a resposta da oração de alguém"            
-    Fase 3  Por que ser voluntário (3 benefícios com ícones)       
-    Fase 4  Cards das 4 formas de ajudar                           
-    Fase 5  Modais com dicas por tipo de voluntariado              
-    Fase 6  Formulário com mensagem personalizada por tipo         
-    Fase 9  Backend: salva via DoaVidaAPI.addVoluntario() (api.js) 
-    Oração   Formulário público salva via DoaVidaAPI.addOracao()     
-                                                                        
-    DEPENDE DE:                                                        
-      css/global.css      variáveis, navbar, footer, modal, botões     
-      js/api.js           DoaVidaAPI.addVoluntario(), gerarId()        
-      js/app.js           loader, navbar, hamburguer, toast, modal     
-      js/voluntario.js    validação, máscara, mensagem personalizada   
+﻿<!doctype html> <!--
+  
+    DoaVida  voluntario.html
+    Página: Seja um Voluntário
+    FASES IMPLEMENTADAS:
+    Fase 1  Header com logos duplas + navbar responsiva
+    Fase 2  Hero: "Seja a resposta da oração de alguém"
+    Fase 3  Por que ser voluntário (3 benefícios com ícones)
+    Fase 4  Cards das 4 formas de ajudar
+    Fase 5  Modais com dicas por tipo de voluntariado
+    Fase 6  Formulário com mensagem personalizada por tipo
+    Fase 9  Backend: salva via DoaVidaAPI.addVoluntario() (api.js)
+
+    DEPENDE DE:                                                        
+      css/global.css      variáveis, navbar, footer, modal, botões     
+      js/api.js           DoaVidaAPI.addVoluntario(), gerarId()        
+      js/app.js           loader, navbar, hamburguer, toast, modal     
+      js/voluntario.js    validação, máscara, mensagem personalizada   
   a
--->
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <title>Seja um Voluntário | Ação Social Semear + Maanaim</title>
-    <meta
-      name="description"
-      content="Seja a resposta da oração de alguém. Junte-se à Ação Social Semear e
-    Comunidade Maanaim. Ajude a transformar vidas em Belém, Pará."
-    />
-    <!-- Fontes -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Ícones Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-    <!-- CSS global (variáveis, navbar, footer, modal, botões) -->
-    <link rel="stylesheet" href="css/global.css" />
-    <style>
-      /*
+--> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta
+      name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>Seja um Voluntário | Ação Social Semear + Maanaim</title> <meta
+      name="description" content="Seja a resposta da oração de alguém. Junte-se à Ação Social Semear e
+    Comunidade Maanaim. Ajude a transformar vidas em Belém, Pará." /> <!-- Preload --> <link rel="preload" as="image" href="img/hero-voluntario-desktop.jpg" media="(min-width:769px)" /> <link rel="preload" as="image" href="img/hero-voluntario-mobile.jpg" media="(max-width:768px)" /> <!-- Fontes --> <link rel="preconnect" href="https://fonts.googleapis.com" /> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript> <!-- Ícones Font Awesome --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript> <!-- CSS global (variáveis, navbar, footer, modal, botões) --> <link rel="stylesheet" href="css/global.css" /> <style> /*
          VARIÁVEIS EXTRAS
          Complementam o global.css sem sobrescrevê-lo.
        */
@@ -69,7 +41,7 @@
          Sobrescreve #nav do global.css para ter fundo sólido
          e exibir as duas logos das organizações lado a lado.
        */
-      /* Navbar transparente sobre o hero  fica clara ao rolar */
+      /* Navbar transparente sobre o hero  fica clara ao rolar */
       #nav {
         position:        fixed;
         top:             0; left: 0; right: 0;
@@ -99,7 +71,7 @@
       #nav .btn-primary    { transition: opacity .35s; }
       #nav .hamburger span { background: #000; transition: background .35s; }
       #nav.scrolled .hamburger span { background: #000; }
-      /* Container interno da navbar  altura fixa 72px */
+      /* Container interno da navbar  altura fixa 72px */
       #nav .container {
         display:         flex;
         align-items:     center;
@@ -135,14 +107,14 @@
         border:        1.5px solid rgba(255,255,255,.12);
         transition:    border-color var(--t);
       }
-      /* Semear  retrato */
+      /* Semear  retrato */
       .nav-logo-item.semear .nav-logo-img-wrap {
         width: 30px; height: 44px;
         border-radius: 6px;
         background: #fff;
         border-color: rgba(125,192,99,.3);
       }
-      /* Maanaim  circular */
+      /* Maanaim  circular */
       .nav-logo-item.maanaim .nav-logo-img-wrap {
         width: 44px; height: 44px;
         border-radius: 50%;
@@ -199,16 +171,16 @@
       /* Seção com fundo levemente diferente */
       .vol-section-alt { padding: 72px 0; background: #faf9f5; }
       /*
-         FASE 2  HERO
+         FASE 2  HERO
        */
       .vol-hero {
         position: relative;
         overflow: hidden;
         background: #f5f0e6;
       }
-      /* Foto card mobile  oculta no desktop */
+      /* Foto card mobile  oculta no desktop */
       .vol-hero-photo { display: none; }
-      /* Foto de fundo via <img> real  controlada pelo admin */
+      /* Foto de fundo via <img loading="lazy" decoding="async"> real  controlada pelo admin */
       #vol-hero-bg {
         display: block;
         position: relative;
@@ -335,7 +307,7 @@
         letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.9);
       }
       /*
-         FASE 3  POR QUE SER VOLUNTÁRIO
+         FASE 3  POR QUE SER VOLUNTÁRIO
        */
       /* Grade de 3 benefícios */
       /* Grade de 3 benefícios */
@@ -376,7 +348,7 @@
         .vol-why-card:nth-child(2) .vol-why-footer a:hover { background:#3a8a27; color:#fff; }
         .vol-why-card:nth-child(3) .vol-why-footer a:hover { background:#1e5214; color:#fff; }
         .vol-why-footer a svg { width:18px; height:18px; }
-        /* FASE 4  CARDS DAS FORMAS DE AJUDAR */
+        /* FASE 4  CARDS DAS FORMAS DE AJUDAR */
       /* Grade de 4 cards */
       .vol-cards-grid {
           display: grid !important;
@@ -432,7 +404,7 @@
         }
         .vol-card-btn:hover { background: #4A7A3A; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(90,138,74,0.35); }
         .vol-card-btn i { font-size: 0.84rem; }
-        FASE 5  MODAIS DE DICAS
+        FASE 5  MODAIS DE DICAS
          Reutiliza .modal-overlay e .modal-box do global.css.
          Apenas estilos adicionais específicos aqui.
        */
@@ -466,7 +438,7 @@
         color:var(--gold); font-style:normal; opacity:.7;
       }
       /*
-         FASE 6  FORMULÁRIO
+         FASE 6  FORMULÁRIO
        */
       /* Layout 2 colunas: info à esquerda + form à direita */
       .vol-form-layout {
@@ -587,7 +559,7 @@
       .vf-privacy { margin-top:12px; text-align:center; font-size:.72rem; color:var(--text2); line-height:1.5; }
       .vf-privacy i { color:var(--gold); margin-right:4px; }
       /*
-         MODAL DE SUCESSO  mensagem personalizada pós-envio
+         MODAL DE SUCESSO  mensagem personalizada pós-envio
        */
       /* Emoji animado no topo do modal */
       .success-emoji {
@@ -633,10 +605,10 @@
          RESPONSIVIDADE
        */
       @media (max-width: 1024px) {
-        /* Formulário: 2 colunas   1 coluna */
+        /* Formulário: 2 colunas   1 coluna */
         .vol-form-layout { grid-template-columns:1fr; gap:40px; }
         .vol-form-card { position:static; }
-        /* Why: 3 colunas   1 coluna */
+        /* Why: 3 colunas   1 coluna */
         .vol-why-grid { grid-template-columns:1fr; }
       }
       @media (max-width: 768px) {
@@ -645,7 +617,7 @@
         .hamburger { display: flex !important; }
         .nav-logo-title { font-size:.72rem; }
         .nav-logo-sub   { font-size:.52rem; }
-        /*  Hero mobile: fundo claro + imagem em card full bleed  */
+        /*  Hero mobile: fundo claro + imagem em card full bleed  */
         .vol-hero {
           min-height: unset;
           height: auto;
@@ -658,7 +630,7 @@
           position: relative;
           z-index: 1; /* garante que cobre o wave-bg canvas */
         }
-        /* Esconde bg e overlay  foto vai no card */
+        /* Esconde bg e overlay  foto vai no card */
         #vol-hero-bg        { display: none !important; }
         .vol-hero::before   {
           content: none !important;
@@ -677,7 +649,7 @@
           width: 100%;
           text-align: center;
         }
-        /* Foto card  de borda a borda (fora do container, filho direto da section) */
+        /* Foto card  de borda a borda (fora do container, filho direto da section) */
         .vol-hero-photo {
           display: block;
           width: 100%;
@@ -686,7 +658,7 @@
           margin-top: 16px;
           margin-bottom: 28px;
         }
-        /* Textos  espelho exato do design do index.html mobile */
+        /* Textos  espelho exato do design do index.html mobile */
         .vol-hero .container {
           display: flex;
           flex-direction: column;
@@ -697,10 +669,10 @@
           position: relative;
           z-index: 10;
         }
-        /* Badge e stats  ocultos no mobile */
+        /* Badge e stats  ocultos no mobile */
         .vol-hero-badge  { display: none !important; }
         .vol-hero-stats  { display: none !important; }
-        /* Título  remove text-shadow do desktop (fundo escuro) */
+        /* Título  remove text-shadow do desktop (fundo escuro) */
         .vol-hero-title {
           color: #1A3312;
           font-size: clamp(2rem, 8vw, 2.6rem);
@@ -724,7 +696,7 @@
           text-align: center;
           text-shadow: none !important;
         }
-        /* Botões empilhados, largura total  igual ao index */
+        /* Botões empilhados, largura total  igual ao index */
         .vol-hero-actions {
           flex-direction: column;
           gap: 10px;
@@ -737,7 +709,7 @@
           font-size: 0.95rem !important;
           padding: 15px 24px !important;
         }
-        /* Botão outline (Saiba mais)  visível no fundo claro */
+        /* Botão outline (Saiba mais)  visível no fundo claro */
         .vol-hero-actions .btn-outline,
         .vol-hero-actions .btn:not(.btn-primary) {
           color: #1A3312 !important;
@@ -823,150 +795,6 @@
           overflow: hidden !important;
         }
       }
-      /*
-         SEÇÃO DE PEDIDOS DE ORAÇÃO
-         Formulário público para enviar pedidos de oração.
-         Inserida entre os Cards (Fase 4) e o Form (Fase 6).
-       */
-      /* Layout 2 colunas: motivação à esquerda + form à direita */
-      .orac-layout {
-        display:               grid;
-        grid-template-columns: 1fr 1fr;
-        gap:                   56px;
-        align-items:           start;
-        margin-top:            48px;
-      }
-      /* Coluna de motivação */
-      .orac-motiv-title {
-        font-family:var(--ff-display); font-size:1.5rem; font-weight:700;
-        color:var(--cream); margin-bottom:14px; line-height:1.3;
-      }
-      .orac-motiv-desc {
-        font-size:.9rem; color:var(--text2); line-height:1.7; margin-bottom:24px;
-      }
-      /* Lista de formas de interceder */
-      .orac-lista { display:flex; flex-direction:column; gap:12px; }
-      .orac-item {
-        display:flex; align-items:center; gap:12px;
-        padding:12px 16px;
-        background:var(--surface); border:1px solid var(--border);
-        border-radius:var(--r-md);
-        font-size:.88rem; color:var(--text2);
-        transition:border-color var(--t), color var(--t);
-      }
-      .orac-item:hover { border-color:rgba(206,147,216,.3); color:var(--cream); }
-      .orac-item-icon {
-        font-size:1.2rem; flex-shrink:0;
-        width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-      }
-      /* Card do formulário de oração */
-      .orac-form-card {
-        background:    var(--surface);
-        border:        1px solid rgba(206,147,216,.2);
-        border-radius: var(--r-xl);
-        padding:       36px 32px;
-        position:      sticky;
-        top:           88px;
-      }
-      /* Linha roxa no topo do card */
-      .orac-form-card::before {
-        content:""; display:block; height:3px; margin:-36px -32px 28px;
-        border-radius:var(--r-xl) var(--r-xl) 0 0;
-        background:linear-gradient(to right, #ce93d8, #ba68c8);
-      }
-      .orac-form-card-title {
-        font-family:var(--ff-display); font-size:1.2rem; font-weight:700;
-        color:var(--cream); margin-bottom:6px;
-      }
-      .orac-form-card-sub {
-        font-size:.82rem; color:var(--text2); margin-bottom:24px; line-height:1.5;
-      }
-      /* Campos específicos do form de oração */
-      .orac-field { margin-bottom:18px; }
-      .orac-label {
-        display:block; font-size:.72rem; font-weight:700;
-        letter-spacing:.1em; text-transform:uppercase;
-        color:var(--text2); margin-bottom:7px;
-      }
-      .orac-label .req  { color:#e55a5a; margin-left:3px; }
-      .orac-label .opt  { font-size:.65rem; color:var(--muted,#888876); font-weight:400;
-                           text-transform:none; letter-spacing:0; margin-left:4px; }
-      /* Input/select/textarea do form de oração */
-      .orac-input, .orac-select, .orac-textarea {
-        width:100%; background:rgba(0,0,0,.25);
-        border:1.5px solid rgba(255,255,255,.1);
-        border-radius:var(--r-md); padding:12px 14px;
-        color:var(--cream); font-size:.9rem; font-family:var(--ff-body);
-        outline:none; transition:border-color .2s, box-shadow .2s;
-      }
-      .orac-input::placeholder, .orac-textarea::placeholder {
-        color:var(--text2); opacity:.5;
-      }
-      /* Foco: borda roxa/lilás */
-      .orac-input:focus, .orac-select:focus, .orac-textarea:focus {
-        border-color:#ce93d8;
-        box-shadow:0 0 0 3px rgba(206,147,216,.12);
-      }
-      /* Estado de erro */
-      .orac-field.err .orac-input,
-      .orac-field.err .orac-select,
-      .orac-field.err .orac-textarea {
-        border-color:#e55a5a;
-        box-shadow:0 0 0 3px rgba(229,90,90,.12);
-        animation:vfShake .4s ease; /* reutiliza @keyframes do form de voluntário */
-      }
-      /* Textarea redimensionável */
-      .orac-textarea { resize:vertical; min-height:100px; line-height:1.6; }
-      /* Select com seta roxa */
-      .orac-select {
-        cursor:pointer; appearance:none; -webkit-appearance:none;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ce93d8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat:no-repeat; background-position:right 14px center;
-        background-color:rgba(0,0,0,.25); padding-right:40px;
-      }
-      .orac-select option { background:var(--surface); color:var(--cream); }
-      /* Mensagem de erro dos campos de oração */
-      .orac-msg {
-        font-size:.72rem; margin-top:4px; min-height:16px;
-        color:transparent; transition:color .2s;
-      }
-      .orac-field.err .orac-msg { color:#e55a5a; }
-      /* Botão de envio da oração */
-      .orac-btn {
-        width:100%; padding:14px 24px;
-        background:rgba(206,147,216,.15);
-        color:#e8d5f0;
-        border:1.5px solid rgba(206,147,216,.4);
-        border-radius:var(--r-md);
-        font-family:var(--ff-body); font-size:.95rem; font-weight:600;
-        cursor:pointer; transition:background .2s, border-color .2s, transform .15s;
-        display:flex; align-items:center; justify-content:center; gap:10px;
-      }
-      .orac-btn:hover:not(:disabled) {
-        background:rgba(206,147,216,.25);
-        border-color:rgba(206,147,216,.6);
-        transform:translateY(-1px);
-      }
-      .orac-btn:disabled, .orac-btn.loading { opacity:.6; cursor:not-allowed; }
-      /* Spinner de loading */
-      .orac-spinner { display:none; }
-      .orac-btn.loading .orac-spinner {
-        display:inline-block; width:16px; height:16px;
-        border:2px solid rgba(232,213,240,.2); border-top-color:#e8d5f0;
-        border-radius:50%; animation:girar .7s linear infinite; /* @keyframes do form vol */
-      }
-      .orac-btn.loading .orac-btn-lbl { display:none; }
-      /* Versículo abaixo do botão */
-      .orac-verse-hint {
-        margin-top:14px; text-align:center;
-        font-family:var(--ff-display); font-style:italic;
-        font-size:.78rem; color:var(--text2); line-height:1.5; opacity:.75;
-      }
-      /*  Responsividade da seção de oração  */
-      @media (max-width:1024px) {
-        .orac-layout { grid-template-columns:1fr; gap:36px; }
-        .orac-form-card { position:static; }
-      }
       @media (max-width: 480px) {
         /* Esconde textos das logos em telas muito pequenas */
         .nav-logo-texts { display:none; }
@@ -974,7 +802,7 @@
         .nav-brand      { gap:10px; }
         .vol-hero-title { font-size:2rem; }
       }
-      /*  Animações  Botões específicos de voluntario.html  */
+      /*  Animações  Botões específicos de voluntario.html  */
       /* Botão principal do formulário de voluntário */
       .vf-btn {
         position: relative; overflow: hidden;
@@ -994,32 +822,12 @@
         box-shadow: 0 10px 28px rgba(232,201,106,0.55);
       }
       .vf-btn:not(:disabled):active { transform: translateY(0) scale(0.96); box-shadow: none; }
-      /* Botão de envio da oração */
-      .orac-btn {
-        position: relative; overflow: hidden;
-        transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
-      }
-      .orac-btn::before {
-        content: '';
-        position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-        transform: skewX(-20deg);
-        transition: left 0.6s ease; pointer-events: none;
-      }
-      .orac-btn:not(:disabled):hover::before { left: 140%; }
-      .orac-btn:not(:disabled):hover {
-        background: rgba(206,147,216,0.28);
-        border-color: rgba(206,147,216,0.65);
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 10px 28px rgba(206,147,216,0.32);
-      }
-      .orac-btn:not(:disabled):active { transform: translateY(0) scale(0.96); box-shadow: none; }
       /* Links no footer dos why-cards */
       .vol-why-footer a {
         transition: background 0.2s ease, transform 0.15s ease;
       }
       .vol-why-footer a:hover { transform: scale(1.15); }
-      /*  3D & Shimmer  Vol Cards e Why Cards  */
+      /*  3D & Shimmer  Vol Cards e Why Cards  */
       .vol-cards-grid { perspective: none; }
       .vol-why-grid   { perspective: none; }
       .vol-card, .vol-why-card {
@@ -1077,843 +885,191 @@
           width: 100% !important;
         }
       }
-    </style>
-  </head>
-  <body>
-    <!-- 
-       LOADER  app.js esconde após carregamento
-   -->
-    <div id="loader" role="status" aria-label="Carregando">
-      <div class="loader-inner">
-        <div class="ldr-stage" aria-hidden="true">
-          <span class="ldr-halo"></span>
-          <span class="ldr-ring ldr-ring-1"></span>
-          <span class="ldr-ring ldr-ring-2"></span>
-          <span class="ldr-ring ldr-ring-3"></span>
-          <span class="ldr-orbit">
-            <span class="ldr-dot"></span>
-            <span class="ldr-dot"></span>
-            <span class="ldr-dot"></span>
-            <span class="ldr-dot"></span>
-          </span>
-          <img
-            class="loader-logo-img"
-            src="logo-semear.jpeg"
-            alt="Ação Social Semear"
-            onerror="this.style.display = 'none'"
-          />
-          <span class="ldr-scan"></span>
-        </div>
-        <p class="loader-text" aria-hidden="true">
-          Ação Social Semear · Belém, PA
-        </p>
-        <div class="loader-bar-wrap" aria-hidden="true">
-          <div class="loader-bar"></div>
-        </div>
-      </div>
-    </div>
-    <!-- 
-       NAVBAR  logos duplas
-       app.js controla: scroll   classe "scrolled", hamburguer
-   -->
-    <!-- 
-       DRAWER  menu mobile
-   -->
-    <!-- 
-       MAIN  conteúdo da página
-   -->
-    <main id="main-content">
-      <!-- 
-         FASE 2  HERO
-         "Seja a resposta da oração de alguém"
-     -->
-      <section class="vol-hero" aria-labelledby="hero-title">
-        <!-- Foto de fundo controlada pelo admin via banner-config.js -->
-        <img
-          id="vol-hero-bg"
-          src="img/hero-voluntario-desktop.png"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-        />
-        <!-- Partículas decorativas de fundo -->
-        <div class="vol-hero-particles" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </div>
-        <!-- Foto card  visível apenas no mobile, controlada pelo admin -->
-        <img
-          class="vol-hero-photo"
-          src="img/capa-voluntario-mobile.png"
-          alt="Seja um Voluntário — Ação Social Semear"
-          loading="eager"
-        />
-        <div class="container">
-          <!-- Título principal -->
-          <h1 class="vol-hero-title" id="hero-title">
-            Seja a resposta da<br />
-            oração de <em>alguém</em>
-          </h1>
-          <!-- Subtítulo -->
-          <p class="vol-hero-sub">
-            Venha fazer parte da nossa Ação Social e leve amor, cuidado e
-            esperança. Cada voluntário transforma vidas em Belém, Pará.
-          </p>
-          <!-- Botões de ação -->
-          <div class="vol-hero-actions">
-            <!--
+    </style> </head> <body> <!-- 
+       LOADER  app.js esconde após carregamento
+   --> <div id="loader" role="status" aria-label="Carregando"> <div class="loader-inner"> <div class="ldr-stage" aria-hidden="true"> <span class="ldr-halo"></span> <span class="ldr-ring ldr-ring-1"></span> <span class="ldr-ring ldr-ring-2"></span> <span class="ldr-ring ldr-ring-3"></span> <span class="ldr-orbit"> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> </span> <img
+            class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display = 'none'" loading="eager" decoding="async"> <span class="ldr-scan"></span> </div> <p class="loader-text" aria-hidden="true"> Ação Social Semear · Belém, PA
+        </p> <div class="loader-bar-wrap" aria-hidden="true"> <div class="loader-bar"></div> </div> </div> </div> <!-- 
+       NAVBAR  logos duplas
+       app.js controla: scroll   classe "scrolled", hamburguer
+   --> <!-- 
+       DRAWER  menu mobile
+   --> <!-- 
+       MAIN  conteúdo da página
+   --> <main id="main-content"> <!-- 
+         FASE 2  HERO
+         "Seja a resposta da oração de alguém" --> <section class="vol-hero" aria-labelledby="hero-title"> <!-- Foto de fundo controlada pelo admin via banner-config.js --> <img
+          id="vol-hero-bg" src="img/hero-voluntario-desktop.jpg" alt="" aria-hidden="true" loading="eager" /> <!-- Partículas decorativas de fundo --> <div class="vol-hero-particles" aria-hidden="true"> <span></span><span></span><span></span> </div> <!-- Foto card  visível apenas no mobile, controlada pelo admin --> <img
+          class="vol-hero-photo" src="img/capa-voluntario-mobile.jpg" alt="Seja um Voluntário — Ação Social Semear" loading="eager" /> <div class="container"> <!-- Título principal --> <h1 class="vol-hero-title" id="hero-title"> Seja a resposta da<br /> oração de <em>alguém</em> </h1> <!-- Botões de ação --> <div class="vol-hero-actions"> <!--
             Scroll suave até a seção do formulário (#formulario).
             O app.js intercepta links âncora e aplica offset da navbar.
-          -->
-            <a
-              href="voluntario-form.html"
-              class="btn btn-primary btn-lg"
-              style="font-size: 1rem; padding: 16px 40px; color: #ffffff"
-            >
-              <i class="fas fa-hands-helping" aria-hidden="true"></i>
-              Quero ser voluntário
-            </a>
-          </div>
-          <!-- Estatísticas (preenchidas pelo voluntario.js via DoaVidaAPI) -->
-          </div>
-        </div>
-      </section>
-      <!-- 
-         FASE 3  POR QUE SER VOLUNTÁRIO
+          --> <a
+              href="#como-ajudar" class="btn btn-primary btn-lg" style="font-size: 1rem; padding: 16px 40px; color: #ffffff" > <i class="fas fa-hands-helping" aria-hidden="true"></i> Quero ser voluntário
+            </a> </div> <!-- Estatísticas (preenchidas pelo voluntario.js via DoaVidaAPI) --> </div> </div> </section> <!-- 
+         FASE 3  POR QUE SER VOLUNTÁRIO
          3 benefícios com ícones
-     -->
-      <!-- 
-         FASE 4  CARDS DAS FORMAS DE AJUDAR
+     --> <!-- 
+         FASE 4  CARDS DAS FORMAS DE AJUDAR
          4 cards: Doação, Voluntário, Espiritual, Logística
-     -->
-      <section
-        id="como-ajudar"
-        class="vol-section"
-        aria-labelledby="como-title"
-      >
-        <div class="container">
-          <div
-            class="animate-in"
-            style="text-align: center; max-width: 560px; margin: 0 auto"
-          >
-            <h2 class="section-title" id="como-title">
-              Como você pode<br /><em>contribuir?</em>
-            </h2>
-            <div class="divider"></div>
-            <p
-              style="color: var(--text2); font-size: 0.95rem; margin-top: 12px"
-            >
-              Cada pessoa tem um dom único. Escolha a forma que mais combina com
+     --> <section
+        id="como-ajudar" class="vol-section" aria-labelledby="como-title" > <div class="container"> <div
+            class="animate-in" style="text-align: center; max-width: 560px; margin: 0 auto" > <h2 class="section-title" id="como-title"> Como você pode<br /><em>contribuir?</em> </h2> <div class="divider"></div> <p
+              style="color: var(--text2); font-size: 0.95rem; margin-top: 12px" > Cada pessoa tem um dom único. Escolha a forma que mais combina com
               você.
-            </p>
-          </div>
-          <!-- Grade de 4 cards -->
-          <div class="vol-cards-grid">
-            <div class="vol-card doacao animate-in" data-delay="0">
-              <div class="vol-card-img">
-                <picture>
-                  <source media="(max-width: 768px)" srcset="img/card-doacao.png" />
-                  <img
-                    src="img/card-doacao-desk.png"
-                    alt="Doação de alimentos"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <div class="vol-card-body">
-                <span class="vol-card-label">Doação de Alimentos</span>
-                <h3 class="vol-card-title">Alimente uma família hoje</h3>
-                <p class="vol-card-desc">
-                  Contribua com cestas básicas, alimentos não-perecíveis. Cada
+            </p> </div> <!-- Grade de 4 cards --> <div class="vol-cards-grid"> <div class="vol-card doacao animate-in" data-delay="0"> <div class="vol-card-img"> <picture> <source media="(max-width: 768px)" srcset="img/card-doacao.jpg" /> <img
+                    src="img/card-doacao-desk.jpg" alt="Doação de alimentos" loading="lazy" /> </picture> </div> <div class="vol-card-body"> <span class="vol-card-label">Doação de Alimentos</span> <h3 class="vol-card-title">Alimente uma família hoje</h3> <p class="vol-card-desc"> Contribua com cestas básicas, alimentos não-perecíveis. Cada
                   doação alimenta uma família e semeia esperança em Belém.
-                </p>
-                <a href="form.html" class="vol-card-btn">
-                  <i class="fas fa-box-open" aria-hidden="true"></i> Quero doar
-                </a>
-              </div>
-            </div>
-            <div class="vol-card voluntario animate-in" data-delay="100">
-              <div class="vol-card-img">
-                <picture>
-                  <source media="(max-width: 768px)" srcset="img/card-voluntario.png" />
-                  <img
-                    src="img/card-voluntario-desk.png"
-                    alt="Trabalho voluntário"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <div class="vol-card-body">
-                <span class="vol-card-label">Trabalho Voluntário</span>
-                <h3 class="vol-card-title">Doe seu tempo e talento</h3>
-                <p class="vol-card-desc">
-                  Ajude na organização, triagem, montagem das cestas e entrega
+                </p> <a href="form.html" class="vol-card-btn"> <i class="fas fa-box-open" aria-hidden="true"></i> Quero doar
+                </a> </div> </div> <div class="vol-card voluntario animate-in" data-delay="100"> <div class="vol-card-img"> <picture> <source media="(max-width: 768px)" srcset="img/card-voluntario.jpg" /> <img
+                    src="img/card-voluntario-desk.jpg" alt="Trabalho voluntário" loading="lazy" /> </picture> </div> <div class="vol-card-body"> <span class="vol-card-label">Trabalho Voluntário</span> <h3 class="vol-card-title">Doe seu tempo e talento</h3> <p class="vol-card-desc"> Ajude na organização, triagem, montagem das cestas e entrega
                   às famílias. Seu tempo e dedicação fazem toda a diferença.
-                </p>
-                <a
-                  href="voluntario-form.html?tipo=trabalho"
-                  class="vol-card-btn"
-                >
-                  <i class="fas fa-hands-helping" aria-hidden="true"></i> Ser
+                </p> <a
+                  href="voluntario-form.html?tipo=trabalho" class="vol-card-btn" > <i class="fas fa-hands-helping" aria-hidden="true"></i> Ser
                   voluntário
-                </a>
-              </div>
-            </div>
-            <div class="vol-card espiritual animate-in" data-delay="200">
-              <div class="vol-card-img">
-                <picture>
-                  <source media="(max-width: 768px)" srcset="img/card-espiritual.png" />
-                  <img
-                    src="img/card-espiritual-desk.png"
-                    alt="Apoio espiritual"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <div class="vol-card-body">
-                <span class="vol-card-label">Apoio Espiritual</span>
-                <h3 class="vol-card-title">Ore e transforme vidas</h3>
-                <p class="vol-card-desc">
-                  Ore pelas famílias, pelos voluntários e pela missão. Sua
+                </a> </div> </div> <div class="vol-card espiritual animate-in" data-delay="200"> <div class="vol-card-img"> <picture> <source media="(max-width: 768px)" srcset="img/card-espiritual.jpg" /> <img
+                    src="img/card-espiritual-desk.jpg" alt="Apoio espiritual" loading="lazy" /> </picture> </div> <div class="vol-card-body"> <span class="vol-card-label">Apoio Espiritual</span> <h3 class="vol-card-title">Ore e transforme vidas</h3> <p class="vol-card-desc"> Ore pelas famílias, pelos voluntários e pela missão. Sua
                   oração é a fundação de tudo que fazemos.
-                </p>
-                <a
-                  href="voluntario-form.html?tipo=intercessao"
-                  class="vol-card-btn"
-                >
-                  <i class="fas fa-praying-hands" aria-hidden="true"></i> Quero
+                </p> <a
+                  href="voluntario-form.html?tipo=intercessao" class="vol-card-btn" > <i class="fas fa-praying-hands" aria-hidden="true"></i> Quero
                   interceder
-                </a>
-              </div>
-            </div>
-            <div class="vol-card logistica animate-in" data-delay="300">
-              <div class="vol-card-img">
-                <picture>
-                  <source media="(max-width: 768px)" srcset="img/card-logistica.png" />
-                  <img
-                    src="img/card-logistica-desk.png"
-                    alt="Apoio logístico"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <div class="vol-card-body">
-                <span class="vol-card-label">Apoio Logístico</span>
-                <h3 class="vol-card-title">Leve até quem precisa</h3>
-                <p class="vol-card-desc">
-                  Ajude no transporte, armazenamento e distribuição das cestas.
+                </a> </div> </div> <div class="vol-card logistica animate-in" data-delay="300"> <div class="vol-card-img"> <picture> <source media="(max-width: 768px)" srcset="img/card-logistica.jpg" /> <img
+                    src="img/card-logistica-desk.jpg" alt="Apoio logístico" loading="lazy" /> </picture> </div> <div class="vol-card-body"> <span class="vol-card-label">Apoio Logístico</span> <h3 class="vol-card-title">Leve até quem precisa</h3> <p class="vol-card-desc"> Ajude no transporte, armazenamento e distribuição das cestas.
                   Seu veículo pode ser o elo que falta para alcançar mais
                   famílias.
-                </p>
-                <a
-                  href="voluntario-form.html?tipo=logistica"
-                  class="vol-card-btn"
-                >
-                  <i class="fas fa-truck" aria-hidden="true"></i> Apoiar
+                </p> <a
+                  href="voluntario-form.html?tipo=logistica" class="vol-card-btn" > <i class="fas fa-truck" aria-hidden="true"></i> Apoiar
                   logística
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- fim #oracao -->
-    </main>
-    <!-- 
+                </a> </div> </div> </div> </div> </section> </main> <!--
        FOOTER
-   -->
-    <!-- 
-       FASE 5  MODAIS DE DICAS
+   --> <!-- 
+       FASE 5  MODAIS DE DICAS
        Um modal para cada tipo de voluntariado.
        Abertos pelos botões "Ver como ajudar" dos cards.
        Reutilizam .modal-overlay e .modal-box do global.css.
-   -->
-    <!-- Modal: Doação de Alimentos -->
-    <div
-      class="modal-overlay"
-      id="modal-doacao"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-doacao-title"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title" id="modal-doacao-title">
-            <i
-              class="fas fa-box-open"
-              style="color: var(--gold); margin-right: 8px; font-size: 0.9em"
-              aria-hidden="true"
-            ></i>
-            Doação de Alimentos
-          </h2>
-          <button
-            type="button"
-            class="modal-close"
-            onclick="window.fecharModal('modal-doacao')"
-            aria-label="Fechar"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-        <ul class="modal-dicas" role="list">
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(232, 201, 106, 0.1); color: var(--gold)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Alimentos não-perecíveis</strong>
-              <span
+   --> <!-- Modal: Doação de Alimentos --> <div
+      class="modal-overlay" id="modal-doacao" role="dialog" aria-modal="true" aria-labelledby="modal-doacao-title" > <div class="modal-box"> <div class="modal-header"> <h2 class="modal-title" id="modal-doacao-title"> <i
+              class="fas fa-box-open" style="color: var(--gold); margin-right: 8px; font-size: 0.9em" aria-hidden="true" ></i> Doação de Alimentos
+          </h2> <button
+            type="button" class="modal-close" onclick="window.fecharModal('modal-doacao')" aria-label="Fechar" > <i class="fas fa-times" aria-hidden="true"></i> </button> </div> <ul class="modal-dicas" role="list"> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(232, 201, 106, 0.1); color: var(--gold)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Alimentos não-perecíveis</strong> <span
                 >Arroz, feijão, macarrão, óleo, açúcar, farinha e enlatados são
                 sempre bem-vindos.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(232, 201, 106, 0.1); color: var(--gold)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Entrega ou retirada</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(232, 201, 106, 0.1); color: var(--gold)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Entrega ou retirada</strong> <span
                 >Pode trazer pessoalmente ou combinar a retirada pelo WhatsApp
                 com nossa equipe.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(232, 201, 106, 0.1); color: var(--gold)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Doação em grupo</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(232, 201, 106, 0.1); color: var(--gold)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Doação em grupo</strong> <span
                 >Mobilize amigos, família ou sua empresa para uma doação
                 coletiva de maior impacto.</span
-              >
-            </div>
-          </li>
-        </ul>
-        <div class="modal-versiculo">
-          <blockquote>"Compartilha o teu pão com o faminto."</blockquote>
-          <cite>Isaías 58:7</cite>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-outline"
-            onclick="window.fecharModal('modal-doacao')"
-          >
-            Fechar
-          </button>
-          <a href="voluntario-form.html?tipo=doacao" class="btn btn-primary">
-            <i class="fas fa-box-open" aria-hidden="true"></i>
-            Fazer Doação
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- Modal: Trabalho Voluntário -->
-    <div
-      class="modal-overlay"
-      id="modal-voluntario-dicas"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-vol-title"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title" id="modal-vol-title">
-            <i
-              class="fas fa-tools"
-              style="color: var(--sage2); margin-right: 8px; font-size: 0.9em"
-              aria-hidden="true"
-            ></i>
-            Trabalho Voluntário
-          </h2>
-          <button
-            type="button"
-            class="modal-close"
-            onclick="window.fecharModal('modal-voluntario-dicas')"
-            aria-label="Fechar"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-        <ul class="modal-dicas" role="list">
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Triagem de alimentos</strong>
-              <span
+              > </div> </li> </ul> <div class="modal-versiculo"> <blockquote>"Compartilha o teu pão com o faminto."</blockquote> <cite>Isaías 58:7</cite> </div> <div class="modal-footer"> <button
+            type="button" class="btn btn-outline" onclick="window.fecharModal('modal-doacao')" > Fechar
+          </button> <a href="voluntario-form.html?tipo=doacao" class="btn btn-primary"> <i class="fas fa-box-open" aria-hidden="true"></i> Fazer Doação
+          </a> </div> </div> </div> <!-- Modal: Trabalho Voluntário --> <div
+      class="modal-overlay" id="modal-voluntario-dicas" role="dialog" aria-modal="true" aria-labelledby="modal-vol-title" > <div class="modal-box"> <div class="modal-header"> <h2 class="modal-title" id="modal-vol-title"> <i
+              class="fas fa-tools" style="color: var(--sage2); margin-right: 8px; font-size: 0.9em" aria-hidden="true" ></i> Trabalho Voluntário
+          </h2> <button
+            type="button" class="modal-close" onclick="window.fecharModal('modal-voluntario-dicas')" aria-label="Fechar" > <i class="fas fa-times" aria-hidden="true"></i> </button> </div> <ul class="modal-dicas" role="list"> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Triagem de alimentos</strong> <span
                 >Ajude a separar, pesar e organizar os alimentos recebidos nas
                 ações.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Montagem de cestas</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Montagem de cestas</strong> <span
                 >Participe da montagem das cestas básicas que serão entregues às
                 famílias cadastradas.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Divulgação nas redes</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(125, 192, 99, 0.1); color: var(--sage2)" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Divulgação nas redes</strong> <span
                 >Ajude a divulgar a campanha nas suas redes sociais e alcançar
                 mais doadores.</span
-              >
-            </div>
-          </li>
-        </ul>
-        <div class="modal-versiculo">
-          <blockquote>"Sede uns para com os outros, servindo."</blockquote>
-          <cite>Gálatas 5:13</cite>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-outline"
-            onclick="window.fecharModal('modal-voluntario-dicas')"
-          >
-            Fechar
-          </button>
-          <a
-            href="voluntario-form.html?tipo=trabalho"
-            class="btn btn-primary"
-            onclick="window.fecharModal('modal-voluntario-dicas')"
-          >
-            <i class="fas fa-hands-helping" aria-hidden="true"></i>
-            Quero me cadastrar
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- Modal: Apoio Espiritual (PRIORIDADE  dicas detalhadas) -->
-    <div
-      class="modal-overlay"
-      id="modal-espiritual"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-esp-title"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title" id="modal-esp-title">
-            <i
-              class="fas fa-praying-hands"
-              style="color: #ce93d8; margin-right: 8px; font-size: 0.9em"
-              aria-hidden="true"
-            ></i>
-            Apoio Espiritual
-          </h2>
-          <button
-            type="button"
-            class="modal-close"
-            onclick="window.fecharModal('modal-espiritual')"
-            aria-label="Fechar"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-        <!-- Subtítulo de destaque -->
-        <p
-          style="
-            font-size: 0.85rem;
+              > </div> </li> </ul> <div class="modal-versiculo"> <blockquote>"Sede uns para com os outros, servindo."</blockquote> <cite>Gálatas 5:13</cite> </div> <div class="modal-footer"> <button
+            type="button" class="btn btn-outline" onclick="window.fecharModal('modal-voluntario-dicas')" > Fechar
+          </button> <a
+            href="voluntario-form.html?tipo=trabalho" class="btn btn-primary" onclick="window.fecharModal('modal-voluntario-dicas')" > <i class="fas fa-hands-helping" aria-hidden="true"></i> Quero me cadastrar
+          </a> </div> </div> </div> <!-- Modal: Apoio Espiritual (PRIORIDADE  dicas detalhadas) --> <div
+      class="modal-overlay" id="modal-espiritual" role="dialog" aria-modal="true" aria-labelledby="modal-esp-title" > <div class="modal-box"> <div class="modal-header"> <h2 class="modal-title" id="modal-esp-title"> <i
+              class="fas fa-praying-hands" style="color: #ce93d8; margin-right: 8px; font-size: 0.9em" aria-hidden="true" ></i> Apoio Espiritual
+          </h2> <button
+            type="button" class="modal-close" onclick="window.fecharModal('modal-espiritual')" aria-label="Fechar" > <i class="fas fa-times" aria-hidden="true"></i> </button> </div> <!-- Subtítulo de destaque --> <p
+          style=" font-size: 0.85rem;
             color: var(--text2);
             margin-bottom: 4px;
             line-height: 1.6;
-          "
-        >
-          A oração é a base de tudo que fazemos. Escolha uma das formas abaixo
+          " > A oração é a base de tudo que fazemos. Escolha uma das formas abaixo
           para interceder pela missão:
-        </p>
-        <ul class="modal-dicas" role="list">
-          <!-- Dica 1: Oração do meio-dia -->
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(206, 147, 216, 0.1); color: #ce93d8"
-            >
-              x":
-            </div>
-            <div class="modal-dica-text">
-              <strong>Oração do Meio-Dia</strong>
-              <span
+        </p> <ul class="modal-dicas" role="list"> <!-- Dica 1: Oração do meio-dia --> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(206, 147, 216, 0.1); color: #ce93d8" > x":
+            </div> <div class="modal-dica-text"> <strong>Oração do Meio-Dia</strong> <span
                 >Pare por 1 minuto ao meio-dia e ore pelas famílias que
                 receberão as cestas. Uma oração simples, mas poderosa.</span
-              >
-            </div>
-          </li>
-          <!-- Dica 2: 7 dias de oração -->
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(206, 147, 216, 0.1); color: #ce93d8"
-            >
-              x&
-            </div>
-            <div class="modal-dica-text">
-              <strong>7 Dias de Oração</strong>
-              <span
+              > </div> </li> <!-- Dica 2: 7 dias de oração --> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(206, 147, 216, 0.1); color: #ce93d8" > x&
+            </div> <div class="modal-dica-text"> <strong>7 Dias de Oração</strong> <span
                 >Comprometa-se a orar durante 7 dias consecutivos pela missão.
                 Cada dia, um aspecto diferente: famílias, voluntários,
                 recursos.</span
-              >
-            </div>
-          </li>
-          <!-- Dica 3: 1 mês de propósito -->
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(206, 147, 216, 0.1); color: #ce93d8"
-            >
-              xR"
-            </div>
-            <div class="modal-dica-text">
-              <strong>1 Mês de Propósito</strong>
-              <span
+              > </div> </li> <!-- Dica 3: 1 mês de propósito --> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(206, 147, 216, 0.1); color: #ce93d8" > xR" </div> <div class="modal-dica-text"> <strong>1 Mês de Propósito</strong> <span
                 >Adote a Ação Social como foco de oração por um mês inteiro. Ore
                 no seu tempo devocional e observe Deus agir poderosamente.</span
-              >
-            </div>
-          </li>
-          <!-- Dica 4: Intercessão -->
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(206, 147, 216, 0.1); color: #ce93d8"
-            >
-              x"
-            </div>
-            <div class="modal-dica-text">
-              <strong>Intercessão em Grupo</strong>
-              <span
+              > </div> </li> <!-- Dica 4: Intercessão --> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(206, 147, 216, 0.1); color: #ce93d8" > x" </div> <div class="modal-dica-text"> <strong>Intercessão em Grupo</strong> <span
                 >Reúna um grupo de amigos ou célula da sua igreja para orar
                 juntos pela missão. Onde dois ou três se reúnem, Ele está
                 presente.</span
-              >
-            </div>
-          </li>
-        </ul>
-        <div class="modal-versiculo">
-          <blockquote>
-            "Não andeis ansiosos por coisa alguma, mas em tudo, pela oração e
-            súplicas, e com ação de graças, apresentem seus pedidos a Deus."
-          </blockquote>
-          <cite>Filipenses 4:6</cite>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-outline"
-            onclick="window.fecharModal('modal-espiritual')"
-          >
-            Fechar
-          </button>
-          <a
-            href="voluntario-form.html?tipo=intercessao"
-            class="btn btn-primary"
-            onclick="window.fecharModal('modal-espiritual')"
-            style="background: rgba(206, 147, 216, 0.9); color: #1a0a2e"
-          >
-            <i class="fas fa-praying-hands" aria-hidden="true"></i>
-            Quero orar pela missão
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- Modal: Apoio Logístico -->
-    <div
-      class="modal-overlay"
-      id="modal-logistica"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-log-title"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title" id="modal-log-title">
-            <i
-              class="fas fa-truck"
-              style="color: #64b5f6; margin-right: 8px; font-size: 0.9em"
-              aria-hidden="true"
-            ></i>
-            Apoio Logístico
-          </h2>
-          <button
-            type="button"
-            class="modal-close"
-            onclick="window.fecharModal('modal-logistica')"
-            aria-label="Fechar"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-        <ul class="modal-dicas" role="list">
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(100, 181, 246, 0.1); color: #64b5f6"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Transporte de doações</strong>
-              <span
+              > </div> </li> </ul> <div class="modal-versiculo"> <blockquote> "Não andeis ansiosos por coisa alguma, mas em tudo, pela oração e
+            súplicas, e com ação de graças, apresentem seus pedidos a Deus." </blockquote> <cite>Filipenses 4:6</cite> </div> <div class="modal-footer"> <button
+            type="button" class="btn btn-outline" onclick="window.fecharModal('modal-espiritual')" > Fechar
+          </button> <a
+            href="voluntario-form.html?tipo=intercessao" class="btn btn-primary" onclick="window.fecharModal('modal-espiritual')" style="background: rgba(206, 147, 216, 0.9); color: #1a0a2e" > <i class="fas fa-praying-hands" aria-hidden="true"></i> Quero orar pela missão
+          </a> </div> </div> </div> <!-- Modal: Apoio Logístico --> <div
+      class="modal-overlay" id="modal-logistica" role="dialog" aria-modal="true" aria-labelledby="modal-log-title" > <div class="modal-box"> <div class="modal-header"> <h2 class="modal-title" id="modal-log-title"> <i
+              class="fas fa-truck" style="color: #64b5f6; margin-right: 8px; font-size: 0.9em" aria-hidden="true" ></i> Apoio Logístico
+          </h2> <button
+            type="button" class="modal-close" onclick="window.fecharModal('modal-logistica')" aria-label="Fechar" > <i class="fas fa-times" aria-hidden="true"></i> </button> </div> <ul class="modal-dicas" role="list"> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(100, 181, 246, 0.1); color: #64b5f6" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Transporte de doações</strong> <span
                 >Ajude a buscar as doações nos pontos de coleta e transportar
                 até o centro de triagem.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(100, 181, 246, 0.1); color: #64b5f6"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Entrega às famílias</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(100, 181, 246, 0.1); color: #64b5f6" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Entrega às famílias</strong> <span
                 >Participe das rotas de entrega das cestas às famílias
                 cadastradas em Belém.</span
-              >
-            </div>
-          </li>
-          <li class="modal-dica">
-            <div
-              class="modal-dica-icon"
-              style="background: rgba(100, 181, 246, 0.1); color: #64b5f6"
-            >
-              <i class="fas fa-check" aria-hidden="true"></i>
-            </div>
-            <div class="modal-dica-text">
-              <strong>Disponibilizar veículo</strong>
-              <span
+              > </div> </li> <li class="modal-dica"> <div
+              class="modal-dica-icon" style="background: rgba(100, 181, 246, 0.1); color: #64b5f6" > <i class="fas fa-check" aria-hidden="true"></i> </div> <div class="modal-dica-text"> <strong>Disponibilizar veículo</strong> <span
                 >Se tiver carro, moto ou van disponível para as ações, entre em
                 contato conosco.</span
-              >
-            </div>
-          </li>
-        </ul>
-        <div class="modal-versiculo">
-          <blockquote>"Quem dá ao pobre, empresta ao Senhor."</blockquote>
-          <cite>Provérbios 19:17</cite>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-outline"
-            onclick="window.fecharModal('modal-logistica')"
-          >
-            Fechar
-          </button>
-          <a
-            href="voluntario-form.html?tipo=logistica"
-            class="btn btn-primary"
-            onclick="window.fecharModal('modal-logistica')"
-          >
-            <i class="fas fa-truck" aria-hidden="true"></i>
-            Quero ajudar na logística
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- 
-       MODAL DE CONFIRMAÇÃO: PEDIDO DE ORAÇÃO ENVIADO
-       Aberto por voluntario.js após DoaVidaAPI.addOracao() OK.
-   -->
-    <div
-      class="modal-overlay"
-      id="modal-oracao-sucesso"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-orac-title"
-    >
-      <div class="modal-box" style="text-align: center">
-        <!-- Emoji animado -->
-        <span class="success-emoji" aria-hidden="true">x"</span>
-        <!-- Título -->
-        <h2 class="success-title" id="modal-orac-title">
-          Pedido recebido com amor!
-        </h2>
-        <!-- Mensagem -->
-        <p class="success-body">
-          Nossa equipe vai interceder pelo seu pedido. Você não está sozinho(a) 
-          <strong style="color: var(--gold)">Deus ouve cada oração.</strong>
-        </p>
-        <!-- Versículo -->
-        <div class="success-verse">
-          <blockquote>
-            "Confessai, pois, os vossos pecados uns aos outros, e orai uns pelos
-            outros, para serdes curados. A oração do justo é poderosa e eficaz."
-          </blockquote>
-          <cite>Tiago 5:16</cite>
-        </div>
-        <!-- Botões -->
-        <div class="success-actions">
-          <button
-            type="button"
-            class="btn btn-outline btn-sm"
-            onclick="window.fecharModal('modal-oracao-sucesso')"
-            aria-label="Fechar"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-            Fechar
-          </button>
-          <a
-            href="voluntario-form.html"
-            class="btn btn-primary btn-sm"
-            onclick="window.fecharModal('modal-oracao-sucesso')"
-            style="
-              background: rgba(206, 147, 216, 0.85);
-              color: #1a0a2e;
-              border-color: rgba(206, 147, 216, 0.85);
-            "
-          >
-            <i class="fas fa-hands-helping" aria-hidden="true"></i>
-            Ser Voluntário
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- fim #modal-oracao-sucesso -->
-    <!-- 
-       MODAL DE SUCESSO  mensagem personalizada pós-envio
-       (Fase 6  voluntario.js preenche dinamicamente)
-       CASE 1  apoio-espiritual:
-         emoji:      x"
-         título:     "{NOME}, muito obrigado por ajudar espiritualmente!"
-         versículo:  Filipenses 4:6
-       CASE 2  demais tipos:
-         emoji:      ❤️
-         título:     "{NOME}, muito obrigado por se voluntariar!"
-         versículo:  1 Pedro 4:10
-   -->
-    <div
-      class="modal-overlay"
-      id="modal-sucesso"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="success-titulo"
-      aria-hidden="true"
-    >
-      <div class="modal-box">
-        <!-- Emoji animado (voluntario.js preenche) -->
-        <span id="success-emoji" class="success-emoji" aria-hidden="true"
-          >x"</span
-        >
-        <!-- Título personalizado com nome (voluntario.js preenche via innerHTML) -->
-        <h2 class="success-title" id="success-titulo"></h2>
-        <!-- Corpo da mensagem (voluntario.js preenche via textContent) -->
-        <p class="success-body" id="success-corpo"></p>
-        <!-- Versículo bíblico (voluntario.js preenche) -->
-        <div class="success-verse">
-          <blockquote id="success-versiculo"></blockquote>
-          <cite id="success-referencia"></cite>
-        </div>
-        <!-- Botões de ação -->
-        <div class="success-actions">
-          <!-- Fecha o modal -->
-          <button
-            type="button"
-            class="btn btn-outline btn-sm"
-            onclick="window.fecharModal('modal-sucesso')"
-            aria-label="Fechar esta mensagem"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-            Fechar
-          </button>
-          <!-- Compartilha no WhatsApp (href preenchido pelo voluntario.js) -->
-          <a
-            id="success-whatsapp"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-primary btn-sm"
-            aria-label="Compartilhar no WhatsApp"
-          >
-            <i class="fab fa-whatsapp" aria-hidden="true"></i>
-            Compartilhar
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- 
+              > </div> </li> </ul> <div class="modal-versiculo"> <blockquote>"Quem dá ao pobre, empresta ao Senhor."</blockquote> <cite>Provérbios 19:17</cite> </div> <div class="modal-footer"> <button
+            type="button" class="btn btn-outline" onclick="window.fecharModal('modal-logistica')" > Fechar
+          </button> <a
+            href="voluntario-form.html?tipo=logistica" class="btn btn-primary" onclick="window.fecharModal('modal-logistica')" > <i class="fas fa-truck" aria-hidden="true"></i> Quero ajudar na logística
+          </a> </div> </div> </div> <!--
+       MODAL DE SUCESSO  mensagem personalizada pós-envio
+       (Fase 6  voluntario.js preenche dinamicamente)
+       CASE 1  apoio-espiritual:
+         emoji:      x" título:     "{NOME}, muito obrigado por ajudar espiritualmente!" versículo:  Filipenses 4:6
+       CASE 2  demais tipos:
+         emoji:      
+         título:     "{NOME}, muito obrigado por se voluntariar!" versículo:  1 Pedro 4:10
+   --> <div
+      class="modal-overlay" id="modal-sucesso" role="dialog" aria-modal="true" aria-labelledby="success-titulo" aria-hidden="true" > <div class="modal-box"> <!-- Emoji animado (voluntario.js preenche) --> <span id="success-emoji" class="success-emoji" aria-hidden="true" >x"</span
+        > <!-- Título personalizado com nome (voluntario.js preenche via innerHTML) --> <h2 class="success-title" id="success-titulo"></h2> <!-- Corpo da mensagem (voluntario.js preenche via textContent) --> <p class="success-body" id="success-corpo"></p> <!-- Versículo bíblico (voluntario.js preenche) --> <div class="success-verse"> <blockquote id="success-versiculo"></blockquote> <cite id="success-referencia"></cite> </div> <!-- Botões de ação --> <div class="success-actions"> <!-- Fecha o modal --> <button
+            type="button" class="btn btn-outline btn-sm" onclick="window.fecharModal('modal-sucesso')" aria-label="Fechar esta mensagem" > <i class="fas fa-times" aria-hidden="true"></i> Fechar
+          </button> <!-- Compartilha no WhatsApp (href preenchido pelo voluntario.js) --> <a
+            id="success-whatsapp" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" aria-label="Compartilhar no WhatsApp" > <i class="fab fa-whatsapp" aria-hidden="true"></i> Compartilhar
+          </a> </div> </div> </div> <!-- 
        ELEMENTOS GLOBAIS (requeridos pelo app.js)
-   -->
-    <!-- Botão voltar ao topo -->
-    <button
-      id="btn-back-top"
-      class="btn-back-top"
-      type="button"
-      aria-label="Voltar ao topo"
-      title="Voltar ao topo"
-    >
-      <i class="fas fa-arrow-up" aria-hidden="true"></i>
-    </button>
-    <!-- Toast de notificação (app.js expõe window.showToast()) -->
-    <div
-      id="toast"
-      class="toast"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      aria-hidden="true"
-    >
-      <span id="toast-message"></span>
-    </div>
-    <!-- 
-       SCRIPTS  ORDEM OBRIGATRIA:
-         1. api.js         DoaVidaAPI.addVoluntario(), gerarId()
+   --> <!-- Botão voltar ao topo --> <button
+      id="btn-back-top" class="btn-back-top" type="button" aria-label="Voltar ao topo" title="Voltar ao topo" > <i class="fas fa-arrow-up" aria-hidden="true"></i> </button> <!-- Toast de notificação (app.js expõe window.showToast()) --> <div
+      id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" aria-hidden="true" > <span id="toast-message"></span> </div> <!-- 
+       SCRIPTS  ORDEM OBRIGATRIA:
+         1. api.js         DoaVidaAPI.addVoluntario(), gerarId()
                            Sessão v3.0 (localStorage multi-aba)
-         2. app.js         loader, navbar, hamburguer, toast,
+         2. app.js         loader, navbar, hamburguer, toast,
                            abrirModal(), fecharModal(), mascaraTelefone()
-         3. voluntario.js   validação, mensagem personalizada,
+         3. voluntario.js   validação, mensagem personalizada,
                             salva via DoaVidaSync.addVoluntario()
-   -->
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="js/services/firebase.js"></script>
-    <script src="js/api.js" defer></script>
-    <script src="js/banner-config.js"></script>
-    <script src="js/app.js" defer></script>
-    <script src="js/voluntario.js" defer></script>
-    <script>
-      /* Aplica imagens personalizadas salvas no admin  com sync em tempo real */
+   --> <!-- Firebase SDK --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script> <script src="js/services/firebase.js" defer></script> <script src="js/api.js" defer></script> <script src="js/banner-config.js"></script> <script src="js/app.js" defer></script> <script src="js/voluntario.js" defer></script> <script> /* Aplica imagens personalizadas salvas no admin  com sync em tempo real */
       (function () {
-        /*  Aplica capa do hero  */
+        /*  Aplica capa do hero  */
         function aplicarCapaVol(url) {
           if (!url) return;
           var s = document.getElementById("_vol_capa_style");
@@ -1927,7 +1083,7 @@
             url.replace(/'/g, "\\'") +
             "') !important; }";
         }
-        /*  Aplica fotos "Por que ser Voluntário"  */
+        /*  Aplica fotos "Por que ser Voluntário"  */
         function aplicarWhy(why) {
           if (!why) return;
           var imgs = document.querySelectorAll(
@@ -1937,7 +1093,7 @@
             if (why[k] && imgs[i]) imgs[i].src = why[k];
           });
         }
-        /*  Aplica fotos "Como Contribuir"  */
+        /*  Aplica fotos "Como Contribuir"  */
         function aplicarContrib(contrib) {
           if (!contrib) return;
           var imgs = document.querySelectorAll(".vol-card .vol-card-img img");
@@ -1945,7 +1101,7 @@
             if (contrib[k] && imgs[i]) imgs[i].src = contrib[k];
           });
         }
-        /*  1º: localStorage (instantâneo)  */
+        /*  1º: localStorage (instantâneo)  */
         try {
           var dc = JSON.parse(localStorage.getItem("doavida_vol_capa") || "{}");
           if (dc.capa) aplicarCapaVol(dc.capa);
@@ -1960,10 +1116,10 @@
             JSON.parse(localStorage.getItem("doavida_vol_contrib") || "{}"),
           );
         } catch (e) {}
-        /*  2º: Supabase  autoritativo, sincroniza entre dispositivos  */
+        /*  2º: Supabase  autoritativo, sincroniza entre dispositivos  */
         function buscarImagensVolSupabase() {
           if (!window.DoaVidaSync) return;
-          /*  Busca do Supabase (autoritative) e sincroniza  */
+          /*  Busca do Supabase (autoritative) e sincroniza  */
           if (typeof DoaVidaSync.getAllConfigs === "function") {
             DoaVidaSync.getAllConfigs()
               .then(function (cfg) {
@@ -2009,7 +1165,7 @@
           );
           setTimeout(buscarImagensVolSupabase, 1000);
         }
-        /*  3º: Sync entre abas (mesmo browser)  */
+        /*  3º: Sync entre abas (mesmo browser)  */
         window.addEventListener("storage", function (ev) {
           try {
             if (ev.key === "doavida_vol_capa") {
@@ -2025,11 +1181,8 @@
           } catch (e) {}
         });
       })();
-    </script>
-    <!-- Foto do banner  Supabase (todos devices) > localStorage > config.js -->
-    <script>
-      (function () {
-        var VOL_HERO_MOBILE_COVER = "img/capa-voluntario-mobile.png";
+    </script> <!-- Foto do banner  Supabase (todos devices) > localStorage > config.js --> <script> (function () {
+        var VOL_HERO_MOBILE_COVER = "img/capa-voluntario-mobile.jpg";
         function aplicarBanner(url) {
           if (!url) return;
           var bg = document.getElementById("vol-hero-bg");
@@ -2051,8 +1204,7 @@
         }
         if (
           window.DoaVidaSync &&
-          typeof DoaVidaSync.getBanners === "function"
-        ) {
+          typeof DoaVidaSync.getBanners === "function" ) {
           DoaVidaSync.getBanners()
             .then(function (b) {
               if (b && b.voluntario) aplicarBanner(b.voluntario);
@@ -2060,7 +1212,4 @@
             .catch(function () {});
         }
       })();
-    </script>
-    <!-- Tilt 3D removido dos vol-cards e why-cards -->
-  </body>
-</html>
+    </script> <!-- Tilt 3D removido dos vol-cards e why-cards --> </body> </html> 

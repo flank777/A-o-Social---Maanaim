@@ -1,4 +1,4 @@
-/*
+﻿/*
   ╔══════════════════════════════════════════════════════════════════════╗
   ║  Ação Social — js/media-renderer.js                                 ║
   ║  Renderizador universal de mídia (imagem ou vídeo)                  ║
@@ -116,8 +116,7 @@ var MediaRenderer = (function () {
   /*
     Função pública principal.
     @param {Object} opts — configurações da mídia
-    @returns {HTMLElement} — <img> ou <video>
-  */
+    @returns {HTMLElement} — <img> ou <video> */
   function render(opts) {
     if (!opts || !opts.url) {
       return _criarImagem({ url: FALLBACK_IMG, alt: opts && opts.alt || '', className: opts && opts.className || '' });

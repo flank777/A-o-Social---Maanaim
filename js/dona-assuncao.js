@@ -1,852 +1,981 @@
-/* ══════════════════════════════════════════════════════════════════════
-   dona-assuncao.js — Agente Dona Assunção (Chatbot Humanizado)
-   DoaVida · Ação Social Semear + Comunidade Evangélica Maanaim
+/*
+  Chat Dona Assuncao
+  Assistente publica da Acao Social Semear.
+*/
+(function () {
+  "use strict";
 
-   Dona Assunção é uma avozinha simpática, acolhedora e cheia de fé.
-   Ela conversa com os visitantes sobre:
-   ✅ Doações de alimentos
-   ✅ Voluntariado
-   ✅ A missão da Ação Social
-   ✅ Como funciona o sistema
-   ✅ Versículos bíblicos (de forma natural)
+  var DONA_DEFAULTS = {
+    active: true,
+    displayName: "Dona Assunção",
+    subtitle: "Ação Social Semear",
+    avatarUrl: "img/dona-fab.jpeg",
+    greeting:
+      "Olá! Eu sou a Dona Assunção, da Ação Social Semear. Estou aqui para te ajudar com doações, cesta básica, voluntariado e informações da nossa missão.\nComo posso te ajudar hoje?",
+    fallback:
+      "Ainda não tenho essa resposta certinha. Posso te ajudar com cesta básica, doações, voluntariado, horário, endereço ou contato pelo WhatsApp.",
+    humanHandoff:
+      "Se for urgente, fale diretamente com nossa equipe pelo WhatsApp.",
+  };
 
-   Ela NUNCA fala sobre:
-   ❌ Código, programação, tecnologia
-   ❌ Painel admin, banco de dados
-   ❌ Dados pessoais de doadores
-   ❌ Assuntos fora do contexto da ação social
-   ══════════════════════════════════════════════════════════════════════ */
+  var state = {
+    config: Object.assign({}, DONA_DEFAULTS),
+    opened: false,
+    name: localStorage.getItem("dona_assuncao_nome") || "",
+    userId: getOrCreateUserId(),
+    lastIntent: "",
+    remoteKnowledge: [],
+    whatsappPhone: "",
+    backendUrl: "",
+  };
 
-/* ─── 1. BANCO DE RESPOSTAS ───────────────────────────────────────── */
-/* Objeto com todas as respostas organizadas por tema */
-var DonaRespostas = {
-  /* Saudações e boas-vindas */
-  saudacao: [
-    "Olá, meu filho! 🤗 Que bom te ver por aqui! Sou a Dona Assunção, e estou aqui pra te ajudar no que precisar. Como posso te servir hoje?",
-    'Oi, querido! 😊 Bem-vindo à nossa ação social! "O Senhor é bom para todos" (Salmo 145:9). Em que posso te ajudar?',
-    "Que alegria te receber aqui! 🌻 Sou a vovó Assunção. Me conta, o que te trouxe até nós?",
-    "Olá, benzinho! Que Deus abençoe seu dia! ✨ Estou aqui pronta pra conversar. O que você gostaria de saber?",
-  ],
-
-  /* Sobre doações */
-  doacao: [
-    'Que coração generoso, meu filho! 💛 Para fazer uma doação, é bem simples: clique em "Doar Agora" no menu ou vá direto pra página de doação. Lá você escolhe os alimentos e a quantidade. Cada doação faz uma diferença enorme! "Deus ama quem dá com alegria" (2 Coríntios 9:7).',
-    'Fico tão feliz que queira ajudar! 🤗 Na página de doação você pode escolher entre vários alimentos — arroz, feijão, leite, óleo... Tudo que faz falta nas famílias que atendemos aqui em Belém. É só clicar em "Doar Agora" ali no menu!',
-    'Que lindo, querido! 🌾 Cada grão de arroz, cada litro de leite... tudo importa! Vai na página de doação e escolhe o que seu coração mandar. "Quem semeia com generosidade, com generosidade colherá" (2 Coríntios 9:6).',
-  ],
-
-  /* Sobre voluntariado */
-  voluntario: [
-    'Ah, que maravilha! 🙌 Ser voluntário é uma bênção! Temos várias formas de ajudar: separando alimentos, fazendo entregas, ajudando na cozinha ou no acolhimento. Clique em "Seja Voluntário" no menu e preencha o formulário. É rapidinho!',
-    'Meu coração se enche de alegria quando alguém quer servir! 💛 Vai lá na página "Seja Voluntário" e se cadastra. Você pode escolher como prefere ajudar. "Sirvo ao Senhor com alegria" é o nosso lema! (Salmo 100:2)',
-    'Que bom que quer fazer parte da nossa família! 🤗 No menu tem o botão "Seja Voluntário". Lá você escolhe o tipo de ajuda: entrega, separação, cozinha ou acolhimento. Cada mãozinha faz uma diferença enorme!',
-  ],
-
-  /* Sobre a missão */
-  missao: [
-    'A Ação Social Semear, junto com a Comunidade Evangélica Maanaim, trabalha aqui em Belém, no Pará, levando alimentos e esperança pra quem mais precisa. 🌿 "Porque tive fome e me destes de comer" (Mateus 25:35). Cada doação é uma semente que a gente planta com amor!',
-    "Nossa missão é linda, meu filho! 💛 Somos a Ação Social Semear em parceria com a Comunidade Maanaim. Cuidamos de famílias em situação de vulnerabilidade aqui em Belém. Doações de alimentos, voluntariado, acolhimento... tudo feito com muito amor e fé!",
-    'Sabe, querido, a gente acredita que "o amor ao próximo é a maior herança que podemos deixar". 🌻 A Semear e a Maanaim se uniram pra fazer a diferença em Belém. Cada cesta que entregamos é um abraço de Deus chegando nessas famílias.',
-  ],
-
-  /* Como funciona */
-  comoFunciona: [
-    "É bem simples, meu anjo! 📋 Funciona assim: 1️⃣ O doador escolhe os alimentos na página de doação. 2️⃣ A gente registra e organiza tudo. 3️⃣ Os voluntários separam e preparam as cestas. 4️⃣ Entregamos com carinho pras famílias! Tudo organizado direitinho.",
-    'Funciona assim, querido: a pessoa entra no site, escolhe o que quer doar (arroz, feijão, leite...), e registra a doação. 📝 Depois a nossa equipe de voluntários cuida de tudo — separa, organiza e entrega! "Cada um contribua segundo propôs no seu coração" (2 Coríntios 9:7).',
-    "Ah, deixa eu te explicar! 🤗 É bem fácil: o doador acessa o formulário, escolhe os alimentos e a quantidade. A gente registra tudo e nossos voluntários maravilhosos cuidam da separação e entrega. Tudo com muito amor e organização!",
-  ],
-
-  /* Galeria */
-  galeria: [
-    'Ai, que bom que quer ver! 📸 Na nossa galeria tem fotos lindas das ações! Momentos de entrega, preparo das cestas, o sorriso das famílias... Clique em "Galeria" no menu pra ver tudo. Cada foto conta uma história de amor!',
-    'A galeria é o meu xodó! 🌟 Lá tem registros de tudo que fazemos — fotos das entregas, dos voluntários trabalhando, das famílias recebendo. Vai lá ver, querido! É só clicar em "Galeria" no menu.',
-  ],
-
-  /* Versículos e motivação */
-  fe: [
-    '"Não nos cansemos de fazer o bem, pois no tempo certo colheremos, se não desanimarmos." (Gálatas 6:9) 🙏 Cada gesto de amor conta, meu filho!',
-    '"O que semeia generosamente, generosamente também colherá." (2 Coríntios 9:6) 🌾 Continue fazendo o bem, querido. Deus vê cada esforço!',
-    '"Porque tive fome, e vocês me deram de comer; tive sede, e vocês me deram de beber." (Mateus 25:35) 💛 É isso que fazemos aqui, com a graça de Deus!',
-    '"O amor é paciente, o amor é bondoso." (1 Coríntios 13:4) 🤗 E é com esse amor que a gente trabalha, meu filho. Cada dia é uma oportunidade de amar mais!',
-  ],
-
-  /* Agradecimento */
-  agradecimento: [
-    'Imagina, querido! 🤗 É uma alegria poder ajudar. Que Deus abençoe muito você e toda a sua família! "A graça do Senhor Jesus Cristo seja com todos vocês." (Filipenses 4:23)',
-    "De nada, meu filho! 💛 Deus abençoe seu coração generoso! Se precisar de qualquer coisa, a vovó Assunção está aqui!",
-    'Eu que agradeço por você ter vindo aqui! 🌻 "Deem graças ao Senhor, porque ele é bom; o seu amor dura para sempre." (Salmo 136:1). Volte sempre!',
-  ],
-
-  /* Despedida */
-  despedida: [
-    'Que Deus te abençoe e te guarde, meu filho! 🙏✨ Volte sempre que quiser conversar. A porta está sempre aberta! "O Senhor te abençoe e te guarde" (Números 6:24).',
-    "Até mais, querido! 💛 Foi uma alegria conversar com você. Que Deus ilumine seu caminho! Volte quando quiser!",
-    "Vá com Deus, meu anjo! 🌻 E lembre-se: cada ato de bondade transforma o mundo um pouquinho. Até a próxima!",
-  ],
-
-  /* Quando não entende */
-  naoEntendi: [
-    "Ai, meu filho, essa velha aqui não entendeu muito bem... 😅 Pode me perguntar sobre doações, voluntariado, nossa missão ou como funciona? Nisso eu sou boa!",
-    "Hmm, acho que não entendi direito, querido. 🤔 Sou boa mesmo é em falar sobre doações, voluntariado e nossa ação social. Quer saber sobre alguma dessas coisas?",
-    "Essa vovó aqui é meio dura de entender às vezes! 😄 Me pergunta sobre doação, voluntariado, a galeria ou como funciona que eu te explico direitinho!",
-  ],
-
-  /* Quando pergunta sobre código/admin/dados (recusa educada) */
-  recusa: [
-    "Ai, meu filho, isso aí é coisa lá dos rapazes da tecnologia! 😄 Eu entendo mesmo é de comida, de cuidar das famílias e de muito amor! Quer saber como fazer uma doação ou ser voluntário?",
-    "Eita, isso tá fora da minha cozinha! 😅 Sou apenas uma vovó que cuida das pessoas. Me pergunta sobre doação, voluntariado ou nossa missão que eu te ajudo!",
-    "Ah, querido, isso eu não sei não! 🤗 Meu negócio é cuidar de gente! Posso te ajudar com doações, voluntariado ou contar sobre nosso trabalho aqui em Belém.",
-  ],
-};
-
-/* ─── 1B. RESPOSTAS EXTRAS (horário, localização, contato, fé, família) ── */
-DonaRespostas.horario = [
-  "Atendemos de segunda a sexta, das 8h às 17h, e aos sábados das 8h às 12h. 🕗 Às vezes ficamos além do horário quando o coração manda! Tem alguma dúvida sobre como nos visitar?",
-  "Nosso horário de atendimento é de segunda a sexta das 8h às 17h. 📅 Mas as doações podem ser registradas aqui no site a qualquer hora! Se quiser nos visitar pessoalmente, entre em contato antes pelo WhatsApp.",
-];
-DonaRespostas.localizacao = [
-  "Estamos em Belém do Pará! 📍 A Comunidade Evangélica Maanaim nos abriga com muito carinho. Para saber o endereço exato e como chegar, entre em contato pelo WhatsApp que a gente te passa tudo direitinho. 🙏",
-  "Ficamos em Belém, PA! 🌿 Nossa sede é na Comunidade Maanaim. Quer saber como chegar? Manda uma mensagem no WhatsApp que a gente te orienta com prazer!",
-];
-DonaRespostas.contato = [
-  "Para entrar em contato com a gente, o melhor jeito é pelo WhatsApp! 📱 Você também pode nos encontrar pelas redes sociais. Quer saber mais alguma coisa?",
-  "A gente adora conversar! 😊 O contato mais rápido é pelo WhatsApp. Mas é claro que você também pode vir nos visitar pessoalmente aqui em Belém. Como posso te ajudar?",
-];
-
-/* Família, amor e cuidado */
-DonaRespostas.familia = [
-  'Ah, família é tudo, meu filho! 👨‍👩‍👧‍👦 "Honra teu pai e tua mãe" (Êxodo 20:12). A família é o primeiro lugar onde aprendemos a amar. E é justamente pelas famílias que a gente trabalha aqui — cada cesta que entregamos é pra manter essas famílias de pé!',
-  "Falar de família me aquece o coração! 💛 Sabe, a Bíblia diz que o amor é o laço perfeito (Colossenses 3:14). Cuidar da família, amar os filhos, honrar os mais velhos... isso é sagrado! Aqui na nossa ação social, lutamos pra que cada família tenha alimento, dignidade e esperança.",
-  'A família é a base de tudo! 🏠 "Quanto a mim e à minha casa, serviremos ao Senhor" (Josué 24:15). Cada lar que a gente atende tem uma história linda — pais que batalham pelos filhos, avós que criam os netos com tanto amor. É por elas que a gente não para!',
-  'Amo falar de família! 🌻 Aqui na Ação Social Semear, cada família recebe não só alimento — recebe atenção, carinho e oração. Porque toda família merece dignidade. "O amor suporta tudo, crê em tudo, espera tudo" (1 Coríntios 13:7).',
-];
-
-/* Igreja e comunidade de fé */
-DonaRespostas.igreja = [
-  'A Comunidade Evangélica Maanaim é o nosso lar espiritual! ⛪ Lá a gente se reúne pra adorar, crescer na Palavra e servir uns aos outros. A ação social nasceu justamente dessa visão de ser a mão de Deus no mundo. "Porque o Filho do Homem veio servir" (Marcos 10:45).',
-  'A nossa igreja, a Maanaim, é um lugar de acolhimento e fé! 🙏 Maanaim significa "dois campos" em hebraico — um campo espiritual e um campo prático. E é exatamente isso que vivemos: fé e ação andando juntas! Você participa de alguma Igreja?',
-  'A Comunidade Maanaim tem sido um instrumento de Deus aqui em Belém! ✨ Cultos de louvor e adoração, estudos bíblicos, grupos de jovens, ação social... "A fé sem obras é morta" (Tiago 2:26). Nossa fé se vive no servir ao próximo!',
-];
-
-/* Louvor e adoração */
-DonaRespostas.louvor = [
-  'Ah, o louvor é o oxigênio da alma! 🎵 "Cantai ao Senhor um cântico novo; cantai ao Senhor toda a terra!" (Salmo 96:1). Aqui na Maanaim, o louvor é cheio de vida e fervor. Que bom que você quer saber sobre isso!',
-  'Louvor é comunicar amor a Deus com tudo que temos! 🎶 "Que todo ser vivo louve ao Senhor!" (Salmo 150:6). Na Comunidade Maanaim temos um ministério de louvor muito abençoado. A música transforma, cura e une corações!',
-  'Quando o povo louva, Deus age! 🙌 Lembra de Paulo e Silas na prisão? "Por volta da meia-noite, Paulo e Silas oravam e cantavam hinos a Deus" (Atos 16:25). E Deus moveu! O louvor abre portas que nenhuma chave humana abre!',
-];
-
-/* Oração específica */
-DonaRespostas.oracao_especial = [
-  'A oração é a respiração da alma, meu filho! 🙏 "Orai sem cessar" (1 Tessalonicenses 5:17). Aqui na nossa ação social, cada cesta que preparamos é acompanhada de oração. Cada família que atendemos é lembrada no altar. Quer que eu ore por você agora?',
-  'Que maravilha que quer falar de oração! 💛 "Tudo o que pedirdes em oração, crendo, recebereis" (Mateus 21:22). Na nossa página de voluntários tem um espaço para pedidos de oração — a gente intercede por cada pessoa! Quer enviar um pedido?',
-  'A oração move montanhas, querido! ⛰️ "A oração do justo é poderosa e eficaz" (Tiago 5:16). Aqui na Maanaim temos grupos de intercessão que oram pelas famílias que atendemos, pelos voluntários e pelos doadores. Que Deus abençoe sua vida!',
-];
-
-/* Crianças e jovens */
-DonaRespostas.criancas = [
-  'As crianças são o nosso tesouro mais precioso! 👧👦 "Deixai as crianças virem a mim" (Mateus 19:14). Muitas das famílias que atendemos têm crianças pequenas — e ver o olhinho delas brilhar ao receber uma cesta... é o maior presente! Cada doação também é por elas.',
-  'Ai, as crianças! ❤️ Jesus disse que "quem recebe uma criança em Meu nome, a Mim recebe" (Marcos 9:37). Aqui na ação social, lutamos pra que nenhuma criança durma com fome em Belém. Cada quilo de alimento doado é uma criança com mais saúde e alegria!',
-  'As crianças merecem o melhor! 🌟 "Instrui o menino no caminho em que deve andar" (Provérbios 22:6). Muitas famílias que atendemos têm crianças em idade escolar — e uma criança bem alimentada aprende melhor, sonha mais alto e tem futuro mais bonito!',
-];
-
-/* Esperança e propósito */
-DonaRespostas.esperanca = [
-  '"Porque sou eu que conheço os planos que tenho a vosso respeito, diz o Senhor; planos de paz e não de calamidade, para vos dar um futuro e uma esperança." (Jeremias 29:11) 🌅 Esse versículo é o lema da nossa vida! Deus tem planos lindos pra você, querido.',
-  'Esperança é o que não falta aqui! 🌿 "E a esperança não nos envergonha, porque o amor de Deus foi derramado em nossos corações." (Romanos 5:5). Cada família que atendemos precisa não só de comida — precisa de esperança, de saber que alguém se importa!',
-  'A esperança é a âncora da alma! ⚓ "Esta esperança nós a temos como âncora da alma, segura e firme." (Hebreus 6:19). Em Belém, muitas famílias passam por dificuldades — mas a gente leva esperança junto com cada cesta! Você pode fazer parte disso!',
-];
-
-/* Amor ao próximo */
-DonaRespostas.amor = [
-  '"Amarás o teu próximo como a ti mesmo." (Marcos 12:31) 💛 Esse é o segundo maior mandamento! E é exatamente isso que fazemos aqui — amar o próximo de forma prática, com alimento, cuidado e presença. Cada doação é um ato de amor concreto!',
-  'O amor verdadeiro se vê nas ações! 🤗 "Filhinhos, não amemos de palavra nem de língua, mas por obras e em verdade." (1 João 3:18). Por isso a gente não fica só na palavra — a gente vai lá, entrega as cestas, abraça as famílias e faz a diferença!',
-  'Deus é amor, e quem ama conhece a Deus! ❤️ "Amados, amemo-nos uns aos outros; porque o amor é de Deus; e todo aquele que ama é nascido de Deus." (1 João 4:7). Quando você doa, você está expressando o amor de Deus por uma família que precisa!',
-];
-
-/* Cura e intercessão */
-DonaRespostas.cura = [
-  '"Ele mesmo levou os nossos pecados em seu corpo sobre o madeiro... por suas chagas fostes sarados." (1 Pedro 2:24) 🙏 Seja qual for a dor que você esteja sentindo — física, emocional, espiritual — há cura em Jesus! Posso orar por você?',
-  'Cura é promessa de Deus! ✨ "Sou o Senhor que te curo." (Êxodo 15:26). Jesus sarou enfermos, abriu olhos de cegos, levantou paralíticos. E Ele continua fazendo milagres hoje! Se precisar de oração, pode me contar — a vovó intercede com fé!',
-  '"Confessai as vossas ofensas uns aos outros, e orai uns pelos outros, para serdes curados." (Tiago 5:16) 💛 Na nossa comunidade Maanaim temos grupos de oração e intercessão. Se você tiver alguma necessidade, pode deixar seu pedido de oração na nossa página!',
-];
-
-/* ─── 2. PALAVRAS-CHAVE POR TEMA ─────────────────────────────────── */
-/* Mapa de palavras-chave → tema para identificar a intenção do usuário */
-var DonaKeywords = {
-  saudacao: [
-    "oi",
-    "olá",
-    "ola",
-    "hey",
-    "hello",
-    "bom dia",
-    "boa tarde",
-    "boa noite",
-    "eai",
-    "e ai",
-    "fala",
-    "salve",
-    "tudo bem",
-    "tudo bom",
-  ],
-  doacao: [
-    "doar",
-    "doação",
-    "doacao",
-    "alimento",
-    "cesta",
-    "comida",
-    "arroz",
-    "feijão",
-    "feijao",
-    "leite",
-    "contribuir",
-    "alimentos",
-    "quero doar",
-    "como donar",
-  ],
-  voluntario: [
-    "voluntário",
-    "voluntario",
-    "voluntária",
-    "voluntaria",
-    "quero ajudar",
-    "participar",
-    "cadastrar",
-    "inscrever",
-    "servir",
-    "me voluntariar",
-    "ser voluntario",
-  ],
-  missao: [
-    "missão",
-    "missao",
-    "quem são",
-    "quem sao",
-    "sobre vocês",
-    "sobre voces",
-    "organização",
-    "organizacao",
-    "semear",
-    "maanaim",
-    "história",
-    "historia",
-    "o que fazem",
-    "o que é isso",
-  ],
-  comoFunciona: [
-    "como funciona",
-    "como funciona",
-    "como faz",
-    "processo",
-    "etapa",
-    "passo a passo",
-    "explica",
-    "me explica",
-    "entendo",
-    "não entendo",
-  ],
-  galeria: [
-    "galeria",
-    "foto",
-    "fotos",
-    "imagem",
-    "imagens",
-    "vídeo",
-    "video",
-    "momentos",
-    "registros",
-  ],
-  fe: [
-    "versículo",
-    "versiculo",
-    "bíblia",
-    "biblia",
-    "deus",
-    "oração",
-    "oracao",
-    "fé",
-    "fe",
-    "jesus",
-    "palavra",
-    "motivação",
-    "motivacao",
-  ],
-  horario: [
-    "horário",
-    "horario",
-    "hora",
-    "funciona quando",
-    "que horas",
-    "quando abre",
-    "quando fecha",
-    "dias",
-    "funcionamento",
-  ],
-  localizacao: [
-    "onde fica",
-    "endereço",
-    "endereco",
-    "localização",
-    "localizacao",
-    "como chegar",
-    "onde são",
-    "onde voces",
-    "belem",
-    "belém",
-    "visitar",
-  ],
-  contato: [
-    "contato",
-    "whatsapp",
-    "telefone",
-    "ligar",
-    "falar com",
-    "fale conosco",
-    "redes sociais",
-    "instagram",
-  ],
-  agradecimento: [
-    "obrigado",
-    "obrigada",
-    "valeu",
-    "agradeço",
-    "agradeco",
-    "thanks",
-    "brigado",
-    "brigada",
-    "muito obrigado",
-  ],
-  despedida: [
-    "tchau",
-    "bye",
-    "até mais",
-    "ate mais",
-    "adeus",
-    "falou",
-    "flw",
-    "fuiii",
-    "até logo",
-  ],
-  recusa: [
-    "código",
-    "codigo",
-    "admin",
-    "banco de dados",
-    "database",
-    "localStorage",
-    "javascript",
-    "html",
-    "css",
-    "programação",
-    "programacao",
-    "senha",
-    "login",
-    "cpf",
-    "dados pessoais",
-    "api",
-    "servidor",
-    "bug",
-    "erro",
-  ],
-  familia: [
-    "família",
-    "familia",
-    "filhos",
-    "filho",
-    "filha",
-    "pai",
-    "mãe",
-    "mae",
-    "criança",
-    "crianca",
-    "bebê",
-    "bebe",
-    "esposa",
-    "esposo",
-    "marido",
-    "casal",
-    "parentes",
-    "minha família",
-    "minha familia",
-    "lar",
-    "casa",
-  ],
-  igreja: [
-    "igreja",
-    "comunidade",
-    "maanaim",
-    "templo",
-    "culto",
-    "reunião",
-    "reuniao",
-    "congregação",
-    "congregacao",
-    "pastor",
-    "pregação",
-    "pregacao",
-    "ministério",
-    "ministerio",
-    "evangélica",
-    "evangelica",
-    "evangelho",
-  ],
-  louvor: [
-    "louvor",
-    "adoração",
-    "adoracao",
-    "música",
-    "musica",
-    "cantar",
-    "cântico",
-    "cantico",
-    "hino",
-    "worship",
-    "instrumento",
-    "banda",
-  ],
-  oracao_especial: [
-    "orar",
-    "interceder",
-    "pedido de oração",
-    "pedido de oracao",
-    "preciso de oração",
-    "preciso orar",
-    "intercessão",
-    "intercessao",
-    "vigília",
-    "vigilia",
-    "jejum",
-  ],
-  criancas: [
-    "criança",
-    "criancas",
-    "crianças",
-    "crianca",
-    "jovem",
-    "jovens",
-    "adolescente",
-    "adolescentes",
-    "menino",
-    "menina",
-    "infância",
-    "infancia",
-    "escola",
-    "estudante",
-  ],
-  esperanca: [
-    "esperança",
-    "esperanca",
-    "futuro",
-    "propósito",
-    "proposito",
-    "sonho",
-    "plano",
-    "vida",
-    "sentido",
-    "significado",
-    "razão de viver",
-    "motivo",
-  ],
-  amor: [
-    "amor",
-    "amar",
-    "amado",
-    "amada",
-    "bondade",
-    "generosidade",
-    "compaixão",
-    "compaixao",
-    "misericórdia",
-    "misericordia",
-    "graça",
-    "graca",
-    "cuidado",
-  ],
-  cura: [
-    "cura",
-    "curar",
-    "saúde",
-    "saude",
-    "doença",
-    "doenca",
-    "doente",
-    "hospital",
-    "médico",
-    "medico",
-    "enfermidade",
-    "milagre",
-    "recuperação",
-    "recuperacao",
-  ],
-};
-
-/* ─── 2B. VARIÁVEIS DE CONTEXTO / MEMÓRIA ─────────────────────────── */
-/* Nome do usuário (detectado durante a conversa) */
-var _donaNomeUsuario = "";
-/* Último tema detectado (para respostas contextuais) */
-var _donaUltimoTema = "";
-
-/* ─── 3. FUNÇÃO DE DETECÇÃO DE NOME ──────────────────────────────── */
-/* Tenta extrair o nome do usuário a partir do texto */
-function donaDetectarNome(texto) {
-  var norm = texto.toLowerCase().trim();
-  /* Padrões: "meu nome é X", "me chamo X", "sou X", "pode me chamar de X" */
-  var padroes = [
-    /meu nome (?:é|e) ([a-záàâãéêíóôõúüçñ]+)/i,
-    /me chamo ([a-záàâãéêíóôõúüçñ]+)/i,
-    /pode (?:me )?chamar (?:de )?([a-záàâãéêíóôõúüçñ]+)/i,
-    /sou (?:o|a) ([a-záàâãéêíóôõúüçñ]+)/i,
-    /sou ([a-záàâãéêíóôõúüçñ]+)$/i,
-    /(?:oi|olá|ola),?\s+(?:sou |me chamo )?([a-záàâãéêíóôõúüçñ]{3,})/i,
+  var QUICK_DEFAULT = [
+    ["Como receber cesta básica", "Como receber cesta básica"],
+    ["Quero fazer uma doação", "Quero fazer uma doação"],
+    ["Quero ser voluntário", "Quero ser voluntário"],
+    ["Horário de atendimento", "Horário de atendimento"],
+    ["Outras dúvidas", "Outras dúvidas"],
   ];
-  for (var i = 0; i < padroes.length; i++) {
-    var m = norm.match(padroes[i]);
-    if (m && m[1] && m[1].length > 2) {
-      /* Capitaliza a primeira letra */
-      return m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+
+  var QUICK_BY_INTENT = {
+    cesta_basica: [
+      ["Preencher cadastro", "Quero preencher o cadastro da cesta"],
+      ["Quem pode receber?", "Quem pode receber cesta básica?"],
+      ["Documentos", "Quais documentos preciso para cesta básica?"],
+      ["Falar com equipe", "Quero falar com a equipe"],
+    ],
+    doacao: [
+      ["Doar alimentos", "Quero doar alimentos"],
+      ["Como entregar?", "Como posso entregar minha doação?"],
+      ["Comprovante", "Recebo comprovante da doação?"],
+      ["Ser voluntário", "Quero ser voluntário"],
+    ],
+    voluntario: [
+      ["Cadastrar", "Quero me cadastrar como voluntário"],
+      ["Tipos de ajuda", "Quais formas de voluntariado existem?"],
+      ["Horários", "Quais horários posso ajudar?"],
+      ["Doar alimentos", "Quero fazer uma doação"],
+    ],
+    contato: [
+      ["WhatsApp", "Quero falar no WhatsApp"],
+      ["Endereço", "Onde fica a sede?"],
+      ["Horário", "Horário de atendimento"],
+      ["Missão", "O que é a Ação Social Semear?"],
+    ],
+  };
+
+  // Atalhos de sugestão (QUICK_BY_INTENT) mandam um texto fixo e conhecido —
+  // por isso respondem por correspondência exata aqui, sem depender do
+  // matching difuso de LOCAL_TOPICS (que pode escolher um tópico mais
+  // genérico concorrente, como "cesta_basica", para essa mesma frase).
+  // "menu" mantém o submenu de sugestões aberto após a resposta.
+  var QUICK_REPLY_OVERRIDES = {
+    "Quem pode receber cesta básica?": { topic: "quem_pode_receber", menu: "cesta_basica" },
+    "Quais documentos preciso para cesta básica?": { topic: "documentos_cesta", menu: "cesta_basica" },
+    "Quero falar com a equipe": { topic: "contato", menu: "contato" },
+  };
+
+  var LOCAL_TOPICS = {
+    recusa: {
+      priority: 100,
+      keywords: [
+        "codigo",
+        "programacao",
+        "javascript",
+        "html",
+        "css",
+        "admin",
+        "senha",
+        "login",
+        "banco de dados",
+        "database",
+        "api",
+        "cpf",
+        "dados pessoais",
+      ],
+      answer:
+        "Essa parte técnica e administrativa fica com a equipe responsável. Eu posso te orientar sobre doações, cesta básica, voluntariado, horários, endereço e contato com a Ação Social Semear.",
+    },
+    cesta_basica: {
+      priority: 90,
+      keywords: [
+        "cesta",
+        "cesta basica",
+        "receber cesta",
+        "quero cesta",
+        "preciso de cesta",
+        "solicitar cesta",
+        "ganhar cesta",
+        "receber alimento",
+        "receber alimentos",
+        "vulnerabilidade",
+        "familia precisa",
+      ],
+      answer:
+        "Para solicitar uma cesta básica, a família precisa fazer um cadastro social simples. Em geral, verificamos:\n\n- situação de vulnerabilidade\n- residência em Belém/PA ou região atendida\n- telefone para contato\n- dados da família e endereço\n\nDepois do cadastro, a equipe analisa a solicitação e entra em contato conforme a disponibilidade das cestas.",
+      ctas: [{ label: "Preencher formulário", href: "cesta-form.html", icon: "fa-regular fa-pen-to-square" }],
+    },
+    quem_pode_receber: {
+      priority: 88,
+      keywords: [
+        "quem pode receber",
+        "quem tem direito",
+        "quem pode pedir",
+        "quem pode solicitar",
+        "criterio",
+        "critério",
+        "criterios",
+        "critérios",
+        "quem se qualifica",
+      ],
+      answer:
+        "Damos prioridade a famílias em situação de vulnerabilidade social, moradoras de Belém/PA ou região atendida. Não há uma lista fechada e rígida — cada caso é avaliado pela equipe no cadastro, com carinho e atenção à realidade de cada família.",
+      ctas: [{ label: "Preencher formulário", href: "cesta-form.html", icon: "fa-regular fa-pen-to-square" }],
+    },
+    documentos_cesta: {
+      priority: 88,
+      keywords: [
+        "documento",
+        "documentos",
+        "documentacao",
+        "documentação",
+        "preciso de documento",
+        "que documentos",
+        "quais documentos",
+      ],
+      answer:
+        "No cadastro pedimos dados básicos: nome completo, endereço, contato e informações da família. Documentos específicos (se forem necessários) a equipe confirma durante a análise, conforme a situação de cada família — não exigimos nada complicado de cara.",
+      ctas: [{ label: "Preencher formulário", href: "cesta-form.html", icon: "fa-regular fa-pen-to-square" }],
+    },
+    doacao: {
+      priority: 85,
+      keywords: [
+        "doar",
+        "doacao",
+        "doação",
+        "alimento",
+        "alimentos",
+        "contribuir",
+        "arroz",
+        "feijao",
+        "feijão",
+        "leite",
+        "macarrao",
+        "macarrão",
+        "oleo",
+        "óleo",
+        "quero doar",
+      ],
+      answer:
+        "Que gesto importante. Para doar, você pode registrar os alimentos no formulário do site. Isso ajuda nossa equipe a organizar estoque, retirada, entrega e comprovante.\n\nVocê escolhe os itens, informa a quantidade e deixa um contato para combinarmos os próximos passos.",
+      ctas: [{ label: "Quero doar", href: "form.html", icon: "fa-solid fa-heart" }],
+    },
+    voluntario: {
+      priority: 82,
+      keywords: [
+        "voluntario",
+        "voluntário",
+        "voluntaria",
+        "voluntária",
+        "ajudar",
+        "participar",
+        "servir",
+        "trabalho voluntario",
+        "me cadastrar",
+        "cadastro voluntario",
+      ],
+      answer:
+        "Você pode ajudar de várias formas: triagem de alimentos, montagem de cestas, entrega, logística, divulgação e apoio espiritual.\n\nO cadastro informa sua disponibilidade e o tipo de ajuda que você consegue oferecer. A equipe entra em contato quando houver uma ação compatível.",
+      ctas: [{ label: "Cadastro de voluntário", href: "voluntario-form.html", icon: "fa-solid fa-hands-helping" }],
+    },
+    horario: {
+      priority: 70,
+      keywords: [
+        "horario",
+        "horário",
+        "que horas",
+        "quando abre",
+        "quando fecha",
+        "funcionamento",
+        "atendimento",
+        "dias",
+      ],
+      answer:
+        "O atendimento costuma acontecer de segunda a sexta, das 8h às 17h, e aos sábados pela manhã quando há ações programadas.\n\nAs doações e cadastros pelo site podem ser feitos a qualquer hora. Para visita presencial, é melhor confirmar antes com a equipe.",
+    },
+    localizacao: {
+      priority: 70,
+      keywords: [
+        "onde fica",
+        "endereco",
+        "endereço",
+        "localizacao",
+        "localização",
+        "como chegar",
+        "belem",
+        "belém",
+        "sede",
+        "maanaim",
+      ],
+      answer:
+        "Estamos em Belém, PA, com apoio da Comunidade Evangélica Maanaim. Para evitar desencontro, confirme o endereço e o melhor horário antes de ir presencialmente.",
+    },
+    contato: {
+      priority: 70,
+      keywords: [
+        "contato",
+        "whatsapp",
+        "telefone",
+        "falar com",
+        "fale conosco",
+        "ligar",
+        "mensagem",
+        "instagram",
+      ],
+      answer:
+        "O caminho mais rápido é falar com a equipe pelo WhatsApp. Se o contato estiver configurado no painel, deixo o botão aqui embaixo para abrir a conversa com uma mensagem pronta.",
+    },
+    missao: {
+      priority: 65,
+      keywords: [
+        "missao",
+        "missão",
+        "quem sao",
+        "quem são",
+        "sobre voces",
+        "sobre vocês",
+        "semear",
+        "acao social",
+        "ação social",
+        "o que fazem",
+        "historia",
+        "história",
+      ],
+      answer:
+        "A Ação Social Semear trabalha para levar alimento, cuidado e esperança a famílias em situação de vulnerabilidade em Belém, PA.\n\nCada doação vira organização de estoque, montagem de cesta e atendimento feito com respeito. A missão é simples: servir pessoas com dignidade e amor ao próximo.",
+    },
+    como_funciona: {
+      priority: 62,
+      keywords: [
+        "como funciona",
+        "sistema",
+        "passo a passo",
+        "processo",
+        "etapas",
+        "explica",
+        "como faz",
+        "comprovante",
+      ],
+      answer:
+        "Funciona assim:\n\n1. A pessoa registra uma doação, pedido de cesta ou cadastro de voluntário.\n2. A equipe recebe as informações e organiza o atendimento.\n3. Os voluntários separam, montam e acompanham as ações.\n4. As famílias são atendidas conforme análise e disponibilidade.\n\nO sistema ajuda a manter tudo registrado e mais organizado.",
+    },
+    galeria: {
+      priority: 55,
+      keywords: ["galeria", "foto", "fotos", "imagem", "imagens", "video", "vídeo", "registros"],
+      answer:
+        "Na galeria ficam os registros das ações: voluntários, doações, entregas e momentos da comunidade. É uma forma de acompanhar o impacto do trabalho.",
+      ctas: [{ label: "Ver galeria", href: "gallery.html", icon: "fa-regular fa-images" }],
+    },
+    oracao: {
+      priority: 52,
+      keywords: [
+        "oracao",
+        "oração",
+        "orar",
+        "interceder",
+        "pedido de oracao",
+        "pedido de oração",
+        "fe",
+        "fé",
+        "deus",
+        "jesus",
+      ],
+      answer:
+        "A oração também faz parte da missão. Você pode deixar um pedido ou se cadastrar para apoiar espiritualmente as famílias, os voluntários e as ações.",
+      ctas: [{ label: "Apoio espiritual", href: "voluntario-form.html?tipo=intercessao", icon: "fa-solid fa-hands-praying" }],
+    },
+    saudacao: {
+      priority: 30,
+      keywords: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "tudo bem", "salve"],
+      answer:
+        "Olá! Que bom te receber por aqui. Posso te ajudar com cesta básica, doações, voluntariado, horário de atendimento, endereço ou contato com a equipe.",
+    },
+    agradecimento: {
+      priority: 30,
+      keywords: ["obrigado", "obrigada", "valeu", "agradeco", "agradeço", "muito obrigado"],
+      answer:
+        "Eu que agradeço pela visita. Que Deus abençoe você e sua família. Quando precisar, é só chamar por aqui.",
+    },
+    despedida: {
+      priority: 30,
+      keywords: ["tchau", "ate mais", "até mais", "ate logo", "até logo", "falou", "bye"],
+      answer:
+        "Até mais. Que Deus te guarde. Volte sempre que precisar falar com a Ação Social Semear.",
+    },
+  };
+
+  function normalize(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function getOrCreateUserId() {
+    try {
+      var key = "dona_assuncao_user_id";
+      var saved = localStorage.getItem(key);
+      if (saved) return saved;
+      var id =
+        "web_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(key, id);
+      return id;
+    } catch (e) {
+      return "web_" + Date.now().toString(36);
     }
   }
-  return null;
-}
 
-/* ─── 3B. FUNÇÃO DE DETECÇÃO DE INTENÇÃO ──────────────────────────── */
-/* Analisa o texto do usuário e retorna o tema mais provável */
-function donaDetectarIntencao(texto) {
-  /* Normaliza o texto: minúsculas */
-  var norm = texto.toLowerCase().trim();
-
-  /* Percorre cada tema e verifica se alguma palavra-chave bate */
-  var temas = Object.keys(DonaKeywords); /* lista de temas */
-  for (var i = 0; i < temas.length; i++) {
-    var tema = temas[i]; /* tema atual */
-    var palavras = DonaKeywords[tema]; /* palavras-chave do tema */
-    for (var j = 0; j < palavras.length; j++) {
-      /* Se o texto contém a palavra-chave, retorna o tema */
-      if (norm.indexOf(palavras[j]) !== -1) {
-        return tema;
-      }
-    }
+  function escapeHtml(text) {
+    return String(text == null ? "" : text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
-  /* Se nenhuma palavra-chave bateu, retorna 'naoEntendi' */
-  return "naoEntendi";
-}
-
-/* ─── 4. FUNÇÃO DE ESCOLHA ALEATÓRIA ─────────────────────────────── */
-/* Escolhe uma resposta aleatória do array de um tema */
-function donaEscolherResposta(tema) {
-  var respostas = DonaRespostas[tema]; /* array de respostas do tema */
-  if (!respostas || respostas.length === 0) {
-    return DonaRespostas.naoEntendi[0]; /* fallback */
-  }
-  /* Índice aleatório entre 0 e (tamanho - 1) */
-  var indice = Math.floor(Math.random() * respostas.length);
-  return respostas[indice];
-}
-
-/* ─── 4B. RENDERIZADOR DE MARKDOWN BÁSICO ────────────────────────── */
-/* Converte **negrito**, _itálico_ e \n em HTML seguro para as bolhas do bot */
-function donaRenderMarkdown(texto) {
-  /* Escapa HTML primeiro — evita XSS mesmo que o LLM retorne tags */
-  var seg = texto
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  /* Aplica formatação Markdown básica */
-  seg = seg
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") /* **negrito** */
-    .replace(/_(.+?)_/g, "<em>$1</em>") /* _itálico_  */
-    .replace(/\n/g, "<br>"); /* quebras de linha */
-
-  return seg;
-}
-
-/* ─── 4C. HOOK PARA LLM EXTERNO ───────────────────────────────────── */
-/* Para integrar um modelo de linguagem (ex: OpenAI, Gemini, Claude),
-   basta substituir window.DonaLLMHook por uma função assíncrona:
-
-   window.DonaLLMHook = async function(texto, nomeUsuario, temaAnterior, callback) {
-     var resposta = await minhaAPIDeLLM(texto);
-     callback('llm', resposta);
-   };
-
-   Por padrão é null — usa o sistema local de palavras-chave. */
-window.DonaLLMHook = null;
-
-/* Roteador: usa LLM se disponível, senão cai no sistema local */
-function donaConsultarResposta(texto, callback) {
-  /* Se há um hook LLM registrado, delega pra ele */
-  if (typeof window.DonaLLMHook === "function") {
-    window.DonaLLMHook(texto, _donaNomeUsuario, _donaUltimoTema, callback);
-    return;
+  function renderMarkdown(text) {
+    return escapeHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/_(.+?)_/g, "<em>$1</em>")
+      .replace(/\n/g, "<br>");
   }
 
-  /* Fallback — sistema local de palavras-chave */
-  var tema = donaDetectarIntencao(texto);
-  _donaUltimoTema = tema;
-  var resposta = donaEscolherResposta(tema);
-  callback(tema, resposta);
-}
-
-/* ─── 5. CRIAR INTERFACE DO CHAT ──────────────────────────────────── */
-/* Injeta o HTML do chatbot na página (chamado no DOMContentLoaded) */
-function donaCriarInterface() {
-  /* Verifica se já existe para evitar duplicação */
-  if (document.getElementById("dona-fab")) return;
-
-  /* HTML do botão flutuante (FAB) */
-  var fabHTML =
-    '<button id="dona-fab" class="dona-fab" ' +
-    'aria-label="Conversar com Dona Assunção" ' +
-    'title="Falar com Dona Assunção">' +
-    '<img src="img/dona-fab.jpeg" alt="Dona Assunção" ' +
-    'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />' +
-    "</button>";
-
-  /* HTML da janela do chat */
-  var chatHTML =
-    "" +
-    '<div id="dona-chat" class="dona-chat" role="dialog" aria-label="Chat com Dona Assunção">' +
-    /* Cabeçalho */
-    '<div class="dona-chat-header">' +
-    '<div class="dona-avatar">' +
-    '<img src="img/dona-fab.jpeg" alt="Dona Assunção" ' +
-    'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />' +
-    "</div>" +
-    '<div class="dona-info">' +
-    "<strong>Dona Assunção</strong>" +
-    "<span>● online agora</span>" +
-    "</div>" +
-    '<button id="dona-close" class="dona-close" aria-label="Fechar chat">' +
-    "&#10005;" +
-    "</button>" +
-    "</div>" +
-    /* Área de mensagens */
-    '<div id="dona-messages" class="dona-messages"></div>' +
-    /* Sugestões rápidas */
-    '<div id="dona-sugestoes" class="dona-sugestoes">' +
-    '<button class="dona-sug-btn" data-msg="Como faço uma doação?">🍚 Doar</button>' +
-    '<button class="dona-sug-btn" data-msg="Quero ser voluntário">🤝 Voluntário</button>' +
-    '<button class="dona-sug-btn" data-msg="Qual a missão de vocês?">💛 Missão</button>' +
-    '<button class="dona-sug-btn" data-msg="Me fala sobre a família">👨‍👩‍👧 Família</button>' +
-    '<button class="dona-sug-btn" data-msg="Me fala da comunidade Maanaim">⛪ Igreja</button>' +
-    '<button class="dona-sug-btn" data-msg="Me dá esperança">🌅 Esperança</button>' +
-    '<button class="dona-sug-btn" data-msg="Preciso de oração">🙏 Oração</button>' +
-    '<button class="dona-sug-btn" data-msg="Me diz um versículo sobre amor">❤️ Amor</button>' +
-    '<button class="dona-sug-btn" data-msg="Como funciona?">📋 Como funciona</button>' +
-    '<button class="dona-sug-btn" data-msg="Me mostra a galeria">📸 Galeria</button>' +
-    "</div>" +
-    /* Barra de input */
-    '<div class="dona-input-bar">' +
-    '<input type="text" id="dona-input" class="dona-input" placeholder="Digite sua mensagem..." autocomplete="off">' +
-    '<button id="dona-send" class="dona-send" aria-label="Enviar">' +
-    '<i class="fas fa-paper-plane"></i>' +
-    "</button>" +
-    "</div>" +
-    "</div>";
-
-  /* Injeta no final do body */
-  var wrapper = document.createElement("div");
-  wrapper.innerHTML = fabHTML + chatHTML;
-  while (wrapper.firstChild) {
-    document.body.appendChild(wrapper.firstChild);
-  }
-}
-
-/* ─── 6. ADICIONAR MENSAGEM NA TELA ──────────────────────────────── */
-/* Exibe uma bolha de mensagem na área de chat */
-function donaAdicionarMsg(texto, tipo) {
-  var container = document.getElementById("dona-messages");
-  if (!container) return;
-
-  /* Cria o elemento da mensagem */
-  var msg = document.createElement("div");
-  msg.className = "dona-msg " + tipo; /* tipo: 'bot' ou 'user' */
-
-  /* Bot: renderiza Markdown (negrito, itálico, quebras de linha)
-     User: textContent puro — nunca executa HTML digitado pelo usuário */
-  if (tipo === "bot") {
-    msg.innerHTML = donaRenderMarkdown(texto);
-  } else {
-    msg.textContent = texto;
-  }
-
-  /* Adiciona ao container */
-  container.appendChild(msg);
-
-  /* Scroll automático para a última mensagem */
-  container.scrollTop = container.scrollHeight;
-}
-
-/* ─── 7. MOSTRAR INDICADOR DE DIGITAÇÃO ───────────────────────────── */
-/* Exibe os 3 pontinhos enquanto "Dona está digitando" */
-function donaMostrarDigitando() {
-  var container = document.getElementById("dona-messages");
-  if (!container) return;
-
-  var typing = document.createElement("div");
-  typing.className = "dona-typing";
-  typing.id = "dona-typing";
-  typing.innerHTML = "<span></span><span></span><span></span>";
-  container.appendChild(typing);
-  container.scrollTop = container.scrollHeight;
-}
-
-/* Remove o indicador de digitação */
-function donaRemoverDigitando() {
-  var typing = document.getElementById("dona-typing");
-  if (typing) typing.remove();
-}
-
-/* ─── 8. PROCESSAR MENSAGEM DO USUÁRIO ────────────────────────────── */
-/* Recebe o texto do usuário, detecta intenção e responde */
-function donaProcessarMsg(texto) {
-  if (!texto.trim()) return; /* ignora mensagens vazias */
-
-  /* Exibe a mensagem do usuário */
-  donaAdicionarMsg(texto, "user");
-
-  /* Mostra indicador de digitação */
-  donaMostrarDigitando();
-
-  /* Tenta detectar nome do usuário */
-  var nomeDetectado = donaDetectarNome(texto);
-  if (nomeDetectado) {
-    _donaNomeUsuario = nomeDetectado;
-  }
-
-  /* Consulta resposta: LLM externo (se configurado) ou palavras-chave local */
-  donaConsultarResposta(texto, function (tema, resposta) {
-    /* Personaliza a resposta com o nome se disponível */
-    if (_donaNomeUsuario) {
-      /* Se detectou o nome agora, responde com saudação personalizada */
-      if (nomeDetectado) {
-        resposta =
-          "Que nome lindo! 😊 Prazer em te conhecer, **" +
-          _donaNomeUsuario +
-          "**! " +
-          resposta;
-      } else if (tema === "saudacao") {
-        /* Em saudações, substitui os termos carinhosos genéricos pelo nome */
-        resposta = resposta
-          .replace("meu filho", _donaNomeUsuario)
-          .replace("querido", _donaNomeUsuario)
-          .replace("benzinho", _donaNomeUsuario);
-      }
-    }
-
-    /* Simula tempo de digitação (800ms a 1500ms) — parece mais humano */
-    var delay = 800 + Math.floor(Math.random() * 700);
-
-    setTimeout(function () {
-      donaRemoverDigitando(); /* remove pontinhos */
-      donaAdicionarMsg(resposta, "bot"); /* exibe resposta com Markdown */
-    }, delay);
-  });
-}
-
-/* ─── 9. INICIALIZAÇÃO ────────────────────────────────────────────── */
-/* Executa quando o DOM está completamente carregado */
-document.addEventListener("DOMContentLoaded", function () {
-  /* Cria a interface (FAB + janela do chat) */
-  donaCriarInterface();
-
-  /* ── Supabase Auth: pega nome do usuário logado (se houver) ── */
-  /* Útil quando o admin (já autenticado) abre o chat — a Dona o cumprimenta pelo nome */
-  if (window.supabaseClient && typeof supabaseClient.auth === "object") {
-    supabaseClient.auth
-      .getUser()
-      .then(function (result) {
-        var user = result && result.data && result.data.user;
-        if (!user) return; /* visitante anônimo — sem nome */
-
-        /* Tenta nome completo (Google OAuth) ou primeiro segmento do e-mail */
-        var meta = user.user_metadata || {};
-        var nomeCompleto = meta.full_name || meta.name || user.email || "";
-        var primeiroNome =
-          nomeCompleto.split(/[\s@]/)[0]; /* pega só o primeiro token */
-
-        if (primeiroNome && primeiroNome.length > 1) {
-          /* Capitaliza e salva na variável global do chatbot */
-          _donaNomeUsuario =
-            primeiroNome.charAt(0).toUpperCase() +
-            primeiroNome.slice(1).toLowerCase();
-        }
-      })
-      .catch(function () {
-        /* silencia erros de rede — não bloqueia o chat */
-      });
-  }
-
-  /* ── Abrir chat (clique no FAB) ── */
-  var fab = document.getElementById("dona-fab");
-  var chat = document.getElementById("dona-chat");
-
-  if (fab && chat) {
-    fab.addEventListener("click", function () {
-      fab.classList.add("hidden"); /* esconde FAB */
-      chat.classList.add("active"); /* mostra chat */
-
-      /* Se é a primeira vez, manda saudação personalizada de boas-vindas */
-      var msgs = document.getElementById("dona-messages");
-      if (msgs && msgs.children.length === 0) {
-        /* Saudação com nome quando o usuário está autenticado */
-        var saudacaoNome = _donaNomeUsuario
-          ? ", **" + _donaNomeUsuario + "**" /* ex: "Olá, Maria!" */
-          : ""; /* visitante anônimo */
-        var boasVindas =
-          "Olá" +
-          saudacaoNome +
-          "! Eu sou a Dona Assunção 👵🏽💛 A vovó da Ação Social Semear! " +
-          "Estou aqui pra te ajudar com informações. " +
-          '_"O Senhor é bom para todos"_ (Salmo 145:9). Como posso te ajudar hoje?';
-        donaAdicionarMsg(boasVindas, "bot");
-      }
+  function nowTime() {
+    return new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 
-  /* ── Fechar chat ── */
-  document.addEventListener("click", function (e) {
-    if (e.target.id === "dona-close" || e.target.closest("#dona-close")) {
-      if (chat) chat.classList.remove("active"); /* esconde chat */
-      if (fab) fab.classList.remove("hidden"); /* mostra FAB */
+  function detectName(text) {
+    var patterns = [
+      /meu nome (?:é|e) ([a-záàâãéêíóôõúüçñ]{3,})/i,
+      /me chamo ([a-záàâãéêíóôõúüçñ]{3,})/i,
+      /pode me chamar de ([a-záàâãéêíóôõúüçñ]{3,})/i,
+      /sou (?:o|a)?\s*([a-záàâãéêíóôõúüçñ]{3,})$/i,
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var match = String(text || "").trim().match(patterns[i]);
+      if (match && match[1]) {
+        return match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+      }
     }
-  });
+    return "";
+  }
 
-  /* ── Enviar mensagem (botão) ── */
-  document.addEventListener("click", function (e) {
-    if (e.target.id === "dona-send" || e.target.closest("#dona-send")) {
+  function scoreTopic(query, topic) {
+    var q = normalize(query);
+    var score = 0;
+    (topic.keywords || []).forEach(function (kw) {
+      var k = normalize(kw);
+      if (!k) return;
+      if (q === k) score += 10;
+      else if (q.indexOf(k) >= 0) score += k.indexOf(" ") >= 0 ? 7 : 4;
+    });
+    return score + (topic.priority || 0) / 100;
+  }
+
+  function matchLocal(query) {
+    var bestKey = "fallback";
+    var bestScore = 0;
+    Object.keys(LOCAL_TOPICS).forEach(function (key) {
+      var score = scoreTopic(query, LOCAL_TOPICS[key]);
+      if (score > bestScore) {
+        bestScore = score;
+        bestKey = key;
+      }
+    });
+    if (bestScore < 4) return null;
+    var topic = LOCAL_TOPICS[bestKey];
+    return {
+      intent: bestKey,
+      answer: topic.answer,
+      ctas: topic.ctas || [],
+      source: "local",
+    };
+  }
+
+  function matchRemote(query) {
+    if (!state.remoteKnowledge.length) return null;
+    var q = normalize(query);
+    var qTokens = q.split(/\s+/).filter(function (token) {
+      return token.length >= 3;
+    });
+    var best = null;
+    var bestScore = 0;
+
+    state.remoteKnowledge.forEach(function (item) {
+      var score = 0;
+      var keywords = Array.isArray(item.keywords)
+        ? item.keywords
+        : String(item.keywords || "").split(",");
+      keywords.forEach(function (kw) {
+        var k = normalize(kw);
+        if (k && q.indexOf(k) >= 0) score += 8;
+      });
+
+      var title = normalize(item.title);
+      var content = normalize(item.content);
+      qTokens.forEach(function (token) {
+        if (title.indexOf(token) >= 0) score += 3;
+        if (content.indexOf(token) >= 0) score += 1;
+      });
+
+      score = score * ((Number(item.priority) || 50) / 100 + 0.5);
+      if (score > bestScore) {
+        best = item;
+        bestScore = score;
+      }
+    });
+
+    if (!best || bestScore < 4) return null;
+    return {
+      intent: best.category_key || "conhecimento",
+      answer: best.content,
+      ctas: [],
+      source: "remote",
+    };
+  }
+
+  function whatsappHref(message) {
+    var phone = String(state.whatsappPhone || "").replace(/\D/g, "");
+    if (!phone || /999999999/.test(phone)) return "";
+    if (phone.length <= 11) phone = "55" + phone;
+    return "whatsapp://send?phone=" + phone + "&text=" + encodeURIComponent(message || "");
+  }
+
+  function buildWhatsAppCta(label, message) {
+    var href = whatsappHref(message);
+    if (!href) return null;
+    return { label: label || "Falar no WhatsApp", href: href, icon: "fa-brands fa-whatsapp", external: true };
+  }
+
+  function resolveAnswer(query) {
+    var normalized = normalize(query);
+
+    if (normalized === "outras duvidas" || normalized === "outra duvida") {
+      return {
+        intent: "ajuda",
+        answer:
+          "Pode me perguntar sobre cesta básica, doações, voluntariado, horário, endereço, galeria, pedidos de oração ou como funciona a ação social.",
+        ctas: [],
+      };
+    }
+
+    var remote = matchRemote(query);
+    if (remote) return remote;
+
+    var local = matchLocal(query);
+    if (local) {
+      var ctas = local.ctas ? local.ctas.slice() : [];
+      if (local.intent === "contato" || local.intent === "localizacao" || local.intent === "horario") {
+        var wa = buildWhatsAppCta(
+          "Falar no WhatsApp",
+          "Olá! Vim pelo site da Ação Social Semear e gostaria de tirar uma dúvida."
+        );
+        if (wa) ctas.push(wa);
+      }
+      return Object.assign({}, local, { ctas: ctas });
+    }
+
+    return {
+      intent: "fallback",
+      answer: state.config.fallback,
+      ctas: [
+        buildWhatsAppCta(
+          "Falar com a equipe",
+          "Olá! Vim pelo site da Ação Social Semear e preciso de ajuda."
+        ),
+      ].filter(Boolean),
+    };
+  }
+
+  function createInterface() {
+    if (document.getElementById("dona-fab") || state.config.active === false) return;
+
+    var fab = document.createElement("button");
+    fab.id = "dona-fab";
+    fab.className = "dona-fab";
+    fab.type = "button";
+    fab.setAttribute("aria-label", "Conversar com Dona Assunção");
+    fab.innerHTML =
+      '<img class="dona-fab__photo" src="' +
+      escapeHtml(state.config.avatarUrl) +
+      '" alt="Dona Assunção">' +
+      '<span class="dona-fab__status" aria-hidden="true"></span>' +
+      '<span class="dona-fab__hint">Precisa de ajuda?</span>';
+
+    var chat = document.createElement("div");
+    chat.id = "dona-chat";
+    chat.className = "dona-chat";
+    chat.setAttribute("role", "dialog");
+    chat.setAttribute("aria-label", "Chat com Dona Assunção");
+    chat.setAttribute("aria-modal", "false");
+    chat.innerHTML =
+      '<div class="dona-chat-header">' +
+      '<div class="dona-avatar"><img id="dona-avatar-img" src="' +
+      escapeHtml(state.config.avatarUrl) +
+      '" alt=""></div>' +
+      '<div class="dona-info">' +
+      '<strong id="dona-display-name">' +
+      escapeHtml(state.config.displayName) +
+      "</strong>" +
+      '<small id="dona-subtitle">' +
+      escapeHtml(state.config.subtitle) +
+      "</small>" +
+      '<span class="dona-presence">Online agora</span>' +
+      "</div>" +
+      '<button id="dona-close" class="dona-close" type="button" aria-label="Fechar chat">' +
+      '<i class="fa-solid fa-xmark" aria-hidden="true"></i>' +
+      "</button>" +
+      "</div>" +
+      '<div id="dona-messages" class="dona-messages" aria-live="polite"></div>' +
+      '<div id="dona-sugestoes" class="dona-sugestoes"></div>' +
+      '<form id="dona-form" class="dona-input-bar">' +
+      '<span class="dona-input-icon" aria-hidden="true"><i class="fa-regular fa-face-smile"></i></span>' +
+      '<input id="dona-input" class="dona-input" type="text" placeholder="Digite sua mensagem..." autocomplete="off">' +
+      '<button id="dona-send" class="dona-send" type="submit" aria-label="Enviar">' +
+      '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i>' +
+      "</button>" +
+      "</form>";
+
+    document.body.appendChild(fab);
+    document.body.appendChild(chat);
+    renderSuggestions(QUICK_DEFAULT);
+    bindEvents();
+  }
+
+  function refreshIdentity() {
+    var fabImg = document.querySelector(".dona-fab__photo");
+    var avatarImg = document.getElementById("dona-avatar-img");
+    var name = document.getElementById("dona-display-name");
+    var subtitle = document.getElementById("dona-subtitle");
+
+    if (fabImg) fabImg.src = state.config.avatarUrl || DONA_DEFAULTS.avatarUrl;
+    if (avatarImg) avatarImg.src = state.config.avatarUrl || DONA_DEFAULTS.avatarUrl;
+    if (name) name.textContent = state.config.displayName || DONA_DEFAULTS.displayName;
+    if (subtitle) subtitle.textContent = state.config.subtitle || DONA_DEFAULTS.subtitle;
+
+    if (state.config.active === false) {
+      var fab = document.getElementById("dona-fab");
+      var chat = document.getElementById("dona-chat");
+      if (fab) fab.remove();
+      if (chat) chat.remove();
+    }
+  }
+
+  function bindEvents() {
+    var fab = document.getElementById("dona-fab");
+    var chat = document.getElementById("dona-chat");
+    var form = document.getElementById("dona-form");
+
+    if (fab && chat) {
+      fab.addEventListener("click", openChat);
+    }
+
+    document.addEventListener("click", function (event) {
+      if (event.target.closest("#dona-close")) closeChat();
+      var quick = event.target.closest(".dona-sug-btn");
+      if (quick) processQuickReply(quick.getAttribute("data-msg") || quick.textContent || "");
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && chat && chat.classList.contains("active")) closeChat();
+    });
+
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var input = document.getElementById("dona-input");
+        if (!input || !input.value.trim()) return;
+        var text = input.value.trim();
+        input.value = "";
+        processMessage(text);
+      });
+    }
+  }
+
+  function openChat() {
+    var fab = document.getElementById("dona-fab");
+    var chat = document.getElementById("dona-chat");
+    var input = document.getElementById("dona-input");
+    if (!chat) return;
+
+    if (fab) fab.classList.add("hidden");
+    chat.classList.add("active");
+
+    if (!state.opened) {
+      state.opened = true;
+      var greeting = state.config.greeting;
+      if (state.name) {
+        greeting = greeting.replace("Olá!", "Olá, **" + state.name + "**!");
+      }
+      addMessage(greeting, "bot");
+    }
+
+    setTimeout(function () {
+      if (input) input.focus();
+    }, 120);
+  }
+
+  function closeChat() {
+    var fab = document.getElementById("dona-fab");
+    var chat = document.getElementById("dona-chat");
+    if (chat) chat.classList.remove("active");
+    if (fab) fab.classList.remove("hidden");
+  }
+
+  function addMessage(text, type) {
+    var container = document.getElementById("dona-messages");
+    if (!container) return null;
+
+    var msg = document.createElement("div");
+    msg.className = "dona-msg " + (type === "user" ? "user" : "bot");
+
+    var bubble = document.createElement("div");
+    bubble.className = "dona-msg__bubble";
+    if (type === "user") bubble.textContent = text;
+    else bubble.innerHTML = renderMarkdown(text);
+
+    var time = document.createElement("span");
+    time.className = "dona-msg__time";
+    time.textContent = nowTime();
+
+    msg.appendChild(bubble);
+    msg.appendChild(time);
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+    return msg;
+  }
+
+  function addCtas(ctas) {
+    var filtered = (ctas || []).filter(Boolean);
+    if (!filtered.length) return;
+
+    var container = document.getElementById("dona-messages");
+    if (!container) return;
+
+    var actions = document.createElement("div");
+    actions.className = "dona-actions";
+
+    filtered.forEach(function (cta) {
+      var link = document.createElement("a");
+      link.className = "dona-cta";
+      link.href = cta.href || "#";
+      if (cta.external) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      if (cta.icon) {
+        var icon = document.createElement("i");
+        icon.className = cta.icon;
+        icon.setAttribute("aria-hidden", "true");
+        link.appendChild(icon);
+      }
+      link.appendChild(document.createTextNode(cta.label || "Abrir"));
+      actions.appendChild(link);
+    });
+
+    container.appendChild(actions);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function showTyping() {
+    var container = document.getElementById("dona-messages");
+    if (!container || document.getElementById("dona-typing")) return;
+    var typing = document.createElement("div");
+    typing.id = "dona-typing";
+    typing.className = "dona-typing";
+    typing.innerHTML = "<span></span><span></span><span></span>";
+    container.appendChild(typing);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function hideTyping() {
+    var typing = document.getElementById("dona-typing");
+    if (typing) typing.remove();
+  }
+
+  function setInputBusy(isBusy) {
+    var input = document.getElementById("dona-input");
+    var send = document.getElementById("dona-send");
+    if (input) input.disabled = !!isBusy;
+    if (send) send.disabled = !!isBusy;
+  }
+
+  function renderSuggestions(items) {
+    var box = document.getElementById("dona-sugestoes");
+    if (!box) return;
+    box.innerHTML = "";
+    (items || QUICK_DEFAULT).forEach(function (item) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "dona-sug-btn";
+      btn.textContent = item[0];
+      btn.setAttribute("data-msg", item[1]);
+      box.appendChild(btn);
+    });
+  }
+
+  function backendWebhookUrl() {
+    var base = String(state.backendUrl || "").trim();
+    if (!base) return "";
+    return base + "/webhook";
+  }
+
+  async function fetchBackendAnswer(text) {
+    var url = backendWebhookUrl();
+    if (!url) return null;
+
+    var hasAbort = typeof AbortController !== "undefined";
+    var controller = hasAbort ? new AbortController() : null;
+    var timeoutId = controller
+      ? setTimeout(function () {
+          controller.abort();
+        }, 20000)
+      : null;
+
+    try {
+      var resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          canal: "web",
+          user_id: state.userId,
+          nome: state.name || "",
+          texto: text,
+        }),
+        signal: controller ? controller.signal : undefined,
+      });
+      if (!resp.ok) return null;
+      var data = await resp.json();
+      if (!data || typeof data.resposta !== "string" || !data.resposta.trim()) return null;
+      return { answer: data.resposta.trim(), urgente: !!data.urgente };
+    } catch (e) {
+      return null;
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+  }
+
+  async function processMessage(text) {
+    text = String(text || "").trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    showTyping();
+    setInputBusy(true);
+
+    var detectedName = detectName(text);
+    if (detectedName) {
+      state.name = detectedName;
+      localStorage.setItem("dona_assuncao_nome", detectedName);
+    }
+
+    var startedAt = Date.now();
+    var remote = await fetchBackendAnswer(text);
+    var result;
+
+    if (remote) {
+      var hint = matchLocal(text);
+      result = {
+        intent: (hint && hint.intent) || "ajuda",
+        answer: remote.answer,
+        ctas: hint ? hint.ctas || [] : [],
+      };
+      if (remote.urgente) {
+        if (state.config.humanHandoff) {
+          result.answer += "\n\n" + state.config.humanHandoff;
+        }
+        var waUrgente = buildWhatsAppCta(
+          "Falar agora com a equipe",
+          "Olá! Preciso de ajuda urgente, vim pelo chat do site da Ação Social Semear."
+        );
+        if (waUrgente) result.ctas = result.ctas.concat([waUrgente]);
+      }
+    } else {
+      result = resolveAnswer(text);
+    }
+
+    if (detectedName) {
+      result.answer = "Prazer em te conhecer, **" + detectedName + "**. " + result.answer;
+    }
+
+    // Pausa mínima para a digitação não parecer instantânea quando a resposta local é imediata
+    var elapsed = Date.now() - startedAt;
+    var minDelay = Math.max(0, 480 - elapsed);
+
+    setTimeout(function () {
+      state.lastIntent = result.intent || "";
+      hideTyping();
+      addMessage(result.answer, "bot");
+      addCtas(result.ctas);
+      renderSuggestions(QUICK_BY_INTENT[result.intent] || QUICK_DEFAULT);
+      setInputBusy(false);
+
       var input = document.getElementById("dona-input");
-      if (input && input.value.trim()) {
-        donaProcessarMsg(input.value); /* processa */
-        input.value = ""; /* limpa input */
-        input.focus(); /* mantém foco */
-      }
-    }
-  });
+      if (input) input.focus();
 
-  /* ── Enviar mensagem (Enter) ── */
-  document.addEventListener("keydown", function (e) {
-    if (e.target.id === "dona-input" && e.key === "Enter") {
-      e.preventDefault(); /* evita submit de form */
-      var input = e.target;
-      if (input.value.trim()) {
-        donaProcessarMsg(input.value); /* processa */
-        input.value = ""; /* limpa */
-      }
-    }
-  });
+      if (!remote && result.intent === "fallback") logUnanswered(text);
+    }, minDelay);
+  }
 
-  /* ── Sugestões rápidas (delegação de eventos) ── */
-  document.addEventListener("click", function (e) {
-    var btn = e.target.closest(".dona-sug-btn");
-    if (btn) {
-      var msg = btn.getAttribute("data-msg"); /* texto da sugestão */
-      if (msg) {
-        donaProcessarMsg(msg); /* processa como se o usuário digitou */
+  function processQuickReply(text) {
+    text = String(text || "").trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+
+    // Sugestões rápidas são perguntas fixas (FAQ) — responde na hora, sem
+    // esperar o backend de IA, que é mais lento.
+    var override = QUICK_REPLY_OVERRIDES[text];
+    var topic = override && LOCAL_TOPICS[override.topic];
+    var result;
+
+    if (topic) {
+      var ctas = topic.ctas ? topic.ctas.slice() : [];
+      if (override.topic === "contato") {
+        var wa = buildWhatsAppCta(
+          "Falar no WhatsApp",
+          "Olá! Vim pelo site da Ação Social Semear e gostaria de tirar uma dúvida."
+        );
+        if (wa) ctas.push(wa);
       }
+      result = { intent: override.menu, answer: topic.answer, ctas: ctas };
+    } else {
+      result = resolveAnswer(text);
     }
-  });
-});
+
+    state.lastIntent = result.intent || "";
+    addMessage(result.answer, "bot");
+    addCtas(result.ctas);
+    renderSuggestions(QUICK_BY_INTENT[result.intent] || QUICK_DEFAULT);
+
+    if (result.intent === "fallback") logUnanswered(text);
+  }
+
+  function parseStoredWaConfig() {
+    try {
+      var raw = localStorage.getItem("doavida_wa_config");
+      if (!raw) return "";
+      var cfg = JSON.parse(raw);
+      var phones = cfg.adminPhone || cfg.adminPhones || cfg.whatsapp_phones || "";
+      if (Array.isArray(phones)) return phones[0] || "";
+      return String(phones).split(",")[0] || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  async function hydrateWhatsApp() {
+    state.whatsappPhone = parseStoredWaConfig();
+    if (window.DoaVidaSync && typeof window.DoaVidaSync.getWAConfig === "function") {
+      try {
+        var cfg = await window.DoaVidaSync.getWAConfig();
+        var phones = cfg && cfg.adminPhone;
+        if (Array.isArray(phones) && phones[0]) state.whatsappPhone = phones[0];
+        else if (phones) state.whatsappPhone = String(phones).split(",")[0];
+      } catch (e) {}
+    }
+  }
+
+  async function hydrateRemoteAgent() {
+    if (!window.supabaseClient || typeof window.supabaseClient.from !== "function") return;
+
+    try {
+      var settingsResult = await window.supabaseClient
+        .from("agent_settings")
+        .select("*")
+        .eq("internal_key", "default")
+        .single();
+
+      if (!settingsResult.error && settingsResult.data) {
+        var s = settingsResult.data;
+        state.config = Object.assign({}, state.config, {
+          active: s.active !== false,
+          displayName: s.display_name || state.config.displayName,
+          avatarUrl: s.avatar_url || state.config.avatarUrl,
+          greeting: s.greeting || state.config.greeting,
+          fallback: s.fallback_message || state.config.fallback,
+          humanHandoff: s.human_handoff || state.config.humanHandoff,
+        });
+        refreshIdentity();
+      }
+    } catch (e) {}
+
+    try {
+      var knowledgeResult = await window.supabaseClient
+        .from("agent_knowledge")
+        .select("title,content,keywords,priority,category_key,status")
+        .eq("status", "active")
+        .is("deleted_at", null)
+        .limit(150);
+
+      if (!knowledgeResult.error && Array.isArray(knowledgeResult.data)) {
+        state.remoteKnowledge = knowledgeResult.data.filter(function (item) {
+          return item && item.content;
+        });
+      }
+    } catch (e) {}
+  }
+
+  async function hydrateBackendUrl() {
+    if (!window.DoaVidaSync || typeof window.DoaVidaSync.getDonaBackendUrl !== "function") return;
+    try {
+      var url = await window.DoaVidaSync.getDonaBackendUrl();
+      if (url) state.backendUrl = url;
+    } catch (e) {}
+  }
+
+  async function logUnanswered(question) {
+    if (!window.supabaseClient || typeof window.supabaseClient.from !== "function") return;
+    try {
+      await window.supabaseClient.from("agent_unanswered").insert([
+        {
+          question: String(question || "").slice(0, 500),
+          context: state.lastIntent || "",
+          source: "site_publico",
+        },
+      ]);
+    } catch (e) {}
+  }
+
+  function init() {
+    createInterface();
+    hydrateWhatsApp();
+    hydrateRemoteAgent();
+    hydrateBackendUrl();
+
+    window.addEventListener(
+      "DoaVidaSyncPronto",
+      function () {
+        hydrateWhatsApp();
+        hydrateBackendUrl();
+      },
+      { once: true }
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();

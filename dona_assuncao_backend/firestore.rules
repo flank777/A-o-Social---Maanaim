@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// =============================================================================
+// Regras de segurança do Firestore — Dona Assunção
+//
+// Todo o acesso aos dados passa pelo BACKEND (Firebase Admin SDK), que ignora
+// estas regras por usar credencial de serviço. Portanto, o acesso direto de
+// qualquer cliente (app web, mobile) fica BLOQUEADO por padrão.
+//
+// Isso protege conversas, pedidos de oração, solicitações de cesta e registros
+// de serem lidos ou alterados por terceiros.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Bloqueia tudo por padrão.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Exemplo (OPCIONAL): se um dia você quiser que um app web leia
+    // a base de conhecimento pública diretamente, descomente abaixo.
+    // match /base_conhecimento/{doc} {
+    //   allow read: if true;
+    //   allow write: if false;
+    // }
+  }
+}

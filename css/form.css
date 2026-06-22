@@ -428,7 +428,7 @@
   background: var(--surface2);
   border: 1.5px solid var(--border);
   border-radius: 12px;
-  overflow: visible;
+  overflow: hidden;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -449,30 +449,30 @@
   border-color: var(--form-done);
 }
 
-/* Container da imagem — proporção fixa via padding-top (evita CLS) */
+/* Container da imagem — reserva o espaço quadrado antes da imagem carregar,
+   evitando o "corte" visual enquanto o lazy-load do Cloudinary não termina */
 .fcard-img-wrap {
   position: relative;
   width: 100%;
-  padding-top: 0;
+  aspect-ratio: 1 / 1;
   background: var(--surface2);
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-/* Imagem em fluxo normal — card se adapta à altura da imagem */
+/* Desktop: imagem preenche o espaço reservado, sem corte */
 .fcard-img {
-  position: static;
-  inset: auto;
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  object-fit: contain;
+  object-position: center;
 }
 
-/* Emoji fallback */
+/* Emoji fallback quando imagem falha ou não existe */
 .fcard-emoji-fb {
-  position: static;
-  inset: auto;
-  width: 100%;
-  min-height: 80px;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1620,22 +1620,26 @@ body.etapa1 #fs1 .form-btn-row {
    SMART CART — barra fixa + gaveta mobile + sidebar desktop
    ══════════════════════════════════════════════════════════════════ */
 
-/* Filtro dourado — aplicado em todos os ícones de carrinho */
+/* Ícone dourado do carrinho */
 .cart-bar-icon,
 .cart-panel-icon {
-  object-fit: contain;
   flex-shrink: 0;
-  filter: invert(68%) sepia(42%) saturate(600%) hue-rotate(5deg) brightness(95%);
+  color: #c9a84c;
 }
 
 /* Tamanho na barra fixa */
 .cart-bar-icon {
+  font-size: 28px;
   width: 40px;
   height: 40px;
-  object-fit: contain;
-  flex-shrink: 0;
-  /* converte preto → dourado (#c9a84c) */
-  filter: invert(68%) sepia(42%) saturate(600%) hue-rotate(5deg) brightness(95%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tamanho no painel lateral */
+.cart-panel-icon {
+  font-size: 16px;
 }
 
 /* ── Barra fixa inferior (mobile/tablet) ── */
@@ -1857,5 +1861,21 @@ body.etapa1 #fs1 .form-btn-row {
   }
   body.etapa1 #fs1 {
     padding: 16px 14px 100px;
+  }
+  /* Mobile: altura fixa para todos os cards de alimentos */
+  .fcard-img-wrap {
+    height: 130px;
+  }
+  /* Alimentos normais: cover para preencher sem espaço vazio */
+  .fcard-img {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Cesta completa: contain para mostrar a imagem inteira (produto retrato) */
+  .fcard--cesta .fcard-img {
+    object-fit: contain;
+    object-position: center;
+    background: #f5f5f5;
   }
 }

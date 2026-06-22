@@ -1139,7 +1139,7 @@ var DoaVidaAPI = {
     */
 
     /* encodeURIComponent() = codifica caracteres especiais para URL */
-    return 'https://wa.me/55' + fone + '?text=' + encodeURIComponent(msg);
+    return 'whatsapp://send?phone=55' + fone + '&text=' + encodeURIComponent(msg);
   },
 
 
@@ -1191,73 +1191,126 @@ var DoaVidaAPI = {
 
   /* ══════════════════════════════════════════════════════════════
      3.13 — NOTIFICAÇÃO WHATSAPP AO ADMIN (CallMeBot)
+
+     A configuração (apikey/ativo) e a lista de destinatários são lidas
+     do Firebase via DoaVidaSync — a mesma fonte que o painel admin usa
+     para cadastrar quem recebe avisos (aba WhatsApp). Isso garante que
+     o que for configurado lá realmente tenha efeito aqui, em vez de
+     depender de um valor salvo só no localStorage do navegador.
   ══════════════════════════════════════════════════════════════ */
 
-  notificarAdminWA: function (doacao) {
-    var cfg = DoaVidaAPI.getWaConfig();
+  /*
+    Envia 1 mensagem via CallMeBot.
 
-    /* Só envia se ativado e configurado */
-    if (!cfg.ativo || !cfg.apikey) {
-      console.log('[DoaVida] WA: não configurado. Admin → Config → WhatsApp.');
-      return;
-    }
-
-    /* Monta lista de itens doados */
-    var itens = doacao.itens || [];
-    var itensLinhas = itens.length > 0
-      ? itens.map(function(i) {
-          return '  • ' + (i.nome || i.name || '?') + ' x' + (i.qty || 1) + ' = ' + (i.totalKg || 0).toFixed(1) + 'kg';
-        }).join('\n')
-      : '  • ' + (doacao.food || '—');
-
-    var totalKg = doacao.total_kg || doacao.totalKg ||
-      itens.reduce(function(s, i){ return s + (i.totalKg || 0); }, 0);
-
-    var msg = [
-      '🌱 *COMPROVANTE DE DOAÇÃO*',
-      '🏷️ Ação Social Semear + Maanaim',
-      '━━━━━━━━━━━━━━━━━━━━━━━━',
-      '',
-      '👤 *Doador:* ' + (doacao.name || doacao.nome || 'Anônimo'),
-      '📱 *WhatsApp:* ' + (doacao.phone || doacao.telefone || 'não informado'),
-      '🚚 *Entrega:* ' + DoaVidaAPI._labelEntrega(doacao.delivery),
-      '🔢 *Protocolo:* ' + (doacao.protocolo || '—'),
-      '📅 *Data:* ' + new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
-      '',
-      '━━━━━━━━━━━━━━━━━━━━━━━━',
-      '🥫 *ITENS DOADOS:*',
-      itensLinhas,
-      '━━━━━━━━━━━━━━━━━━━━━━━━',
-      '⚖️ *TOTAL: ' + totalKg.toFixed(1) + ' kg*',
-      '',
-      '🙏 Que Deus abençoe sua generosidade!',
-      '✉️ Ação Social Semear + Maanaim — Belém, PA',
-    ].join('\n');
-
-    var phones = Array.isArray(cfg.adminPhone) ? cfg.adminPhone : [cfg.adminPhone];
-
-    phones.forEach(function (phone) {
-      if (!phone) return;
-      var url = 'https://api.callmebot.com/whatsapp.php'
-        + '?phone='  + encodeURIComponent(phone)
-        + '&text='   + encodeURIComponent(msg)
-        + '&apikey=' + encodeURIComponent(cfg.apikey);
-
-      /* fetch() = faz uma requisição HTTP. Assíncrono = não trava a página */
-      fetch(url)
-        .then(function (resp) {
-          if (resp.ok) {
-            console.log('[DoaVida] ✅ WA enviado para ' + phone);
-            DoaVidaAPI.addLog({ tipo: 'notificacao_doacao', para: phone, status: 'enviado', preview: msg.substring(0, 80) });
-          } else {
-            throw new Error('HTTP ' + resp.status);
-          }
-        })
-        .catch(function (err) {
-          console.warn('[DoaVida] ❌ Falha WA:', err.message);
-          DoaVidaAPI.addLog({ tipo: 'notificacao_doacao', para: phone, status: 'erro', preview: err.message });
-        });
+    Não usamos fetch() aqui de propósito: a API do CallMeBot não devolve o
+    cabeçalho Access-Control-Allow-Origin, então fetch() falha sempre com
+    "Failed to fetch" (erro de CORS) ao ser chamado direto do navegador,
+    mesmo com telefone/apikey corretos (confirmado testando a API direto
+    por fora do navegador — ela responde normalmente, só não libera CORS).
+    A própria CallMeBot foi desenhada para ser disparada via tag <img>
+    (é assim que a documentação oficial e a comunidade integram no
+    browser): o navegador faz a requisição GET de qualquer forma, o que
+    já é suficiente para o servidor processar e enviar a mensagem —
+    só não conseguimos ler o corpo da resposta (nem precisamos).
+  */
+  enviarWhatsAppCallMeBot: function (telefone, apikey, mensagem) {
+    var url = 'https://api.callmebot.com/whatsapp.php'
+      + '?phone='  + encodeURIComponent(String(telefone || '').replace(/[^\d+]/g, ''))
+      + '&text='   + encodeURIComponent(mensagem)
+      + '&apikey=' + encodeURIComponent(apikey);
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      var concluido = false;
+      var timer = setTimeout(function () {
+        if (concluido) return;
+        concluido = true;
+        reject(new Error('Tempo esgotado ao contatar o CallMeBot.'));
+      }, 15000);
+      /* onload/onerror: ambos indicam que a requisição saiu e chegou ao
+         servidor — a resposta do CallMeBot é texto, nunca uma imagem
+         válida, então o navegador sempre cai em onerror mesmo em caso
+         de sucesso no envio. Só um erro de rede real (ex.: sem internet,
+         host indisponível) chega aqui de fato sem o servidor ter processado. */
+      img.onload  = function () { if (concluido) return; concluido = true; clearTimeout(timer); resolve(); };
+      img.onerror = function () { if (concluido) return; concluido = true; clearTimeout(timer); resolve(); };
+      img.src = url;
     });
+  },
+
+  notificarAdminWA: async function (doacao) {
+    try {
+      if (!window.DoaVidaSync || typeof DoaVidaSync.getWAConfig !== 'function') return;
+      var cfg = await DoaVidaSync.getWAConfig();
+
+      /* Só envia se ativado e configurado */
+      if (!cfg.ativo || !cfg.apikey) {
+        console.log('[DoaVida] WA: não configurado. Admin → WhatsApp → Conexão.');
+        return;
+      }
+
+      var admins = typeof DoaVidaSync.getWhatsappAdmins === 'function'
+        ? await DoaVidaSync.getWhatsappAdmins() : [];
+      var destinatarios = admins.filter(function (a) {
+        var ativo  = (a.status || 'ativo') === 'ativo';
+        var avisos = Array.isArray(a.avisos) ? a.avisos : [];
+        return ativo && avisos.indexOf('doacoes') >= 0 && (a.telefone || a.whatsapp);
+      });
+      if (!destinatarios.length) {
+        console.log('[DoaVida] WA: nenhum administrador cadastrado para receber avisos de doação.');
+        return;
+      }
+
+      /* Monta lista de itens doados */
+      var itens = doacao.itens || [];
+      var itensLinhas = itens.length > 0
+        ? itens.map(function(i) {
+            return '  • ' + (i.nome || i.name || '?') + ' x' + (i.qty || 1) + ' = ' + (i.totalKg || 0).toFixed(1) + 'kg';
+          }).join('\n')
+        : '  • ' + (doacao.food || '—');
+
+      var totalKg = doacao.total_kg || doacao.totalKg ||
+        itens.reduce(function(s, i){ return s + (i.totalKg || 0); }, 0);
+
+      var msg = [
+        '🌱 *COMPROVANTE DE DOAÇÃO*',
+        '🏷️ Ação Social Semear + Maanaim',
+        '━━━━━━━━━━━━━━━━━━━━━━━━',
+        '',
+        '👤 *Doador:* ' + (doacao.name || doacao.nome || 'Anônimo'),
+        '📱 *WhatsApp:* ' + (doacao.phone || doacao.telefone || 'não informado'),
+        '🚚 *Entrega:* ' + DoaVidaAPI._labelEntrega(doacao.delivery),
+        '🔢 *Protocolo:* ' + (doacao.protocolo || '—'),
+        '📅 *Data:* ' + new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
+        '',
+        '━━━━━━━━━━━━━━━━━━━━━━━━',
+        '🥫 *ITENS DOADOS:*',
+        itensLinhas,
+        '━━━━━━━━━━━━━━━━━━━━━━━━',
+        '⚖️ *TOTAL: ' + totalKg.toFixed(1) + ' kg*',
+        '',
+        '🙏 Que Deus abençoe sua generosidade!',
+        '✉️ Ação Social Semear + Maanaim — Belém, PA',
+      ].join('\n');
+
+      destinatarios.forEach(function (admin) {
+        var phone = admin.telefone || admin.whatsapp;
+        DoaVidaAPI.enviarWhatsAppCallMeBot(phone, cfg.apikey, msg)
+          .then(function () {
+            console.log('[DoaVida] ✅ WA enviado para ' + phone);
+            if (typeof DoaVidaSync.addWhatsappLog === 'function') {
+              DoaVidaSync.addWhatsappLog({ tipo: 'notificacao_doacao', destinatario: phone, status: 'enviado', detalhes: msg.substring(0, 80) });
+            }
+          })
+          .catch(function (err) {
+            console.warn('[DoaVida] ❌ Falha WA:', err.message);
+            if (typeof DoaVidaSync.addWhatsappLog === 'function') {
+              DoaVidaSync.addWhatsappLog({ tipo: 'notificacao_doacao', destinatario: phone, status: 'erro', detalhes: err.message });
+            }
+          });
+      });
+    } catch (e) {
+      console.warn('[DoaVida] Erro ao notificar administradores via WhatsApp:', e);
+    }
   },
 
 
@@ -1655,6 +1708,33 @@ var DoaVidaAPI = {
 
 /* ── Exporta DoaVidaAPI globalmente ───────────────────────────────── */
 window.DoaVidaAPI = DoaVidaAPI;
+
+/* ══════════════════════════════════════════════════════════════════════
+   abrirWhatsApp — abre no app (mobile) ou no WhatsApp Web (desktop)
+   Uso: abrirWhatsApp("whatsapp://send?phone=5591...&text=...")
+   ══════════════════════════════════════════════════════════════════════ */
+window.abrirWhatsApp = function (whatsappUrl) {
+  var isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Windows Phone/i
+    .test(navigator.userAgent);
+  var url = isMobile
+    ? whatsappUrl
+    : whatsappUrl.replace('whatsapp://send', 'https://web.whatsapp.com/send');
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
+/* Intercepta cliques em <a href="whatsapp://..."> no desktop */
+document.addEventListener('click', function (e) {
+  var a = e.target.closest ? e.target.closest('a[href^="whatsapp://"]') : null;
+  if (!a) return;
+  var isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Windows Phone/i
+    .test(navigator.userAgent);
+  if (!isMobile) {
+    e.preventDefault();
+    var url = a.getAttribute('href')
+      .replace('whatsapp://send', 'https://web.whatsapp.com/send');
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+});
 
 /* ── Log de carregamento ─────────────────────────────────────────── */
 console.log(

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║  DoaVida — js/comprovante-canvas.js                                  ║
  * ║  Geração de imagem PNG do comprovante via Canvas API do browser      ║
@@ -97,8 +97,7 @@
   }
 
   /* ═══════════════════════════════════════════════════
-     FUNÇÃO PRINCIPAL — desenha o recibo num <canvas>
-     e retorna um Blob PNG via callback
+     FUNÇÃO PRINCIPAL — desenha o recibo num <canvas> e retorna um Blob PNG via callback
   ═══════════════════════════════════════════════════ */
   function gerarImagemRecibo(callback) {
     var d = lerDadosRecibo();
@@ -180,7 +179,7 @@
 
     ctx.font      = "15px Arial";
     ctx.fillStyle = "rgba(255,255,255,0.80)";
-    txtC(ctx, "Ação Social Semear  ✦  Comunidade Maanaim  ✦  Belém, PA", CX, y + 82);
+    txtC(ctx, "Ação Social Semear    Comunidade Maanaim    Belém, PA", CX, y + 82);
 
     /* faixa vermelha inferior */
     ctx.fillStyle = C.vermelho;

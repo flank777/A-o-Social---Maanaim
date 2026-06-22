@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<!--
+﻿<!DOCTYPE html> <!--
   ╔══════════════════════════════════════════════════════════════════════╗
   ║  DoaVida — gallery.html                                             ║
   ║  Página: Galeria de Momentos — Fotos e Vídeos das Ações Sociais     ║
   ╠══════════════════════════════════════════════════════════════════════╣
   ║  FUNCIONALIDADES:                                                   ║
-  ║  ✅ Três layouts: Grid, Masonry e Hero                              ║
-  ║  ✅ Modal com título, descrição, contexto e data                    ║
-  ║  ✅ Filtro automático por categoria 'galeria'                       ║
-  ║  ✅ Auto-refresh a cada 30 segundos                                 ║
-  ║  ✅ Estado vazio com mensagem amigável                              ║
-  ║  ✅ Responsivo: mobile, tablet e desktop                            ║
+  ║   Três layouts: Grid, Masonry e Hero                              ║
+  ║   Modal com título, descrição, contexto e data                    ║
+  ║   Filtro automático por categoria 'galeria' ║
+  ║   Auto-refresh a cada 30 segundos                                 ║
+  ║   Estado vazio com mensagem amigável                              ║
+  ║   Responsivo: mobile, tablet e desktop                            ║
   ║                                                                      ║
   ║  DEPENDE DE:                                                        ║
   ║    css/global.css    → variáveis, navbar, footer, modal, botões     ║
@@ -19,36 +18,8 @@
   ║    js/app.js         → loader, navbar, hamburguer, toast, escHtml   ║
   ║    js/gallery.js     → lógica de layout, modal, carregamento        ║
   ╚══════════════════════════════════════════════════════════════════════╝
--->
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Galeria | Ação Social Semear + Maanaim</title>
-  <meta name="description"
-    content="Momentos que transformam vidas. Galeria de fotos e vídeos das ações sociais da
-    Ação Social Semear e Comunidade Evangélica Maanaim em Belém, Pará." />
-  <meta name="theme-color" content="#0d0d0b" />
-
-  <!-- Fontes Google (Playfair Display + DM Sans + Space Mono) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap"
-        rel="stylesheet" />
-
-  <!-- Ícones Font Awesome 6.5 -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-  <!-- CSS Global (variáveis, navbar, footer, modal, botões) -->
-  <link rel="stylesheet" href="css/global.css" />
-  <!-- CSS exclusivo da Galeria -->
-  <link rel="stylesheet" href="css/gallery.css" />
-  <!-- CSS do chatbot Dona Assunção -->
-  <link rel="stylesheet" href="css/dona-assuncao.css" />
-
-  <style>
-    /* ═══════════════════════════════════════════════════════════
+--> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>Galeria | Ação Social Semear + Maanaim</title> <meta name="description" content="Momentos que transformam vidas. Galeria de fotos e vídeos das ações sociais da
+    Ação Social Semear e Comunidade Evangélica Maanaim em Belém, Pará." /> <meta name="theme-color" content="#0d0d0b" /> <!-- Fontes Google (Playfair Display + DM Sans + Space Mono) --> <link rel="preconnect" href="https://fonts.googleapis.com" /> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript> <!-- Ícones Font Awesome 6.5 --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript> <!-- CSS Global (variáveis, navbar, footer, modal, botões) --> <link rel="stylesheet" href="css/global.css" /> <!-- CSS exclusivo da Galeria --> <link rel="stylesheet" href="css/gallery.css" /> <!-- CSS do chatbot Dona Assunção --> <link rel="stylesheet" href="css/dona-assuncao.css" /> <style> /* ═══════════════════════════════════════════════════════════
        VARIÁVEIS EXTRAS — complementam global.css
     ═══════════════════════════════════════════════════════════ */
     :root {
@@ -160,179 +131,39 @@
 
     /* Corpo com padding-top para compensar navbar fixa */
     body { padding-top: 70px; }
-  </style>
-</head>
-<body>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  </style> </head> <body> <!-- ════════════════════════════════════════════════════════════════
        LOADER — tela de carregamento com barra de progresso
-  ════════════════════════════════════════════════════════════════ -->
-  <div id="loader" role="status" aria-label="Carregando galeria">
-  <div class="loader-inner">
-    <div class="ldr-stage" aria-hidden="true">
-      <span class="ldr-halo"></span>
-      <span class="ldr-ring ldr-ring-1"></span>
-      <span class="ldr-ring ldr-ring-2"></span>
-      <span class="ldr-ring ldr-ring-3"></span>
-      <span class="ldr-orbit">
-        <span class="ldr-dot"></span>
-        <span class="ldr-dot"></span>
-        <span class="ldr-dot"></span>
-        <span class="ldr-dot"></span>
-      </span>
-      <img class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display='none'" />
-      <span class="ldr-scan"></span>
-    </div>
-    <p class="loader-text" aria-hidden="true">Ação Social Semear · Belém, PA</p>
-    <div class="loader-bar-wrap" aria-hidden="true"><div class="loader-bar"></div></div>
-  </div>
-</div>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <div id="loader" role="status" aria-label="Carregando galeria"> <div class="loader-inner"> <div class="ldr-stage" aria-hidden="true"> <span class="ldr-halo"></span> <span class="ldr-ring ldr-ring-1"></span> <span class="ldr-ring ldr-ring-2"></span> <span class="ldr-ring ldr-ring-3"></span> <span class="ldr-orbit"> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> </span> <img class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display='none'" loading="eager" decoding="async"> <span class="ldr-scan"></span> </div> <p class="loader-text" aria-hidden="true">Ação Social Semear · Belém, PA</p> <div class="loader-bar-wrap" aria-hidden="true"><div class="loader-bar"></div></div> </div> </div> <!-- ════════════════════════════════════════════════════════════════
        NAVBAR — navegação principal com links para todas as páginas
        NÃO contém botão Admin (está apenas no footer)
-  ════════════════════════════════════════════════════════════════ -->
-  
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <!-- ════════════════════════════════════════════════════════════════
        DRAWER MOBILE — menu lateral que abre no hambúrguer
-  ════════════════════════════════════════════════════════════════ -->
-  
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <!-- ════════════════════════════════════════════════════════════════
        HEADER DA GALERIA — título e descrição
-  ════════════════════════════════════════════════════════════════ -->
-  <header class="gallery-header">
-    <h1>Momentos que transformam vidas</h1>
-    <p>
-      Cada imagem conta uma história de amor, fé e solidariedade.
+  ════════════════════════════════════════════════════════════════ --> <header class="gallery-header"> <h1>Momentos que transformam vidas</h1> <p> Cada imagem conta uma história de amor, fé e solidariedade.
       Registros das ações sociais da Ação Social Semear e Comunidade Evangélica Maanaim
       em Belém, Pará.
-    </p>
-  </header>
-
-  <!-- ════════════════════════════════════════════════════════════════
+    </p> </header> <!-- ════════════════════════════════════════════════════════════════
        CONTROLES DE LAYOUT — botões para alternar grid/masonry/hero
-  ════════════════════════════════════════════════════════════════ -->
-  <div class="gallery-controls">
-    <!-- Botão Grid (padrão, começa ativo) -->
-    <button class="layout-btn active" data-layout="grid">
-      <i class="fas fa-th" aria-hidden="true"></i> Grid
-    </button>
-    <!-- Botão Masonry (estilo Pinterest) -->
-    <button class="layout-btn" data-layout="masonry">
-      <i class="fas fa-columns" aria-hidden="true"></i> Masonry
-    </button>
-    <!-- Botão Hero (destaque + grid) -->
-    <button class="layout-btn" data-layout="hero">
-      <i class="fas fa-star" aria-hidden="true"></i> Hero
-    </button>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <div class="gallery-controls"> <!-- Botão Grid (padrão, começa ativo) --> <button class="layout-btn active" data-layout="grid"> <i class="fas fa-th" aria-hidden="true"></i> Grid
+    </button> <!-- Botão Masonry (estilo Pinterest) --> <button class="layout-btn" data-layout="masonry"> <i class="fas fa-columns" aria-hidden="true"></i> Masonry
+    </button> <!-- Botão Hero (destaque + grid) --> <button class="layout-btn" data-layout="hero"> <i class="fas fa-star" aria-hidden="true"></i> Hero
+    </button> </div> <!-- ════════════════════════════════════════════════════════════════
        CONTAINER DA GALERIA — os itens são injetados aqui via JS
-  ════════════════════════════════════════════════════════════════ -->
-  <main class="gallery-container" id="gallery-container" role="main">
-    <!-- gallery.js popula este container dinamicamente -->
-  </main>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <main class="gallery-container" id="gallery-container" role="main"> <!-- gallery.js popula este container dinamicamente --> </main> <!-- ════════════════════════════════════════════════════════════════
        ESTADO VAZIO — exibido quando não há itens na galeria
-  ════════════════════════════════════════════════════════════════ -->
-  <div id="gallery-empty" class="gallery-empty">
-    <i class="fas fa-camera-retro" aria-hidden="true"></i>
-    <h3>Nenhum momento registrado ainda</h3>
-    <p>Em breve teremos fotos e vídeos das nossas ações sociais aqui!</p>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <div id="gallery-empty" class="gallery-empty"> <i class="fas fa-camera-retro" aria-hidden="true"></i> <h3>Nenhum momento registrado ainda</h3> <p>Em breve teremos fotos e vídeos das nossas ações sociais aqui!</p> </div> <!-- ════════════════════════════════════════════════════════════════
        MODAL DA GALERIA — exibe detalhes ao clicar em um item
-  ════════════════════════════════════════════════════════════════ -->
-  <div id="gallery-modal" class="gallery-modal-overlay" role="dialog" aria-label="Detalhes da imagem" aria-hidden="true">
-    <!-- Botão fechar (X) -->
-    <button id="gallery-modal-close" class="gallery-modal-close" aria-label="Fechar">
-      <i class="fas fa-times"></i>
-    </button>
-    <!-- Caixa principal do modal -->
-    <div class="gallery-modal-box">
-      <!-- Área da mídia (imagem ou vídeo) -->
-      <div class="gallery-modal-media" id="modal-media">
-        <!-- Populado via JS -->
-      </div>
-      <!-- Conteúdo textual -->
-      <div class="gallery-modal-content">
-        <h2 id="modal-title"></h2>
-        <p class="gallery-modal-context" id="modal-context"></p>
-        <p class="gallery-modal-description" id="modal-description"></p>
-        <p class="gallery-modal-date" id="modal-date"></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <div id="gallery-modal" class="gallery-modal-overlay" role="dialog" aria-label="Detalhes da imagem" aria-hidden="true"> <!-- Botão fechar (X) --> <button id="gallery-modal-close" class="gallery-modal-close" aria-label="Fechar"> <i class="fas fa-times"></i> </button> <!-- Caixa principal do modal --> <div class="gallery-modal-box"> <!-- Área da mídia (imagem ou vídeo) --> <div class="gallery-modal-media" id="modal-media"> <!-- Populado via JS --> </div> <!-- Conteúdo textual --> <div class="gallery-modal-content"> <h2 id="modal-title"></h2> <p class="gallery-modal-context" id="modal-context"></p> <p class="gallery-modal-description" id="modal-description"></p> <p class="gallery-modal-date" id="modal-date"></p> </div> </div> </div> <!-- ════════════════════════════════════════════════════════════════
        FOOTER — rodapé com link para Admin (único lugar com este link)
-  ════════════════════════════════════════════════════════════════ -->
-  <footer id="footer" role="contentinfo">
-    <div class="container">
-      <div class="footer-grid">
-        <!-- Coluna 1: Marca -->
-        <div class="footer-col">
-          <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--cream);margin-bottom:0.5rem;">
-            Doa<span style="color:var(--gold)">Vida</span>
-          </div>
-          <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;">
-            Ação Social Semear × Comunidade Evangélica Maanaim.<br>
-            Transformamos doações em esperança real em Belém, PA.
-          </p>
-        </div>
-
-        <!-- Coluna 2: Links -->
-        <div class="footer-col">
-          <h4 style="color:var(--cream);margin-bottom:0.75rem;">Navegação</h4>
-          <ul class="footer-links" role="list">
-            <li><a href="index.html">› Início</a></li>
-            <li><a href="gallery.html">› Galeria</a></li>
-            <li><a href="form.html">› Fazer Doação</a></li>
-            <li><a href="voluntario.html">› Seja Voluntário</a></li>
-            <!-- Link Admin — presente APENAS no footer (removido do header) -->
-            <li><a href="admin.html">› Painel Admin</a></li>
-          </ul>
-        </div>
-
-        <!-- Coluna 3: Contato -->
-        <div class="footer-col">
-          <h4 style="color:var(--cream);margin-bottom:0.75rem;">Contato</h4>
-          <ul class="footer-links" role="list">
-            <li><a href="index.html#about">› Sobre Nós</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Barra inferior com créditos -->
-      <div class="footer-bottom" style="text-align:center;padding-top:2rem;margin-top:2rem;border-top:1px solid rgba(255,255,255,0.07);">
-        <p style="color:var(--muted);font-size:0.8rem;">
-          © 2025 Ação Social Semear + Comunidade Evangélica Maanaim. Belém, PA.
-        </p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <footer id="footer" role="contentinfo"> <div class="container"> <div class="footer-grid"> <!-- Coluna 1: Marca --> <div class="footer-col"> <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--cream);margin-bottom:0.5rem;"> Doa<span style="color:var(--gold)">Vida</span> </div> <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;"> Ação Social Semear × Comunidade Evangélica Maanaim.<br> Transformamos doações em esperança real em Belém, PA.
+          </p> </div> <!-- Coluna 2: Links --> <div class="footer-col"> <h4 style="color:var(--cream);margin-bottom:0.75rem;">Navegação</h4> <ul class="footer-links" role="list"> <li><a href="index.html">› Início</a></li> <li><a href="gallery.html">› Galeria</a></li> <li><a href="form.html">› Fazer Doação</a></li> <li><a href="voluntario.html">› Seja Voluntário</a></li> <!-- Link Admin — presente APENAS no footer (removido do header) --> <li><a href="admin.html">› Painel Admin</a></li> </ul> </div> <!-- Coluna 3: Contato --> <div class="footer-col"> <h4 style="color:var(--cream);margin-bottom:0.75rem;">Contato</h4> <ul class="footer-links" role="list"> <li><a href="index.html#about">› Sobre Nós</a></li> </ul> </div> </div> <!-- Barra inferior com créditos --> <div class="footer-bottom" style="text-align:center;padding-top:2rem;margin-top:2rem;border-top:1px solid rgba(255,255,255,0.07);"> <p style="color:var(--muted);font-size:0.8rem;"> © 2025 Ação Social Semear + Comunidade Evangélica Maanaim. Belém, PA.
+        </p> </div> </div> </footer> <!-- ════════════════════════════════════════════════════════════════
        TOAST — container para notificações
-  ════════════════════════════════════════════════════════════════ -->
-  <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-  <!-- ════════════════════════════════════════════════════════════════
+  ════════════════════════════════════════════════════════════════ --> <div id="toast-container" class="toast-container" aria-live="polite"></div> <!-- ════════════════════════════════════════════════════════════════
        SCRIPTS — ordem importa!
        1. api.js    → dados (localStorage)
        2. app.js    → utilitários globais (loader, navbar, toast, escHtml)
        3. gallery.js → lógica específica da galeria
        4. dona-assuncao.js → chatbot Dona Assunção
-  ════════════════════════════════════════════════════════════════ -->
-  <script src="js/api.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/gallery.js"></script>
-  <script src="js/dona-assuncao.js"></script>
-
-</body>
-</html>
+  ════════════════════════════════════════════════════════════════ --> <script src="js/api.js"></script> <script src="js/app.js"></script> <script src="js/gallery.js"></script> <script src="js/dona-assuncao.js"></script> </body> </html> 

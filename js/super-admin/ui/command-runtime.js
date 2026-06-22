@@ -74,8 +74,8 @@
       if (num.length === 11) num = '55' + num; // BR mobile
       if (num.length === 10) num = '55' + num; // BR fixo
       var msg = fillTemplate(p.template || '', record);
-      var url = 'https://wa.me/' + num + (msg ? '?text=' + encodeURIComponent(msg) : '');
-      window.open(url, '_blank', 'noopener,noreferrer');
+      var url = 'whatsapp://send?phone=' + num + (msg ? '&text=' + encodeURIComponent(msg) : '');
+      (window.abrirWhatsApp || function (u) { window.open(u, '_blank', 'noopener,noreferrer'); })(url);
       return { message: 'WhatsApp aberto' };
     },
 

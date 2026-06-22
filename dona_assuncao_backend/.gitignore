@@ -1,0 +1,10 @@
+# Credenciais — NUNCA versionar
+.env
+serviceAccountKey.json
+*.json.key
+
+# Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/

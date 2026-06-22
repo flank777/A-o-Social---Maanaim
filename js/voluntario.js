@@ -23,7 +23,7 @@
   ║    Após envio:      Modal com nome + versículo personalizado        ║
   ║                                                                      ║
   ║  DEPENDE DE (carregados antes no HTML):                             ║
-  ║    js/api.js  → DoaVidaAPI.addVoluntario(), .addOracao()           ║
+  ║    js/api.js  → DoaVidaAPI.addVoluntario()                          ║
   ║    js/app.js  → showToast(), abrirModal(), mascaraTelefone()       ║
   ╚══════════════════════════════════════════════════════════════════════╝
 */
@@ -652,7 +652,7 @@ function exibirModalSucessoWizard(voluntario) {
     var msgWA =
       'Acabei de me cadastrar como ' + cfg.label + ' no DoaVida! ' + cfg.emoji +
       '\nAção Social Semear + Maanaim — Belém, PA 🌱';
-    elWA.href = 'https://wa.me/?text=' + encodeURIComponent(msgWA);
+    elWA.href = 'whatsapp://send?text=' + encodeURIComponent(msgWA);
   }
 
   /* Abre o modal */
@@ -682,81 +682,10 @@ function notificarAdminNovoVoluntario(voluntario) {
     /* Abre WA para o primeiro número admin disponível */
     var fone = numeros[0].replace(/\D/g, '');
     if (fone) {
-      window.open('https://wa.me/55' + fone + '?text=' + encodeURIComponent(msg), '_blank');
+      abrirWhatsApp('whatsapp://send?phone=55' + fone + '&text=' + encodeURIComponent(msg));
     }
   } catch(e) { /* silencioso — não bloqueia o fluxo */ }
 }
-
-/* ══════════════════════════════════════════════════════════════════════
-   SEÇÃO 6 — FORMULÁRIO DE PEDIDO DE ORAÇÃO (público)
-   Independente do wizard — seção própria na página
-   ══════════════════════════════════════════════════════════════════════ */
-
-function inicializarFormOracao() {
-  var form = document.getElementById('form-oracao');
-  if (!form) return;
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    processarEnvioOracao();
-  });
-}
-
-function processarEnvioOracao() {
-  var nome      = getValWizard('orac-nome');
-  var categoria = getValWizard('orac-categoria');
-  var mensagem  = getValWizard('orac-mensagem');
-
-  /* Limpa erros */
-  ['oracf-cat', 'oracf-msg'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.classList.remove('err', 'ok');
-  });
-
-  var temErro = false;
-
-  if (!categoria) {
-    var elCat = document.getElementById('oracf-cat');
-    if (elCat) elCat.classList.add('err');
-    var msgCat = document.getElementById('oracf-cat-msg');
-    if (msgCat) msgCat.textContent = 'Selecione a categoria do pedido.';
-    temErro = true;
-  }
-
-  if (mensagem.length < 10) {
-    var elMsg = document.getElementById('oracf-msg');
-    if (elMsg) elMsg.classList.add('err');
-    var msgTxt = document.getElementById('oracf-msg-txt');
-    if (msgTxt) msgTxt.textContent =
-      mensagem.length === 0 ? 'Escreva seu pedido.' : 'Mínimo de 10 caracteres.';
-    temErro = true;
-  }
-
-  if (temErro) {
-    window.showToast('⚠️ Preencha os campos obrigatórios.', 'warning', 3000);
-    return;
-  }
-
-  var btn = document.getElementById('orac-btn-submit');
-  if (btn) { btn.disabled = true; btn.classList.add('loading'); }
-
-  setTimeout(async function () {
-    try {
-      await DoaVidaSync.addOracao({ nome: nome, categoria: categoria, mensagem: mensagem });
-      var form = document.getElementById('form-oracao');
-      if (form) form.reset();
-      ['oracf-cat', 'oracf-msg'].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) el.classList.remove('err', 'ok');
-      });
-      window.showToast('🙏 Pedido enviado! Nossa equipe vai orar por você.', 'success', 5000);
-      window.abrirModal('modal-oracao-sucesso');
-    } catch (err) {
-      window.showToast('❌ Erro ao enviar. Tente novamente.', 'error', 4000);
-    }
-    if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
-  }, 600);
-}
-
 
 /* ══════════════════════════════════════════════════════════════════════
    SEÇÃO 7 — ESTATÍSTICAS DO HERO

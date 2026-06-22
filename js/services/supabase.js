@@ -952,22 +952,24 @@ var DoaVidaSync = {
     if (!supabaseClient) return [];
     var { data, error } = await supabaseClient
       .from('cestas_formadas')
-      .select('*')
+      .select('*, familias(id, name)')
       .order('created_at', { ascending: false });
     if (error) { console.error('[DoaVida] Erro ao listar cestas:', error.message); return []; }
     return data || [];
   },
 
   addCestaFormada: async function (dados) {
+    var row = {
+      quantidade:     dados.quantidade,
+      observacao:     dados.observacao || '',
+      itens_snapshot: dados.itens_snapshot || [],
+      total_kg:       dados.total_kg || 0,
+      formado_por:    dados.formado_por || 'admin'
+    };
+    if (dados.familia_id) row.familia_id = dados.familia_id;
     var { data, error } = await supabaseClient
       .from('cestas_formadas')
-      .insert([{
-        quantidade:      dados.quantidade,
-        observacao:      dados.observacao || '',
-        itens_snapshot:  dados.itens_snapshot || [],
-        total_kg:        dados.total_kg || 0,
-        formado_por:     dados.formado_por || 'admin'
-      }])
+      .insert([row])
       .select()
       .single();
     if (error) throw new Error(error.message);

@@ -67,7 +67,10 @@ async function _getAll(colecao, orderField) {
       : _db.collection(colecao);
     var snap = await _withTimeout(q.get(), 12000, null);
     if (!snap || !snap.docs) return [];
-    return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+    /* { id: d.id } vem por ÚLTIMO de propósito: o ID real do documento no Firestore
+       nunca pode ser sobrescrito por um campo "id" que tenha sido salvo (por engano)
+       dentro dos próprios dados do documento. */
+    return snap.docs.map(function (d) { return Object.assign({}, d.data(), { id: d.id }); });
   } catch (e) {
     console.error('[DoaVida]', colecao, e.message);
     return [];
@@ -78,14 +81,14 @@ async function _getAll(colecao, orderField) {
 async function _insert(colecao, payload) {
   var dados = Object.assign({}, payload, { created_at: _now() });
   var ref   = await _db.collection(colecao).add(dados);
-  return Object.assign({ id: ref.id }, dados);
+  return Object.assign({}, dados, { id: ref.id });
 }
 
 /* Atualiza campos de um documento pelo ID (cria se não existir) */
 async function _update(colecao, id, dados) {
   var atualizado = Object.assign({}, dados, { updated_at: _now() });
   await _db.collection(colecao).doc(id).set(atualizado, { merge: true });
-  return Object.assign({ id: id }, atualizado);
+  return Object.assign({}, atualizado, { id: id });
 }
 
 /* Remove um documento pelo ID */
@@ -103,6 +106,18 @@ var DoaVidaSync = {
   init: function () {
     inicializarFirebase();
     console.log('[DoaVidaSync] ✅ Inicializado — Firebase Auth + Firestore');
+    /* Carrega configurações do R2 do Firestore (se disponível) */
+    setTimeout(function () {
+      if (typeof DoaVidaR2 === 'undefined') return;
+      DoaVidaSync.getConfig('r2_worker_url').then(function (url) {
+        if (url) {
+          DoaVidaSync.getConfig('r2_upload_token').then(function (token) {
+            DoaVidaR2.configure({ workerUrl: url, token: token || '' });
+            console.log('[DoaVidaSync] ✅ Cloudflare R2 configurado via Firestore');
+          });
+        }
+      }).catch(function () {});
+    }, 800);
     window.dispatchEvent(new CustomEvent('DoaVidaSyncPronto'));
   },
 
@@ -144,11 +159,7 @@ var DoaVidaSync = {
 
   /* ── ALIMENTOS ── */
   getAlimentos: async function () {
-    var lista = await _getAll('alimentos', 'name');
-    if (!lista || lista.length === 0) {
-      return typeof DoaVidaAPI !== 'undefined' ? DoaVidaAPI.getAlimentos() : [];
-    }
-    return lista;
+    return _getAll('alimentos', 'name');
   },
 
   addAlimento: async function (dados) {
@@ -196,6 +207,23 @@ var DoaVidaSync = {
   updateOracao: async function (id, dados) { return _update('oracoes', id, dados); },
   deleteOracao: async function (id)        { return _delete('oracoes', id); },
 
+  getTarefas:   async function ()          { return _getAll('tarefas', 'created_at'); },
+  addTarefa:    async function (dados)     { return _insert('tarefas', dados); },
+  updateTarefa: async function (id, dados) { return _update('tarefas', id, dados); },
+  deleteTarefa: async function (id)        { return _delete('tarefas', id); },
+
+  getEventos:   async function ()          { return _getAll('eventos', 'data'); },
+  addEvento:    async function (dados)     { return _insert('eventos', dados); },
+  updateEvento: async function (id, dados) { return _update('eventos', id, dados); },
+  deleteEvento: async function (id)        { return _delete('eventos', id); },
+
+  getWhatsappAdmins:    async function ()          { return _getAll('whatsapp_admins', 'created_at'); },
+  addWhatsappAdmin:     async function (dados)     { return _insert('whatsapp_admins', dados); },
+  updateWhatsappAdmin:  async function (id, dados) { return _update('whatsapp_admins', id, dados); },
+  deleteWhatsappAdmin:  async function (id)        { return _delete('whatsapp_admins', id); },
+  getWhatsappLogs:      async function ()          { return _getAll('whatsapp_logs', 'created_at'); },
+  addWhatsappLog:       async function (dados)     { return _insert('whatsapp_logs', dados); },
+
   /* ── GALERIA ── */
   getGaleriaMetadata: async function () { return _getAll('galeria', 'created_at'); },
   getGaleria:         async function () { return _getAll('galeria', 'created_at'); },
@@ -227,14 +255,24 @@ var DoaVidaSync = {
   updateFotoGaleria: async function (id, dados) { return _update('galeria', id, dados); },
   deleteFotoGaleria: async function (id)        { return _delete('galeria', id); },
 
-  /* Upload → Cloudinary (não usa Firebase Storage para evitar cobrança) */
-  uploadImagemGaleria: async function (arquivo, nomeArquivo) {
-    if (typeof DoaVidaCloudinary === 'undefined') {
-      throw new Error('Cloudinary não carregado. Adicione js/services/cloudinary.js antes de firebase.js.');
+  /* Upload → R2 (preferencial) ou Cloudinary (fallback) */
+  uploadImagemGaleria: async function (arquivo, pasta) {
+    /* Tenta Cloudflare R2 primeiro */
+    if (typeof DoaVidaR2 !== 'undefined' && DoaVidaR2.configurado()) {
+      var pastaR2 = pasta && pasta.indexOf('alimento') >= 0 ? 'alimentos'
+                  : pasta && pasta.indexOf('banner')   >= 0 ? 'banners'
+                  : pasta && pasta.indexOf('voluntar') >= 0 ? 'voluntarios'
+                  : 'galeria';
+      var res = await DoaVidaR2.upload(arquivo, pastaR2);
+      return res.url;
     }
-    var tipo      = arquivo.type.startsWith('video/') ? 'video' : 'image';
-    var resultado = await DoaVidaCloudinary.upload(arquivo, tipo);
-    return resultado.url;
+    /* Fallback: Cloudinary */
+    if (typeof DoaVidaCloudinary !== 'undefined') {
+      var tipo = arquivo.type.startsWith('video/') ? 'video' : 'image';
+      var resultado = await DoaVidaCloudinary.upload(arquivo, tipo);
+      return resultado.url;
+    }
+    throw new Error('Nenhum serviço de upload configurado. Configure Cloudflare R2 ou Cloudinary.');
   },
 
   /* ── MODELO CESTA ── */
@@ -318,6 +356,87 @@ var DoaVidaSync = {
         Array.isArray(cfg.adminPhone) ? cfg.adminPhone.join(',') : (cfg.adminPhone || '')),
       DoaVidaSync.setConfig('whatsapp_ativo', cfg.ativo ? 'true' : 'false')
     ]);
+  },
+
+  /* ── DONA ASSUNCAO (base do backend FastAPI/Firebase) ── */
+  getDonaBackendUrl: async function () {
+    var url = await DoaVidaSync.getConfig('dona_assuncao_backend_url');
+    return String(url || '').replace(/\/+$/, '');
+  },
+
+  setDonaBackendUrl: async function (url) {
+    await DoaVidaSync.setConfig('dona_assuncao_backend_url', String(url || '').replace(/\/+$/, ''));
+  },
+
+  getDonaBaseConhecimento: async function () {
+    try {
+      var snap = await _withTimeout(_db.collection('base_conhecimento').get(), 12000, null);
+      if (!snap || !snap.docs) return [];
+      return snap.docs.map(function (d) {
+        return Object.assign({}, d.data(), { id: d.id });
+      });
+    } catch (e) {
+      console.warn('[DoaVidaSync] Dona Assuncao base_conhecimento indisponivel:', e.message);
+      return [];
+    }
+  },
+
+  getDonaCampanhasAtivas: async function () {
+    try {
+      var q = _db.collection('campanhas').where('ativa', '==', true);
+      var snap = await _withTimeout(q.get(), 12000, null);
+      if (!snap || !snap.docs) return [];
+      return snap.docs.map(function (d) {
+        return Object.assign({}, d.data(), { id: d.id });
+      });
+    } catch (e) {
+      console.warn('[DoaVidaSync] Dona Assuncao campanhas indisponiveis:', e.message);
+      return [];
+    }
+  },
+
+  getDonaConversa: async function (userId) {
+    try {
+      var doc = await _db.collection('conversas').doc(String(userId || 'web:anonimo')).get();
+      return doc.exists ? Object.assign({}, doc.data(), { id: doc.id }) : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  salvarDonaTurno: async function (userId, nome, msgUsuario, msgAssistente) {
+    try {
+      userId = String(userId || 'web:anonimo');
+      var ref = _db.collection('conversas').doc(userId);
+      var doc = await ref.get();
+      var dados = doc.exists ? (doc.data() || {}) : {};
+      var mensagens = Array.isArray(dados.mensagens) ? dados.mensagens.slice() : [];
+      mensagens.push({ role: 'user', text: String(msgUsuario || ''), ts: _now() });
+      mensagens.push({ role: 'model', text: String(msgAssistente || ''), ts: _now() });
+      mensagens = mensagens.slice(-40);
+      await ref.set({
+        nome: nome || dados.nome || '',
+        mensagens: mensagens,
+        atualizado_em: _now()
+      }, { merge: true });
+      return true;
+    } catch (e) {
+      console.warn('[DoaVidaSync] Falha ao salvar conversa da Dona Assuncao:', e.message);
+      return false;
+    }
+  },
+
+  addDonaRegistro: async function (registro) {
+    try {
+      return _insert('registros', Object.assign({
+        tipo: 'pergunta_sem_resposta',
+        status: 'novo',
+        canal: 'web'
+      }, registro || {}));
+    } catch (e) {
+      console.warn('[DoaVidaSync] Falha ao registrar caso da Dona Assuncao:', e.message);
+      return null;
+    }
   },
 
   /* ── EMAIL (stub) ── */
