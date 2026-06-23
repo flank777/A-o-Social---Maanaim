@@ -877,14 +877,11 @@ body::before {
   --gold:      rgba(255, 255, 255, 0.90);
 }
 
-/* Grid de 3 colunas no desktop */
+/* Grid de 4 colunas no desktop */
 .footer-grid {
   display:               grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  /* 
-    2fr 1fr 1fr = a primeira coluna é 2x maior que as outras.
-    Total = 4 partes: coluna 1 = 2/4 = 50%, colunas 2 e 3 = 1/4 = 25% cada.
-  */
+  grid-template-columns: 1.7fr 1fr 1.25fr 1fr;
+  /* Primeira coluna maior para as marcas; demais colunas para redes, cultos e CTA. */
   gap:         48px;
   padding-bottom: 48px;
   border-bottom:  1px solid var(--border);
@@ -963,6 +960,36 @@ body::before {
 .footer-credit {
   font-size: 0.78rem;
   color:     var(--text2);
+}
+
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 8px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--ff-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    color var(--t),
+    border-color var(--t),
+    background var(--t),
+    transform var(--t);
+}
+
+.footer-admin-link:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .footer-social {
@@ -1552,6 +1579,10 @@ body::before {
     grid-column: 1 / -1;
     /* 1 / -1 = da coluna 1 até a última coluna */
   }
+
+  .footer-admin-link {
+    display: none;
+  }
 }
 
 /* ── Celulares (até 768px) ───────────────────────────────────── */
@@ -1633,6 +1664,10 @@ body::before {
     flex: 0 1 auto;
     font-size: 0.72rem;
     line-height: 1.35;
+  }
+
+  .footer-admin-link {
+    display: none;
   }
 
   /* Toast centralizado embaixo */

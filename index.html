@@ -1707,7 +1707,7 @@
                 letter-spacing: 0.03em;
               "
             >
-              x! &nbsp;Tocando sem som  clique para ativar
+              Clique para assistir com som
             </div>
             <!-- Controles personalizados  sempre visíveis -->
             <div
@@ -1812,6 +1812,7 @@
           var _muted = false; /* estado de mute do usuário */
           var _autoIniciou = false; /* IntersectionObserver já disparou o play */
           var _ytMudoAuto = false; /* YouTube foi iniciado mudo pelo auto-play */
+          var _usuarioAtivouSom = true; /* som ligado por padrão; se o navegador bloquear, o usuário toca uma vez */
           /*  Helpers de tipo  */
           function _ytId(url) {
             if (!url) return null;
@@ -1823,6 +1824,89 @@
           function _isVideoArq(url) {
             return url && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
           }
+          function _srcVideoDireto(url) {
+            var src = String(url || "").trim();
+            if (/res\.cloudinary\.com\/[^/]+\/video\/upload\//i.test(src)) {
+              src = src.replace(/\/video\/upload\/(?![^/]*f_mp4)/i, "/video/upload/f_mp4,q_auto/");
+              src = src.replace(/\.(mov|qt)(\?.*)?$/i, ".mp4$2");
+            }
+            return src;
+          }
+          function _secaoVideoVisivel() {
+            var secao = document.getElementById("video-acao-player") || document.getElementById("video-acao");
+            if (!secao) return false;
+            var r = secao.getBoundingClientRect();
+            var visivel = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+            return visivel > Math.min(r.height, window.innerHeight) * 0.35;
+          }
+          function _tocarVideoDiretoAuto() {
+            if (!_videoUrl || !_isVideoArq(_videoUrl)) return;
+            var vid = document.getElementById("vacao-video");
+            if (!vid) return;
+            var poster = document.getElementById("vacao-poster");
+            var controls = document.getElementById("vacao-controls");
+            var videoSrc = _srcVideoDireto(_videoUrl);
+            if (poster) poster.style.display = "none";
+            if (controls) controls.style.display = "none";
+            if (vid.src !== videoSrc) vid.src = videoSrc;
+            vid.muted = false;
+            vid.volume = 1;
+            _muted = vid.muted;
+            vid.controls = true;
+            vid.loop = false;
+            vid.style.display = "";
+            vid.play().then(function () {
+              _autoIniciou = true;
+            }).catch(function () {
+              _autoIniciou = false;
+              _mostrarBadgeSom();
+            });
+            _atualizarBtnSom(vid.muted);
+          }
+          function _posterPersonalizado() {
+            try {
+              return !!localStorage.getItem("doavida_video_acao_poster");
+            } catch (e) {
+              return false;
+            }
+          }
+          function _mostrarPosterImg(src) {
+            var posterImg = document.getElementById("vacao-poster-img");
+            if (!posterImg) return;
+            posterImg.src = src;
+            posterImg.style.display = "block";
+          }
+          function _ocultarPosterImg() {
+            var posterImg = document.getElementById("vacao-poster-img");
+            if (posterImg) posterImg.style.display = "none";
+          }
+          function _aplicarThumbYoutube(ytId) {
+            if (ytId && !_posterPersonalizado()) {
+              _mostrarPosterImg("https://i.ytimg.com/vi/" + ytId + "/hqdefault.jpg");
+            }
+          }
+          function _resetarPlayer() {
+            _autoIniciou = false;
+            _ytMudoAuto = false;
+            var poster = document.getElementById("vacao-poster");
+            var vid = document.getElementById("vacao-video");
+            var controls = document.getElementById("vacao-controls");
+            var ytWrap = document.getElementById("vacao-yt-wrap");
+            var ytIframe = document.getElementById("vacao-yt-iframe");
+            if (poster) poster.style.display = "";
+            if (controls) controls.style.display = "flex";
+            if (vid) {
+              try { vid.pause(); } catch (e) {}
+              vid.removeAttribute("src");
+              vid.removeAttribute("poster");
+              vid.controls = false;
+              vid.style.display = "none";
+              vid.load();
+            }
+            if (ytWrap) ytWrap.style.display = "none";
+            if (ytIframe) ytIframe.removeAttribute("src");
+            _atualizarBtnSom(false);
+          }
           /*  Controle YouTube via postMessage (requer enablejsapi=1)  */
           function _ytCmd(fn) {
             var f = document.getElementById("vacao-yt-iframe");
@@ -1831,6 +1915,18 @@
                 JSON.stringify({ event: "command", func: fn, args: [] }),
                 "*",
               );
+          }
+          function _ativarSomUsuario() {
+            _usuarioAtivouSom = true;
+            _muted = false;
+            var v = document.getElementById("vacao-video");
+            if (v && v.src) v.muted = false;
+            if (_ytMudoAuto) {
+              _ytCmd("unMute");
+              _ytMudoAuto = false;
+            }
+            _atualizarBtnSom(false);
+            _esconderBadgeSom();
           }
           /*  Ícones do botão Som  */
           var _SVG_SOM_ON =
@@ -1848,7 +1944,7 @@
             if (label)
               label.textContent = mudo ? "Som desligado" : "Som ligado";
           }
-          /*  Badge "Tocando sem som"  */
+          /*  Aviso quando o navegador bloqueia autoplay com áudio  */
           function _mostrarBadgeSom() {
             var badge = document.getElementById("vacao-som-hint");
             if (!badge) return;
@@ -1873,20 +1969,7 @@
           }
           /*  Ativar som (badge + botão Som)  */
           window.vacaoAtivarSom = function () {
-            _esconderBadgeSom();
-            var vid = document.getElementById("vacao-video");
-            if (vid && vid.src) {
-              vid.muted = false;
-              _muted = false;
-              _atualizarBtnSom(false);
-              return;
-            }
-            if (_ytMudoAuto) {
-              _ytCmd("unMute");
-              _ytMudoAuto = false;
-              _muted = false;
-              _atualizarBtnSom(false);
-            }
+            _ativarSomUsuario();
           };
           /*  Carregamento de URL (Supabase + localStorage)  */
           function _carregarUrl() {
@@ -1897,36 +1980,30 @@
               if (lsPoster) _aplicarPoster(lsPoster);
             } catch (e) {}
             function buscar() {
-              if (!window.supabaseClient) return;
-              window.supabaseClient
-                .from("configuracao")
-                .select("valor")
-                .eq("chave", "doavida_video_acao")
-                .single()
-                .then(function (res) {
-                  if (!res.error && res.data && res.data.valor) {
-                    localStorage.setItem("doavida_video_acao", res.data.valor);
-                    _aplicarUrl(res.data.valor);
+              if (!window.DoaVidaSync || typeof DoaVidaSync.getConfig !== "function") return;
+              DoaVidaSync.getConfig("doavida_video_acao")
+                .then(function (valor) {
+                  if (valor) {
+                    localStorage.setItem("doavida_video_acao", valor);
+                    _aplicarUrl(valor);
+                  } else {
+                    localStorage.removeItem("doavida_video_acao");
                   }
                 })
                 .catch(function () {});
-              window.supabaseClient
-                .from("configuracao")
-                .select("valor")
-                .eq("chave", "doavida_video_acao_poster")
-                .single()
-                .then(function (res) {
-                  if (!res.error && res.data && res.data.valor) {
-                    localStorage.setItem(
-                      "doavida_video_acao_poster",
-                      res.data.valor,
-                    );
-                    _aplicarPoster(res.data.valor);
+              DoaVidaSync.getConfig("doavida_video_acao_poster")
+                .then(function (valor) {
+                  if (valor) {
+                    localStorage.setItem("doavida_video_acao_poster", valor);
+                    _aplicarPoster(valor);
+                  } else {
+                    localStorage.removeItem("doavida_video_acao_poster");
+                    _aplicarPoster("");
                   }
                 })
                 .catch(function () {});
             }
-            if (window.supabaseClient) {
+            if (window.DoaVidaSync && typeof DoaVidaSync.getConfig === "function") {
               buscar();
             } else {
               window.addEventListener("DoaVidaSyncPronto", buscar, {
@@ -1938,20 +2015,49 @@
           function _aplicarUrl(url) {
             if (!url) return;
             _videoUrl = url.trim();
+            _resetarPlayer();
             var ytId = _ytId(_videoUrl);
-            var posterImg = document.getElementById("vacao-poster-img");
-            if (
-              ytId &&
-              posterImg &&
-              !localStorage.getItem("doavida_video_acao_poster")
-            )
-              posterImg.src =
-                "https://img.youtube.com/vi/" + ytId + "/maxresdefault.jpg";
+            _aplicarThumbYoutube(ytId);
+            if (_isVideoArq(_videoUrl)) {
+              var vid = document.getElementById("vacao-video");
+              var poster = document.getElementById("vacao-poster");
+              var controls = document.getElementById("vacao-controls");
+              var videoSrc = _srcVideoDireto(_videoUrl);
+              if (vid && vid.src !== videoSrc) {
+                vid.src = videoSrc;
+                vid.muted = false;
+                vid.volume = 1;
+                _muted = vid.muted;
+                vid.controls = true;
+                vid.loop = false;
+                vid.style.display = "";
+                if (!vid._vacaoVolumeBound) {
+                  vid.addEventListener("volumechange", function () {
+                    _muted = vid.muted;
+                    if (!vid.muted) _usuarioAtivouSom = true;
+                    _atualizarBtnSom(vid.muted);
+                  });
+                  vid._vacaoVolumeBound = true;
+                }
+                vid.load();
+              }
+              if (poster && !_posterPersonalizado()) poster.style.display = "none";
+              if (controls) controls.style.display = "none";
+              if (_secaoVideoVisivel()) _tocarVideoDiretoAuto();
+            }
           }
           function _aplicarPoster(url) {
-            if (!url) return;
-            var posterImg = document.getElementById("vacao-poster-img");
-            if (posterImg) posterImg.src = url;
+            if (!url) {
+              try { localStorage.removeItem("doavida_video_acao_poster"); } catch (e) {}
+              _aplicarThumbYoutube(_ytId(_videoUrl));
+              if (_isVideoArq(_videoUrl)) _ocultarPosterImg();
+              return;
+            }
+            _mostrarPosterImg(url);
+            var vid = document.getElementById("vacao-video");
+            if (vid) vid.poster = url;
+            var poster = document.getElementById("vacao-poster");
+            if (poster) poster.style.display = "";
           }
           /*  vacaoPlay  clique manual no poster  */
           window.vacaoPlay = function () {
@@ -1963,6 +2069,7 @@
             var ytId = _ytId(_videoUrl);
             if (poster) poster.style.display = "none";
             _esconderBadgeSom();
+            _ativarSomUsuario();
             if (ytId) {
               if (!_autoIniciou) {
                 if (ytWrap) ytWrap.style.display = "";
@@ -1976,9 +2083,11 @@
             } else if (_isVideoArq(_videoUrl)) {
               if (!_autoIniciou) {
                 if (vid) {
-                  vid.src = _videoUrl;
-                  vid.muted = _muted;
-                  vid.controls = false;
+                  vid.src = _srcVideoDireto(_videoUrl);
+                  vid.muted = false;
+                  vid.volume = 1;
+                  _muted = false;
+                  vid.controls = true;
                   vid.loop = false;
                   vid.style.display = "";
                   vid.load();
@@ -1991,6 +2100,7 @@
           /*  Toggle mute (botão Som)  funciona para mp4 e YouTube  */
           window.vacaoToggleMute = function () {
             _muted = !_muted;
+            _usuarioAtivouSom = !_muted;
             var vid = document.getElementById("vacao-video");
             if (vid && vid.src) vid.muted = _muted;
             /* YouTube */
@@ -2029,18 +2139,19 @@
             });
           }
           /*  IntersectionObserver: auto-play / pause / retoma  */
-          var _secao = document.getElementById("video-acao");
+          var _secao = document.getElementById("video-acao-player") || document.getElementById("video-acao");
           if (_secao && "IntersectionObserver" in window) {
             new IntersectionObserver(
               function (entries) {
                 var entry = entries[0];
                 if (!_videoUrl) return;
                 var ytId = _ytId(_videoUrl);
-                if (entry.isIntersecting) {
+                var videoVisivel = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+                if (videoVisivel) {
                   /*  Entrou na tela  */
                   if (!_autoIniciou) {
-                    /* Primeira vez: inicia MUDO (exigido pelo browser para autoplay),
-                     depois desmuta automaticamente no primeiro clique/toque do usuário */
+                    /* Primeira vez: tenta iniciar com som. Se o navegador bloquear,
+                     o player fica pronto para o primeiro toque com áudio. */
                     var poster = document.getElementById("vacao-poster");
                     if (poster) poster.style.display = "none";
                     if (ytId) {
@@ -2051,24 +2162,14 @@
                         ytIframe.src =
                           "https://www.youtube.com/embed/" +
                           ytId +
-                          "?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1";
-                      _ytMudoAuto = true;
-                      _atualizarBtnSom(true);
+                          "?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1";
+                      _ytMudoAuto = false;
+                      _atualizarBtnSom(false);
                     } else if (_isVideoArq(_videoUrl)) {
-                      var vid = document.getElementById("vacao-video");
-                      if (vid) {
-                        vid.src = _videoUrl;
-                        vid.muted = true;
-                        vid.controls = false;
-                        vid.loop = false;
-                        vid.style.display = "";
-                        vid.load();
-                        vid.play().catch(function () {});
-                      }
-                      _atualizarBtnSom(true);
+                      _tocarVideoDiretoAuto();
                     }
                     _autoIniciou = true;
-                    /* Desmuta no primeiro gesto do usuário (click ou touch) */
+                    /* Reforça o som no primeiro gesto do usuário, caso o navegador bloqueie autoplay com áudio. */
                     function _desmutar() {
                       document.removeEventListener("click", _desmutar, true);
                       document.removeEventListener(
@@ -2076,29 +2177,16 @@
                         _desmutar,
                         true,
                       );
-                      var v = document.getElementById("vacao-video");
-                      if (v && v.src && v.muted) {
-                        v.muted = false;
-                        _muted = false;
-                        _atualizarBtnSom(false);
-                      }
-                      if (_ytMudoAuto) {
-                        _ytCmd("unMute");
-                        _ytMudoAuto = false;
-                        _muted = false;
-                        _atualizarBtnSom(false);
-                      }
+                      _ativarSomUsuario();
                     }
                     document.addEventListener("click", _desmutar, true);
                     document.addEventListener("touchstart", _desmutar, true);
-                    _mostrarBadgeSom();
                   } else {
                     /* Voltou para a seção  retoma de onde parou */
                     if (ytId) {
                       _ytCmd("playVideo");
                     } else {
-                      var vid = document.getElementById("vacao-video");
-                      if (vid && vid.src) vid.play().catch(function () {});
+                      _tocarVideoDiretoAuto();
                     }
                   }
                 } else {
@@ -2111,7 +2199,7 @@
                   }
                 }
               },
-              { threshold: 0.5 },
+              { threshold: [0, 0.35, 0.5] },
             ).observe(_secao);
           }
           /* Inicializa */
@@ -2180,13 +2268,13 @@
             <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
             <ul class="footer-social" role="list" aria-label="Redes sociais da igreja" style="display:flex;flex-direction:row;justify-content:center;align-items:center;gap:32px;list-style:none;padding:0;margin:0 auto;width:100%;">
               <li style="display:flex;justify-content:center;">
-                <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:row;align-items:center;gap:8px;font-size:0.78rem;text-decoration:none;">
+                <a href="https://www.youtube.com/channel/UC3oyub4mQz80janwbWI5TpQ" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:row;align-items:center;gap:8px;font-size:0.78rem;text-decoration:none;">
                   <i class="fab fa-youtube footer-social-youtube" aria-hidden="true"></i>
                   YouTube
                 </a>
               </li>
               <li style="display:flex;justify-content:center;">
-                <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:row;align-items:center;gap:8px;font-size:0.78rem;text-decoration:none;">
+                <a href="https://www.instagram.com/comunidade_evangelica_maanaim?igsh=MXJydnV1M2dudXUyeA==" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:row;align-items:center;gap:8px;font-size:0.78rem;text-decoration:none;">
                   <i class="fab fa-instagram footer-social-instagram" aria-hidden="true"></i>
                   Instagram
                 </a>
@@ -2194,6 +2282,26 @@
             </ul>
           </div>
           <!-- fim coluna 2 -->
+          <div class="footer-col" style="text-align:center;">
+            <h3 class="footer-heading" style="font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Contato e Cultos</h3>
+            <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
+            <p class="footer-desc" style="margin-bottom:10px;">
+              <a href="https://wa.me/5591986054141" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                (91) 98605-4141
+              </a>
+            </p>
+            <p class="footer-desc" style="margin-bottom:10px;">
+              <i class="fas fa-location-dot" aria-hidden="true"></i>
+              Rua Quinze de Agosto, 1818
+            </p>
+            <p class="footer-desc" style="margin-bottom:0;">
+              Seg., ter. e qua.: oração do meio-dia<br>
+              Sexta: culto da família às 19h30<br>
+              Sábado: culto dos jovens às 19h<br>
+              Domingo: culto às 18h
+            </p>
+          </div>
         </div>
         <!-- fim .footer-grid -->
         <!--  Linha de créditos  -->
@@ -2202,6 +2310,10 @@
             &copy; <span id="footer-year">2026</span>
             DoaVida · Ação Social · Maanaim
           </p>
+          <a class="footer-admin-link" href="admin.html" aria-label="Acessar painel administrativo">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            Acessar Admin
+          </a>
         </div>
       </div>
       <!-- fim .container -->

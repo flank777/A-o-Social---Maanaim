@@ -17,6 +17,7 @@
     humanHandoff:
       "Se for urgente, fale diretamente com nossa equipe pelo WhatsApp.",
   };
+  var DEFAULT_WHATSAPP_PHONE = "+5591986054141";
 
   var state = {
     config: Object.assign({}, DONA_DEFAULTS),
@@ -25,7 +26,7 @@
     userId: getOrCreateUserId(),
     lastIntent: "",
     remoteKnowledge: [],
-    whatsappPhone: "",
+    whatsappPhone: DEFAULT_WHATSAPP_PHONE,
     backendUrl: "",
   };
 
@@ -33,7 +34,7 @@
     ["Como receber cesta básica", "Como receber cesta básica"],
     ["Quero fazer uma doação", "Quero fazer uma doação"],
     ["Quero ser voluntário", "Quero ser voluntário"],
-    ["Horário de atendimento", "Horário de atendimento"],
+    ["Horários dos cultos", "Horários dos cultos"],
     ["Outras dúvidas", "Outras dúvidas"],
   ];
 
@@ -59,7 +60,7 @@
     contato: [
       ["WhatsApp", "Quero falar no WhatsApp"],
       ["Endereço", "Onde fica a sede?"],
-      ["Horário", "Horário de atendimento"],
+      ["Horários dos cultos", "Horários dos cultos"],
       ["Missão", "O que é a Ação Social Semear?"],
     ],
   };
@@ -199,9 +200,16 @@
         "funcionamento",
         "atendimento",
         "dias",
+        "culto",
+        "cultos",
+        "familia",
+        "família",
+        "jovens",
+        "oração do meio dia",
+        "oracao do meio dia",
       ],
       answer:
-        "O atendimento costuma acontecer de segunda a sexta, das 8h às 17h, e aos sábados pela manhã quando há ações programadas.\n\nAs doações e cadastros pelo site podem ser feitos a qualquer hora. Para visita presencial, é melhor confirmar antes com a equipe.",
+        "Os cultos e orações da Comunidade Evangélica Maanaim são assim:\n\n- Segunda, terça e quarta: oração do meio-dia\n- Sexta-feira: culto da família às 19h30\n- Sábado: culto dos jovens às 19h\n- Domingo: culto às 18h\n\nPara doações, cestas e voluntariado, você também pode chamar a equipe no WhatsApp.",
     },
     localizacao: {
       priority: 70,
@@ -218,7 +226,7 @@
         "maanaim",
       ],
       answer:
-        "Estamos em Belém, PA, com apoio da Comunidade Evangélica Maanaim. Para evitar desencontro, confirme o endereço e o melhor horário antes de ir presencialmente.",
+        "A Comunidade Evangélica Maanaim fica na Rua Quinze de Agosto, 1818, em Belém/PA.\n\nAntes de ir presencialmente por causa da Ação Social Semear, é bom confirmar pelo WhatsApp para evitar desencontro.",
     },
     contato: {
       priority: 70,
@@ -233,7 +241,7 @@
         "instagram",
       ],
       answer:
-        "O caminho mais rápido é falar com a equipe pelo WhatsApp. Se o contato estiver configurado no painel, deixo o botão aqui embaixo para abrir a conversa com uma mensagem pronta.",
+        "O caminho mais rápido é falar com a Comunidade Evangélica Maanaim pelo WhatsApp: (91) 98605-4141.\n\nInstagram: https://www.instagram.com/comunidade_evangelica_maanaim?igsh=MXJydnV1M2dudXUyeA==\nYouTube: https://www.youtube.com/channel/UC3oyub4mQz80janwbWI5TpQ",
     },
     missao: {
       priority: 65,
@@ -455,8 +463,8 @@
   }
 
   function whatsappHref(message) {
-    var phone = String(state.whatsappPhone || "").replace(/\D/g, "");
-    if (!phone || /999999999/.test(phone)) return "";
+    var phone = String(state.whatsappPhone || DEFAULT_WHATSAPP_PHONE).replace(/\D/g, "");
+    if (!phone || /999999999/.test(phone)) phone = DEFAULT_WHATSAPP_PHONE.replace(/\D/g, "");
     if (phone.length <= 11) phone = "55" + phone;
     return "whatsapp://send?phone=" + phone + "&text=" + encodeURIComponent(message || "");
   }
@@ -874,13 +882,13 @@
   function parseStoredWaConfig() {
     try {
       var raw = localStorage.getItem("doavida_wa_config");
-      if (!raw) return "";
+      if (!raw) return DEFAULT_WHATSAPP_PHONE;
       var cfg = JSON.parse(raw);
       var phones = cfg.adminPhone || cfg.adminPhones || cfg.whatsapp_phones || "";
-      if (Array.isArray(phones)) return phones[0] || "";
-      return String(phones).split(",")[0] || "";
+      var phone = Array.isArray(phones) ? (phones[0] || "") : (String(phones).split(",")[0] || "");
+      return phone && !/999999999/.test(phone) ? phone : DEFAULT_WHATSAPP_PHONE;
     } catch (e) {
-      return "";
+      return DEFAULT_WHATSAPP_PHONE;
     }
   }
 
@@ -890,8 +898,8 @@
       try {
         var cfg = await window.DoaVidaSync.getWAConfig();
         var phones = cfg && cfg.adminPhone;
-        if (Array.isArray(phones) && phones[0]) state.whatsappPhone = phones[0];
-        else if (phones) state.whatsappPhone = String(phones).split(",")[0];
+        var phone = Array.isArray(phones) ? (phones[0] || "") : (phones ? String(phones).split(",")[0] : "");
+        if (phone && !/999999999/.test(phone)) state.whatsappPhone = phone;
       } catch (e) {}
     }
   }

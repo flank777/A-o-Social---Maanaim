@@ -1470,6 +1470,45 @@ aside.admin-grid .admin-side-panel {
   opacity: .6;
 }
 
+.admin-video-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.28);
+  display: grid;
+  place-items: center;
+  color: rgba(218, 229, 255, 0.42);
+}
+
+.admin-video-preview iframe,
+.admin-video-preview video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #000;
+}
+
+.admin-video-preview > i {
+  font-size: 2rem;
+}
+
+.admin-video-preview > span,
+.admin-video-preview-fallback span {
+  font-size: 0.82rem;
+  color: var(--admin-text-soft);
+}
+
+.admin-video-preview-fallback {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 18px;
+  text-align: center;
+}
+
 .admin-form-section-title {
   display: flex;
   align-items: center;

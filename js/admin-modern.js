@@ -7,6 +7,7 @@
     { id: "donations", label: "Doações", title: "Relatórios e Analytics", sub: "Análise de doações, arrecadação e desempenho", icon: "fa-gift" },
     { id: "families", label: "Famílias", title: "Famílias e Solicitações", sub: "Cadastro, análise social e acompanhamento", icon: "fa-users" },
     { id: "volunteers", label: "Voluntários", title: "Voluntários", sub: "Equipe ativa e acompanhamento", icon: "fa-hands-holding" },
+    { id: "spiritual", label: "Apoio Espiritual", title: "Apoio Espiritual", sub: "Intercessão em oração e visitas às famílias", icon: "fa-hands-praying" },
     { id: "gallery", label: "Galeria", title: "Galeria", sub: "Imagens públicas e privadas", icon: "fa-image" },
     { id: "tasks", label: "Tarefas", title: "Tarefas dos Voluntários", sub: "Planejamento, execução e acompanhamento", icon: "fa-clipboard-list" },
     { id: "whatsapp", label: "WhatsApp", title: "WhatsApp", sub: "Comunicação e notificações", icon: "fa-brands fa-whatsapp", brand: true },
@@ -23,6 +24,7 @@
       foods:      { categoria: "todos", status: "todos" },
       gallery:    { categoria: "todos", tipo: "todos" },
       volunteers: { tipo: "todos", status: "todos" },
+      spiritual:  { modalidade: "todos", status: "todos" },
       donations:  { status: "todos", tipo: "todos", periodo: "todos" },
     },
     selectedFamilyId: null,
@@ -328,6 +330,7 @@
     else if (page === "donations")  root.innerHTML = renderAnalytics();
     else if (page === "families")   root.innerHTML = renderFamilies();
     else if (page === "volunteers") root.innerHTML = renderVolunteers();
+    else if (page === "spiritual")  root.innerHTML = renderSpiritual();
     else if (page === "tasks")      root.innerHTML = renderTasks();
     else if (page === "foods")      root.innerHTML = renderFoods();
     else if (page === "gallery")    root.innerHTML = renderGallery();
@@ -1144,6 +1147,7 @@
         panel("Segurança da conta", renderSecuritySettings(cfg)) +
         panel("Backup e restauração", renderBackupSettings(cfg)) +
       '</div>' +
+      panel("Video da Acao Social", renderVideoAcaoSettings(cfg)) +
       panel("Cloudflare R2 — Armazenamento de mídias", renderR2Settings(cfg)) +
       panel("Dona Assunção — Backend de IA (FastAPI + Gemini)", renderDonaBackendSettings(cfg)) +
       '<div class="admin-settings-actions"><button class="admin-button" type="button" id="settings-reset2"><i class="fa-solid fa-rotate-left"></i>Restaurar padrão</button><button class="admin-button primary" type="submit"><i class="fa-solid fa-check"></i>Salvar alterações</button></div>' +
@@ -1171,6 +1175,47 @@
       '<label>Token de autenticacao do Worker (deixe vazio se nao configurou UPLOAD_TOKEN)<input name="r2_upload_token" type="password" value="' + esc(cfg["r2_upload_token"] || "") + '" placeholder="Token secreto (wrangler secret put UPLOAD_TOKEN)" autocomplete="new-password"></label>' +
       '<label>URL publica do bucket R2 (ex: https://pub-xxx.r2.dev)<input name="r2_public_url" type="url" value="' + esc(cfg["r2_public_url"] || "") + '" placeholder="https://pub-XXXX.r2.dev"></label>' +
       '<div class="admin-form-row"><button class="admin-button" type="button" id="r2-test"><i class="fa-solid fa-plug-circle-check"></i>Testar conexao R2</button><a class="admin-button" href="worker/COMO-FAZER-DEPLOY.md" target="_blank"><i class="fa-solid fa-book"></i>Guia de deploy</a></div>' +
+      '</div>';
+  }
+
+  function videoAcaoYoutubeId(url) {
+    var m = String(url || "").match(/(?:youtube\.com\/(?:watch\?.*v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : "";
+  }
+
+  function videoAcaoIsFile(url) {
+    return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(String(url || ""));
+  }
+
+  function renderVideoAcaoSettings(cfg) {
+    var videoUrl = cfg["doavida_video_acao"] || "";
+    var posterUrl = cfg["doavida_video_acao_poster"] || "";
+    return '<div class="admin-form-grid">' +
+      '<div class="admin-list-item admin-insight" style="margin-bottom:4px"><div class="admin-list-icon" style="--tone:linear-gradient(135deg,#ef4444,#b91c1c)"><i class="fa-solid fa-circle-play"></i></div><div class="admin-list-body"><div class="admin-list-title">Card de video da pagina inicial</div><div class="admin-list-sub">Aceita link do YouTube, arquivo MP4/WebM ou upload direto pelo painel. A capa e opcional, mas deixa o card mais bonito antes do play.</div></div></div>' +
+      '<div class="admin-video-preview" id="video-acao-preview"><i class="fa-solid fa-film"></i><span>Previa do video</span></div>' +
+      '<label>URL do video' +
+        '<input id="video-acao-url" name="doavida_video_acao" type="url" value="' + esc(videoUrl) + '" placeholder="https://youtu.be/... ou https://.../video.mp4">' +
+      '</label>' +
+      '<label class="admin-upload-box" id="video-acao-upload-box">' +
+        '<input id="video-acao-file" type="file" accept="video/*">' +
+        '<i class="fa-solid fa-cloud-arrow-up"></i>' +
+        '<span>Enviar video do computador</span>' +
+        '<small>MP4 ou WebM. O arquivo sera enviado para R2 ou Cloudinary.</small>' +
+      '</label>' +
+      '<div class="admin-form-row">' +
+        '<label>URL da capa/poster' +
+          '<input id="video-acao-poster-url" name="doavida_video_acao_poster" type="url" value="' + esc(posterUrl) + '" placeholder="https://.../capa.jpg">' +
+        '</label>' +
+        '<label class="admin-upload-box" id="video-acao-poster-upload-box">' +
+          '<input id="video-acao-poster-file" type="file" accept="image/*">' +
+          '<i class="fa-solid fa-image"></i>' +
+          '<span>Enviar capa</span>' +
+        '</label>' +
+      '</div>' +
+      '<div class="admin-settings-actions">' +
+        '<button type="button" class="admin-button" id="video-acao-preview-btn"><i class="fa-regular fa-eye"></i>Ver previa</button>' +
+        '<button type="button" class="admin-button primary" id="video-acao-save"><i class="fa-regular fa-floppy-disk"></i>Salvar video</button>' +
+      '</div>' +
       '</div>';
   }
 
@@ -1340,6 +1385,162 @@
       kpiCard({ label: "Novos (30 dias)", value: fmtInt(novos30d), icon: "fa-user-plus", tone: "linear-gradient(135deg,#3b82f6,#2563eb)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: realTrend(entityGrowth(all)) }) +
       '</div>' +
       panel("Lista de voluntários", renderVolunteerFilters(tipos) + renderVolunteersTable(rows)) +
+      '</div>';
+  }
+
+  var SPIRITUAL_MODALIDADE_LABELS = {
+    intercessao: "Intercessão em oração",
+    visita: "Visita presencial",
+    ambos: "Ambas as formas",
+  };
+  var SPIRITUAL_DIAS_LABELS = {
+    seg: "Seg", ter: "Ter", qua: "Qua", qui: "Qui", sex: "Sex", sab: "Sáb", dom: "Dom",
+  };
+  var SPIRITUAL_DIAS_ORDEM = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+  var SPIRITUAL_HORARIOS_LABELS = {
+    manha: "Manhã", tarde: "Tarde", noite: "Noite", flexivel: "Flexível",
+  };
+
+  function isSpiritualVolunteer(v) {
+    var dados = v.dados || {};
+    return slug(v.tipo) === "espiritual" ||
+      (Array.isArray(dados.areas) && dados.areas.map(slug).indexOf("espiritual") >= 0);
+  }
+
+  function allSpiritualVolunteers() {
+    return state.data.volunteers.filter(isSpiritualVolunteer);
+  }
+
+  function spiritualModalidade(v) {
+    return (v.dados && v.dados.modalidade) || "";
+  }
+
+  function spiritualModalidadeCounts(rows) {
+    var counts = { intercessao: 0, visita: 0, ambos: 0 };
+    rows.forEach(function (v) {
+      var m = spiritualModalidade(v);
+      if (counts.hasOwnProperty(m)) counts[m]++;
+    });
+    return counts;
+  }
+
+  function spiritualDiasLabel(v) {
+    var dias = (v.dados && v.dados.dias_visita) || [];
+    if (!Array.isArray(dias) || !dias.length) return "—";
+    return dias.map(function (d) { return SPIRITUAL_DIAS_LABELS[d] || d; }).join(", ");
+  }
+
+  function spiritualHorariosLabel(v) {
+    var horarios = (v.dados && v.dados.horarios) || [];
+    if (!Array.isArray(horarios) || !horarios.length) return "—";
+    return horarios.map(function (h) { return SPIRITUAL_HORARIOS_LABELS[h] || h; }).join(", ");
+  }
+
+  function filteredSpiritual() {
+    var f = state.filters.spiritual;
+    return allSpiritualVolunteers().filter(function (row) {
+      return matchesSearch(row, ["nome", "name", "telefone", "whatsapp"]) &&
+        (f.modalidade === "todos" || spiritualModalidade(row) === f.modalidade) &&
+        (f.status === "todos" || slug(row.status || "ativo") === f.status);
+    });
+  }
+
+  function renderSpiritualFilters() {
+    return '<div class="admin-filter-bar">' +
+      '<input class="admin-filter-input" id="spiritual-inline-search" placeholder="Buscar voluntário..." value="' + esc(($("#admin-search") || {}).value || "") + '">' +
+      selectFilter("spiritual", "modalidade", [["todos", "Todas as modalidades"]].concat(Object.keys(SPIRITUAL_MODALIDADE_LABELS).map(function (k) { return [k, SPIRITUAL_MODALIDADE_LABELS[k]]; }))) +
+      selectFilter("spiritual", "status", [["todos", "Todos os status"], ["ativo", "Ativo"], ["inativo", "Inativo"], ["aguardando", "Aguardando"]]) +
+      '<button class="admin-button" data-clear-filter="spiritual"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '</div>';
+  }
+
+  function renderSpiritualTable(rows) {
+    if (!rows.length) {
+      return '<div class="admin-empty"><i class="fa-solid fa-hands-praying"></i><p>Nenhum voluntário de apoio espiritual encontrado.</p></div>';
+    }
+    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr>' +
+      '<th>Nome</th><th>WhatsApp</th><th>Bairro/Cidade</th><th>Modalidade</th><th>Dias disponíveis</th><th>Horário disponível</th><th>Status</th><th>Ações</th>' +
+      '</tr></thead><tbody>' +
+      rows.map(function (v) {
+        var nome = v.nome || v.name || "Voluntário";
+        var bairro = (v.dados && v.dados.bairro) || "—";
+        var modalidade = spiritualModalidade(v);
+        return '<tr>' +
+          '<td><div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><strong>' + esc(nome) + '</strong></div></td>' +
+          '<td>' + esc(v.telefone || v.whatsapp || "—") + '</td>' +
+          '<td>' + esc(bairro) + '</td>' +
+          '<td>' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</td>' +
+          '<td>' + esc(spiritualDiasLabel(v)) + '</td>' +
+          '<td>' + esc(spiritualHorariosLabel(v)) + '</td>' +
+          '<td>' + statusBadge(v.status || "ativo") + '</td>' +
+          '<td><div class="admin-row-actions">' +
+            '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
+            '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join("") +
+      '</tbody></table></div>' +
+      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntários de apoio espiritual</p>';
+  }
+
+  function renderSpiritualRequests(all) {
+    var comObservacao = all.filter(function (v) { return v.dados && String(v.dados.observacao || "").trim(); });
+    if (!comObservacao.length) {
+      return '<div class="admin-empty"><i class="fa-solid fa-comment-dots"></i><p>Nenhum pedido de oração registrado ainda.</p></div>';
+    }
+    return '<div class="admin-list">' +
+      comObservacao.slice(0, 8).map(function (v) {
+        var nome = v.nome || v.name || "Voluntário";
+        return '<div class="admin-list-item"><div class="admin-list-icon">' + esc(initials(nome)) + '</div>' +
+          '<div class="admin-list-body"><div class="admin-list-title">' + esc(nome) + '</div>' +
+          '<div class="admin-list-sub">' + esc(v.dados.observacao) + '</div></div></div>';
+      }).join("") +
+      '</div>';
+  }
+
+  function renderSpiritualAgenda(all) {
+    var visitantes = all.filter(function (v) { var m = spiritualModalidade(v); return m === "visita" || m === "ambos"; });
+    return '<div class="admin-list">' +
+      SPIRITUAL_DIAS_ORDEM.map(function (dia) {
+        var count = visitantes.filter(function (v) {
+          var dias = (v.dados && v.dados.dias_visita) || [];
+          return Array.isArray(dias) && dias.indexOf(dia) >= 0;
+        }).length;
+        return '<div class="admin-list-item"><div class="admin-list-icon">' + count + '</div>' +
+          '<div class="admin-list-body"><div class="admin-list-title">' + SPIRITUAL_DIAS_LABELS[dia] + '</div>' +
+          '<div class="admin-list-sub">voluntário' + (count === 1 ? "" : "s") + ' disponível' + (count === 1 ? "" : "is") + ' para visitar</div></div></div>';
+      }).join("") +
+      '</div>';
+  }
+
+  function renderSpiritual() {
+    var all = allSpiritualVolunteers();
+    var rows = filteredSpiritual();
+    var counts = spiritualModalidadeCounts(all);
+    var visitasSemana = all.filter(function (v) {
+      var m = spiritualModalidade(v);
+      var dias = (v.dados && v.dados.dias_visita) || [];
+      return (m === "visita" || m === "ambos") && Array.isArray(dias) && dias.length > 0;
+    }).length;
+    return '<div class="admin-view active">' +
+      '<div class="admin-action-row">' +
+      '<button class="admin-button js-export"><i class="fa-solid fa-download"></i>Exportar</button>' +
+      '</div>' +
+      '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact">' +
+      kpiCard({ label: "Total de voluntários", value: fmtInt(all.length), icon: "fa-hands-praying", tone: "linear-gradient(135deg,#a855f7,#7c3aed)", spark: "linear-gradient(90deg,transparent,#a855f7,transparent)", trend: "Firebase" }) +
+      kpiCard({ label: "Intercessores (oração)", value: fmtInt(counts.intercessao), icon: "fa-hands", tone: "linear-gradient(135deg,#8b5cf6,#6d5dfc)", spark: "linear-gradient(90deg,transparent,#8b5cf6,transparent)", trend: "Tempo real" }) +
+      kpiCard({ label: "Visitantes de famílias", value: fmtInt(counts.visita), icon: "fa-house-chimney", tone: "linear-gradient(135deg,#2f7cff,#2563eb)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: "Tempo real" }) +
+      kpiCard({ label: "Ambos", value: fmtInt(counts.ambos), icon: "fa-hands-holding-circle", tone: "linear-gradient(135deg,#22c55e,#16a34a)", spark: "linear-gradient(90deg,transparent,#22c55e,transparent)", trend: "Tempo real" }) +
+      kpiCard({ label: "Visitas agendadas na semana", value: fmtInt(visitasSemana), icon: "fa-calendar-week", tone: "linear-gradient(135deg,#f7b731,#f59e0b)", spark: "linear-gradient(90deg,transparent,#f7b731,transparent)", trend: "Disponibilidade recorrente", trendNote: "Baseado nos dias marcados" }) +
+      '</div>' +
+      '<div class="admin-grid admin-tasks-layout">' +
+      '<div>' + panel("Lista de voluntários", renderSpiritualFilters() + renderSpiritualTable(rows)) + '</div>' +
+      '<aside class="admin-grid">' +
+      panel("Distribuição por modalidade", '<div class="admin-donut-info"><canvas id="spiritual-modalidade"></canvas><div class="admin-legend" id="spiritual-modalidade-legend"></div></div>', { sub: "Como cada voluntário deseja ajudar" }) +
+      panel("Pedidos e acompanhamento", renderSpiritualRequests(all), { sub: "Pedidos de oração e observações recebidas" }) +
+      panel("Agenda da semana", renderSpiritualAgenda(all), { sub: "Disponibilidade de visitas por dia" }) +
+      '</aside>' +
+      '</div>' +
       '</div>';
   }
 
@@ -2213,6 +2414,13 @@
       renderActivePage();
     }));
 
+    var spiritualInlineSearch = $("#spiritual-inline-search");
+    if (spiritualInlineSearch) spiritualInlineSearch.addEventListener("input", debounce(function () {
+      var global = $("#admin-search");
+      if (global) global.value = spiritualInlineSearch.value;
+      renderActivePage();
+    }));
+
     $all("[data-config-toggle]").forEach(function (btn) {
       btn.addEventListener("click", function () { toggleConfig(btn); });
     });
@@ -2239,6 +2447,20 @@
     if (r2Test) r2Test.addEventListener("click", testR2Connection);
     var donaBackendTest = $("#dona-backend-test");
     if (donaBackendTest) donaBackendTest.addEventListener("click", testDonaBackendConnection);
+
+    var videoAcaoUrl = $("#video-acao-url");
+    if (videoAcaoUrl) videoAcaoUrl.addEventListener("input", updateVideoAcaoPreview);
+    var videoAcaoPoster = $("#video-acao-poster-url");
+    if (videoAcaoPoster) videoAcaoPoster.addEventListener("input", updateVideoAcaoPreview);
+    var videoPreviewBtn = $("#video-acao-preview-btn");
+    if (videoPreviewBtn) videoPreviewBtn.addEventListener("click", updateVideoAcaoPreview);
+    var videoSaveBtn = $("#video-acao-save");
+    if (videoSaveBtn) videoSaveBtn.addEventListener("click", saveVideoAcaoSettings);
+    var videoFile = $("#video-acao-file");
+    if (videoFile) videoFile.addEventListener("change", function () { uploadVideoAcaoFile(videoFile, "video"); });
+    var posterFile = $("#video-acao-poster-file");
+    if (posterFile) posterFile.addEventListener("change", function () { uploadVideoAcaoFile(posterFile, "poster"); });
+    if (videoAcaoUrl || videoAcaoPoster) updateVideoAcaoPreview();
 
     /* Cards de imagem do formulário de voluntário */
     $all(".vol-card-url-input").forEach(function (input) {
@@ -2989,6 +3211,12 @@
     });
     try {
       await Promise.all(tasks);
+      if (Object.prototype.hasOwnProperty.call(state.data.settings, "doavida_video_acao")) {
+        try { localStorage.setItem("doavida_video_acao", state.data.settings["doavida_video_acao"] || ""); } catch (e) {}
+      }
+      if (Object.prototype.hasOwnProperty.call(state.data.settings, "doavida_video_acao_poster")) {
+        try { localStorage.setItem("doavida_video_acao_poster", state.data.settings["doavida_video_acao_poster"] || ""); } catch (e) {}
+      }
       /* Aplica R2 imediatamente sem precisar recarregar a página */
       if (window.DoaVidaR2) {
         var r2Url = state.data.settings["r2_worker_url"] || "";
@@ -3003,8 +3231,8 @@
 
   var SETTINGS_DEFAULTS = {
     instituicao_nome: "Acao Social Semear",
-    instituicao_telefone: "",
-    instituicao_endereco: "",
+    instituicao_telefone: "(91) 98605-4141",
+    instituicao_endereco: "Rua Quinze de Agosto, 1818",
     instituicao_cidade: "Belem",
     instituicao_estado: "Para",
     instituicao_email: "",
@@ -3258,6 +3486,97 @@
     if (!wrap) return;
     var img = wrap.querySelector("img");
     if (img) img.src = url || "";
+  }
+
+  function updateVideoAcaoPreview() {
+    var preview = $("#video-acao-preview");
+    if (!preview) return;
+    var videoInput = $("#video-acao-url");
+    var posterInput = $("#video-acao-poster-url");
+    var url = videoInput ? videoInput.value.trim() : "";
+    var poster = posterInput ? posterInput.value.trim() : "";
+    if (!url) {
+      preview.innerHTML = '<i class="fa-solid fa-film"></i><span>Previa do video</span>';
+      return;
+    }
+    var ytId = videoAcaoYoutubeId(url);
+    if (ytId) {
+      preview.innerHTML = '<iframe src="https://www.youtube.com/embed/' + esc(ytId) + '?rel=0&modestbranding=1" title="Previa do video" allowfullscreen></iframe>';
+      return;
+    }
+    if (videoAcaoIsFile(url)) {
+      preview.innerHTML = '<video src="' + esc(url) + '"' + (poster ? ' poster="' + esc(poster) + '"' : '') + ' controls playsinline preload="metadata"></video>';
+      return;
+    }
+    preview.innerHTML = '<div class="admin-video-preview-fallback"><i class="fa-solid fa-link"></i><span>Link salvo. Use YouTube ou arquivo .mp4/.webm para previa no painel.</span></div>';
+  }
+
+  async function uploadVideoAcaoFile(input, kind) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var expected = kind === "poster" ? "image/" : "video/";
+    if (!file.type || file.type.indexOf(expected) !== 0) {
+      notify(kind === "poster" ? "Selecione uma imagem para a capa." : "Selecione um arquivo de video.");
+      input.value = "";
+      return;
+    }
+    notify(kind === "poster" ? "Enviando capa..." : "Enviando video...");
+    try {
+      var url;
+      if (window.DoaVidaR2 && DoaVidaR2.configurado()) {
+        url = (await DoaVidaR2.upload(file, kind === "poster" ? "banners" : "media")).url;
+      } else if (window.DoaVidaSync && DoaVidaSync.uploadImagemGaleria) {
+        url = await DoaVidaSync.uploadImagemGaleria(file, kind === "poster" ? "banners" : "galeria");
+      } else {
+        throw new Error("Nenhum servico de upload configurado.");
+      }
+      var target = kind === "poster" ? $("#video-acao-poster-url") : $("#video-acao-url");
+      if (target) target.value = url;
+      updateVideoAcaoPreview();
+      var videoUrlInput = $("#video-acao-url");
+      if (videoUrlInput && videoUrlInput.value.trim()) {
+        await saveVideoAcaoSettings();
+      } else {
+        notify(kind === "poster" ? "Capa enviada. Informe o video e salve." : "Video enviado. Clique em Salvar video.");
+      }
+    } catch (e) {
+      notify("Erro no upload: " + (e.message || e));
+    } finally {
+      input.value = "";
+    }
+  }
+
+  async function saveVideoAcaoSettings() {
+    var videoInput = $("#video-acao-url");
+    var posterInput = $("#video-acao-poster-url");
+    var videoUrl = videoInput ? videoInput.value.trim() : "";
+    var posterUrl = posterInput ? posterInput.value.trim() : "";
+    if (!videoUrl) {
+      notify("Informe a URL do video ou envie um arquivo.");
+      if (videoInput) videoInput.focus();
+      return;
+    }
+    if (!window.DoaVidaSync || typeof DoaVidaSync.setConfig !== "function") {
+      notify("Firebase indisponivel para salvar o video.");
+      return;
+    }
+    try {
+      await Promise.all([
+        DoaVidaSync.setConfig("doavida_video_acao", videoUrl),
+        DoaVidaSync.setConfig("doavida_video_acao_poster", posterUrl),
+      ]);
+      try {
+        localStorage.setItem("doavida_video_acao", videoUrl);
+        localStorage.setItem("doavida_video_acao_poster", posterUrl);
+      } catch (e) {}
+      if (!state.data.settings) state.data.settings = {};
+      state.data.settings.doavida_video_acao = videoUrl;
+      state.data.settings.doavida_video_acao_poster = posterUrl;
+      notify("Video da pagina inicial salvo.");
+      updateVideoAcaoPreview();
+    } catch (e) {
+      notify("Erro ao salvar video: " + (e.message || e));
+    }
   }
 
   async function saveVolunteerCards() {
@@ -3949,6 +4268,9 @@
       if (prodData.labels.length) {
         barChart("tasks-productivity", prodData.labels, prodData.values, [COLORS.purple, COLORS.blue, COLORS.purple2, COLORS.blue, COLORS.purple]);
       }
+    } else if (page === "spiritual") {
+      var modCounts = spiritualModalidadeCounts(allSpiritualVolunteers());
+      donutChart("spiritual-modalidade", ["Intercessão em oração", "Visita presencial", "Ambas as formas"], [modCounts.intercessao, modCounts.visita, modCounts.ambos], [COLORS.purple, COLORS.blue, COLORS.green], "spiritual-modalidade-legend");
     }
   }
 
@@ -4124,12 +4446,6 @@
 
   function initLogin() {
     var form = $("#admin-login-form");
-    if (window.DoaVidaSync && DoaVidaSync.onAuthChange) {
-      DoaVidaSync.onAuthChange(function (user) {
-        if (user) showApp();
-      });
-      if (DoaVidaSync.getUsuarioAtual && DoaVidaSync.getUsuarioAtual()) showApp();
-    }
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       var error = $("#admin-login-error");

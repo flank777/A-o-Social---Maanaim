@@ -95,7 +95,7 @@ DoaVida.SESSAO_DURACAO_MS = 8 * 60 * 60 * 1000;
 /* Configuração padrão do WhatsApp (CallMeBot — serviço gratuito) */
 DoaVida.WA_CONFIG_PADRAO = {
   apikey:     '',                  /* chave da API — obtida no CallMeBot   */
-  adminPhone: ['+5591999999999'],  /* número(s) que receberão notificações */
+  adminPhone: ['+5591986054141'],  /* número(s) que receberão notificações */
   ativo:      false,               /* false = notificações desativadas     */
 };
 

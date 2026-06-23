@@ -438,7 +438,7 @@
 
 .dona-input-bar {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 9px;
   padding: 14px 18px;
@@ -570,7 +570,12 @@ body.etapa1 .dona-chat {
   }
 
   .dona-input-bar {
+    grid-template-columns: 36px minmax(0, 1fr) 46px;
     padding: 12px 14px max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .dona-input {
+    font-size: 16px;
   }
 }
 

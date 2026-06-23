@@ -365,6 +365,49 @@
       border-color: var(--green-main);
       color: #fff;
     }
+    /*  Modalidade de apoio espiritual (passo 2)  */
+    .modo-grid { display: flex; flex-direction: column; gap: 10px; }
+    .modo-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border: 2px solid #e5ede0;
+      border-radius: 14px;
+      cursor: pointer;
+      background: #fff;
+      transition: all .18s;
+      user-select: none;
+    }
+    .modo-card:hover { border-color: #7bbf6a; }
+    .modo-card-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--green-pale);
+      color: var(--green-main);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem;
+      transition: all .18s;
+    }
+    .modo-card-text { flex: 1; }
+    .modo-card-title { font-size: .87rem; font-weight: 700; color: #1a1a1a; margin: 0 0 2px; }
+    .modo-card-desc { font-size: .76rem; color: #777; margin: 0; line-height: 1.4; }
+    .modo-card-radio {
+      width: 20px; height: 20px; flex-shrink: 0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .55rem; color: transparent;
+      transition: all .18s;
+    }
+    .modo-card.selected {
+      border-color: var(--green-main);
+      background: var(--green-pale);
+      box-shadow: 0 4px 16px rgba(45,110,31,.14);
+    }
+    .modo-card.selected .modo-card-icon { background: var(--green-main); color: #fff; }
+    .modo-card.selected .modo-card-radio {
+      background: var(--green-main); border-color: var(--green-main); color: #fff;
+    }
+    .obs-counter { display: block; text-align: right; font-size: .72rem; color: #999; margin-top: 6px; }
         .vfc-actions-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 40px; border-top: 1px solid #eef2eb; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
     .vfc-bar-summary { display: flex; align-items: center; gap: 12px; }
     .vfc-bar-icon { width: 38px; height: 38px; border-radius: 50%; background: #dde8d9; color: #aaa; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; transition: background .25s, color .25s; }
@@ -546,12 +589,23 @@
     }
   </style> </head> <body> <!-- Loader de transição entre páginas --> <div id="loader" role="status" aria-label="Carregando"> <div class="loader-inner"> <div class="ldr-stage" aria-hidden="true"> <span class="ldr-halo"></span> <span class="ldr-ring ldr-ring-1"></span> <span class="ldr-ring ldr-ring-2"></span> <span class="ldr-ring ldr-ring-3"></span> <span class="ldr-orbit"> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> </span> <img class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display='none'" loading="eager" decoding="async"> <span class="ldr-scan"></span> </div> <p class="loader-text" aria-hidden="true">Ação Social Semear · Belém, PA</p> <div class="loader-bar-wrap" aria-hidden="true"><div class="loader-bar"></div></div> </div> </div> <!-- Navbar --> <nav id="nav"> <div class="container"> <a href="voluntario.html" class="nav-back"> <i class="fas fa-arrow-left"></i> Voltar
       </a> <div class="nav-brand-text"> Semear <span>Ação Social</span> </div> </div> </nav> <div class="vol-form-page"> <div class="vol-form-card"> <!-- Cabeçalho --> <div class="vfc-header"> <img class="vfc-header-bg" src="img/folha-header.jpg" alt="" aria-hidden="true" loading="eager" decoding="async"><div class="vfc-header-inner"><div class="vfc-header-icon"> <i class="fas fa-hands-helping"></i> </div> <h1>Quero ser Voluntário</h1> <p>Preencha os campos abaixo e entraremos em contato em breve.</p> </div></div> <!-- Progresso --> <div class="vfc-progress"> <div class="vfc-steps"> <div class="vfc-step-item"> <div class="vfc-step-bubble active" id="bubble-1">1</div> <span class="vfc-step-label active" id="label-1">Como quer ajudar</span> </div> <div class="vfc-step-line" id="line-1"></div> <div class="vfc-step-item"> <div class="vfc-step-bubble" id="bubble-2">2</div> <span class="vfc-step-label" id="label-2">Seus dados</span> </div> <div class="vfc-step-line" id="line-2"></div> <div class="vfc-step-item" style="flex:0;"> <div class="vfc-step-bubble" id="bubble-3"><i class="fas fa-check"></i></div> <span class="vfc-step-label" id="label-3">Concluído</span> </div> </div> </div> <!-- Corpo --> <div class="vfc-body"> <!-- PASSO 1 --> <div class="step-panel active" id="step-1"> <h2 class="step-title">Como você quer ajudar?</h2> <p class="step-subtitle">Selecione uma ou mais áreas  você pode marcar quantas quiser.</p> <div class="help-options-grid"> <div class="help-opt" data-key="alimentos" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=320&fit=crop&auto=format" alt="Organização dos Alimentos" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Organização dos Alimentos</p> <p class="help-opt-desc">Separe, organize e monte as cestas básicas para distribuição.</p> </div> </div> <div class="help-opt" data-key="espiritual" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=320&fit=crop&auto=format" alt="Apoio Espiritual" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Apoio Espiritual</p> <p class="help-opt-desc">Ore, escute e ofereça suporte emocional e espiritual.</p> </div> </div> <div class="help-opt" data-key="transporte" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=320&fit=crop&auto=format" alt="Transporte" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Transporte</p> <p class="help-opt-desc">Entregue e transporte alimentos e doações com segurança.</p> </div> </div> <div class="help-opt" data-key="coleta" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=320&fit=crop&auto=format" alt="Ajuda na Coleta de Alimentos" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Ajuda na Coleta de Alimentos</p> <p class="help-opt-desc">Apoie ações de arrecadação em mercados e pontos parceiros.</p> </div> </div> </div> <p class="field-error" id="error-opt" style="margin-top:14px;"> Por favor, selecione pelo menos uma área de atuação.
-          </p> </div> <!-- PASSO 2 --> <div class="step-panel" id="step-2"> <h2 class="step-title">Seus dados</h2> <p class="step-subtitle">Preencha suas informações para entrarmos em contato.</p> <div class="p2-summary"> <div class="p2-summary-icon"><i class="fas fa-check"></i></div> <div> <p class="p2-summary-label">Você quer ajudar com</p> <p class="p2-summary-value" id="p2-chosen"></p> </div> </div> <div class="form-field"> <label for="field-nome">Nome completo <span>*</span></label> <input type="text" id="field-nome" class="form-input" placeholder="Ex: João da Silva" autocomplete="name" /> <p class="field-error" id="error-nome">Por favor, informe seu nome completo.</p> </div> <div class="form-field"> <label for="field-whats">WhatsApp <span>*</span></label> <input type="tel" id="field-whats" class="form-input" placeholder="(00) 00000-0000" autocomplete="tel" maxlength="15" oninput="maskPhone(this)" /> <p class="field-error" id="error-whats">Por favor, informe um número de WhatsApp válido.</p> </div> <div class="form-field"> <span class="avail-label-top"> Qual é a sua disponibilidade? <span style="color:#e53935">*</span> <span style="font-weight:400;color:#888;font-size:.76rem;margin-left:6px;">(pode marcar mais de uma)</span> </span> <div class="avail-grid"> <div class="avail-chip" data-val="manha"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Manhã
+          </p> </div> <!-- PASSO 2 --> <div class="step-panel" id="step-2"> <h2 class="step-title">Seus dados</h2> <p class="step-subtitle">Preencha suas informações para entrarmos em contato.</p> <div class="p2-summary"> <div class="p2-summary-icon"><i class="fas fa-check"></i></div> <div> <p class="p2-summary-label">Você quer ajudar com</p> <p class="p2-summary-value" id="p2-chosen"></p> </div> </div> <div class="form-field"> <label for="field-nome">Nome completo <span>*</span></label> <input type="text" id="field-nome" class="form-input" placeholder="Ex: João da Silva" autocomplete="name" /> <p class="field-error" id="error-nome">Por favor, informe seu nome completo.</p> </div> <div class="form-field"> <label for="field-whats">WhatsApp <span>*</span></label> <input type="tel" id="field-whats" class="form-input" placeholder="(00) 00000-0000" autocomplete="tel" maxlength="15" oninput="maskPhone(this)" /> <p class="field-error" id="error-whats">Por favor, informe um número de WhatsApp válido.</p> </div> <div id="campos-genericos"> <div class="form-field"> <span class="avail-label-top"> Qual é a sua disponibilidade? <span style="color:#e53935">*</span> <span style="font-weight:400;color:#888;font-size:.76rem;margin-left:6px;">(pode marcar mais de uma)</span> </span> <div class="avail-grid" id="generic-avail-grid"> <div class="avail-chip" data-val="manha"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Manhã
               </div> <div class="avail-chip" data-val="tarde"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Tarde
               </div> <div class="avail-chip" data-val="noite"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Noite
               </div> <div class="avail-chip" data-val="fds"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Fins de semana
               </div> <div class="avail-chip" data-val="qualquer"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Qualquer horário
-              </div> </div> <p class="field-error" id="error-avail">Selecione pelo menos um horário disponível.</p> </div> </div> <!-- SUCESSO --> <div class="step-panel" id="step-success"> <div class="vfc-success"> <span class="success-confetti" aria-hidden="true">🎉</span> <div class="success-anim" aria-hidden="true">🤝</div> <h2 class="success-title">Muito obrigado!</h2> <p class="success-msg"> Sua inscrição foi recebida com sucesso,
+              </div> </div> <p class="field-error" id="error-avail">Selecione pelo menos um horário disponível.</p> </div> </div> <div id="campos-espiritual" style="display:none;"> <div class="form-field"> <label for="field-bairro">Bairro / Cidade <span>*</span></label> <input type="text" id="field-bairro" class="form-input" placeholder="Ex: Marco, Belém - PA" autocomplete="address-level2" /> <p class="field-error" id="error-bairro">Por favor, informe seu bairro ou cidade.</p> </div> <div class="form-field"> <span class="avail-label-top">Como você deseja ajudar? <span style="color:#e53935">*</span></span> <div class="modo-grid"> <div class="modo-card" data-val="intercessao"> <div class="modo-card-icon"><i class="fas fa-praying-hands"></i></div> <div class="modo-card-text"> <p class="modo-card-title">Interceder em oração</p> <p class="modo-card-desc">Orar pelas famílias atendidas, sem visitas presenciais.</p> </div> <div class="modo-card-radio"><i class="fas fa-check"></i></div> </div> <div class="modo-card" data-val="visita"> <div class="modo-card-icon"><i class="fas fa-house-chimney"></i></div> <div class="modo-card-text"> <p class="modo-card-title">Visitar famílias e orar presencialmente</p> <p class="modo-card-desc">Visitar e orar pessoalmente com as famílias atendidas.</p> </div> <div class="modo-card-radio"><i class="fas fa-check"></i></div> </div> <div class="modo-card" data-val="ambos"> <div class="modo-card-icon"><i class="fas fa-hands-holding-circle"></i></div> <div class="modo-card-text"> <p class="modo-card-title">Ambas as formas</p> <p class="modo-card-desc">Interceder em oração e também visitar quando possível.</p> </div> <div class="modo-card-radio"><i class="fas fa-check"></i></div> </div> </div> <p class="field-error" id="error-modo">Por favor, selecione como você deseja ajudar.</p> </div> <div class="form-field" id="campo-dias-visita" style="display:none;"> <span class="avail-label-top">Dias disponíveis para visitar famílias <span style="font-weight:400;color:#888;font-size:.76rem;margin-left:6px;">(pode marcar mais de um)</span></span> <div class="avail-grid" id="dias-visita-grid"> <div class="avail-chip" data-val="seg"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Seg
+              </div> <div class="avail-chip" data-val="ter"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Ter
+              </div> <div class="avail-chip" data-val="qua"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Qua
+              </div> <div class="avail-chip" data-val="qui"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Qui
+              </div> <div class="avail-chip" data-val="sex"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Sex
+              </div> <div class="avail-chip" data-val="sab"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Sáb
+              </div> <div class="avail-chip" data-val="dom"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Dom
+              </div> </div> <p class="field-error" id="error-dias">Selecione pelo menos um dia disponível para visitar.</p> </div> <div class="form-field" id="campo-horarios-esp" style="display:none;"> <span class="avail-label-top"><span id="horarios-esp-titulo">Escolha um horário do seu dia para orar pelo Ministério de Ação Social</span> <span style="color:#e53935">*</span> <span style="font-weight:400;color:#888;font-size:.76rem;margin-left:6px;">(pode marcar mais de um)</span></span> <div class="avail-grid" id="horarios-espiritual-grid"> <div class="avail-chip" data-val="manha"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Manhã
+              </div> <div class="avail-chip" data-val="tarde"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Tarde
+              </div> <div class="avail-chip" data-val="noite"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Noite
+              </div> <div class="avail-chip" data-val="flexivel"> <span class="avail-chip-dot"><i class="fas fa-check" style="font-size:.55rem;"></i></span> Horário flexível
+              </div> </div> <p class="field-error" id="error-horarios-esp">Selecione pelo menos um horário disponível.</p> </div> <div class="form-field"> <label for="field-obs-espiritual">Observações ou pedido de oração <span style="font-weight:400;color:#888;">(opcional)</span></label> <textarea id="field-obs-espiritual" class="form-input" rows="4" maxlength="300" placeholder="Compartilhe um pedido de oração ou alguma observação importante..." oninput="atualizarContadorObs(this)" style="resize:vertical;font-family:var(--ff-body);"></textarea> <span class="obs-counter" id="obs-counter">0/300</span> </div> </div> <!-- SUCESSO --> <div class="step-panel" id="step-success"> <div class="vfc-success"> <span class="success-confetti" aria-hidden="true">🎉</span> <div class="success-anim" aria-hidden="true">🤝</div> <h2 class="success-title">Muito obrigado!</h2> <p class="success-msg"> Sua inscrição foi recebida com sucesso,
               <strong id="success-nome"></strong>!<br> Nossa equipe entrará em contato com você em breve pelo WhatsApp.
             </p> <div class="success-verse"> <p> "Porque tive fome, e vocês me deram de comer; tive sede,
                 e me deram de beber; fui estrangeiro, e me hospedaram;
@@ -574,6 +628,8 @@
       btnBack.style.display = step > 1 ? '' : 'none';
       if (step === 1) {
         btnNext.innerHTML = 'Próxima etapa <i class="fas fa-arrow-right"></i>';
+      } else if (modoEspiritualAtivo()) {
+        btnNext.innerHTML = 'Quero apoiar em oração <i class="fas fa-paper-plane"></i>';
       } else {
         btnNext.innerHTML = 'Enviar inscrição <i class="fas fa-paper-plane"></i>';
       }
@@ -586,6 +642,43 @@
       el.classList.toggle('selected');
       document.getElementById('error-opt').classList.remove('show');
       atualizarBarraResumo();
+    }
+    function modoEspiritualAtivo() {
+      return document.querySelector('.help-opt.selected[data-key="espiritual"]') !== null;
+    }
+    function atualizarContadorObs(textarea) {
+      document.getElementById('obs-counter').textContent = textarea.value.length + '/300';
+    }
+    function atualizarCamposPorModalidade() {
+      var modoEl = document.querySelector('.modo-card.selected');
+      var modo = modoEl ? modoEl.dataset.val : null;
+      var mostrarDias = (modo === 'ambos');
+      var mostrarHorarios = (modo === 'intercessao' || modo === 'ambos');
+
+      var campoDias = document.getElementById('campo-dias-visita');
+      if (campoDias) {
+        campoDias.style.display = mostrarDias ? '' : 'none';
+        if (!mostrarDias) {
+          document.getElementById('error-dias').classList.remove('show');
+          document.querySelectorAll('#dias-visita-grid .avail-chip.checked').forEach(function(c) { c.classList.remove('checked'); });
+        }
+      }
+
+      var campoHorarios = document.getElementById('campo-horarios-esp');
+      if (campoHorarios) {
+        campoHorarios.style.display = mostrarHorarios ? '' : 'none';
+        if (!mostrarHorarios) {
+          document.getElementById('error-horarios-esp').classList.remove('show');
+          document.querySelectorAll('#horarios-espiritual-grid .avail-chip.checked').forEach(function(c) { c.classList.remove('checked'); });
+        }
+      }
+
+      var titulo = document.getElementById('horarios-esp-titulo');
+      if (titulo) {
+        titulo.textContent = (modo === 'ambos')
+          ? 'Horários disponíveis para oração e visitas'
+          : 'Escolha um horário do seu dia para orar pelo Ministério de Ação Social';
+      }
     }
     function atualizarBarraResumo() {
       var sel = document.querySelectorAll('.help-opt.selected').length;
@@ -630,9 +723,19 @@
         chip.addEventListener('click', function() {
           this.classList.toggle('checked');
           if (this.dataset.val === 'qualquer' && this.classList.contains('checked')) {
-            document.querySelectorAll('.avail-chip').forEach(function(c) { c.classList.add('checked'); });
+            document.querySelectorAll('#generic-avail-grid .avail-chip').forEach(function(c) { c.classList.add('checked'); });
           }
           document.getElementById('error-avail').classList.remove('show');
+          document.getElementById('error-dias').classList.remove('show');
+          document.getElementById('error-horarios-esp').classList.remove('show');
+        });
+      });
+      document.querySelectorAll('.modo-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          document.querySelectorAll('.modo-card').forEach(function(c) { c.classList.remove('selected'); });
+          card.classList.add('selected');
+          document.getElementById('error-modo').classList.remove('show');
+          atualizarCamposPorModalidade();
         });
       });
     });
@@ -651,6 +754,10 @@
       }
       document.getElementById('p2-chosen').textContent =
         sel.map(function(el) { return nomesArea[el.dataset.key]; }).join(' · ');
+      var esp = modoEspiritualAtivo();
+      document.getElementById('campos-genericos').style.display = esp ? 'none' : '';
+      document.getElementById('campos-espiritual').style.display = esp ? '' : 'none';
+      if (esp) atualizarCamposPorModalidade();
       pasoAtual = 2;
       setActive(2);
       showPanel('step-2', false);
@@ -700,12 +807,53 @@
         document.getElementById('field-whats').classList.remove('error');
         document.getElementById('error-whats').classList.remove('show');
       }
-      var avail = [].slice.call(document.querySelectorAll('.avail-chip.checked'));
-      if (avail.length === 0) {
-        document.getElementById('error-avail').classList.add('show');
-        ok = false;
+      var esp = modoEspiritualAtivo();
+      var avail = [], modo = null, diasVisita = [], horariosEsp = [], bairro = '', observacao = '';
+      if (esp) {
+        bairro = document.getElementById('field-bairro').value.trim();
+        if (bairro.length < 2) {
+          document.getElementById('field-bairro').classList.add('error');
+          document.getElementById('error-bairro').classList.add('show');
+          ok = false;
+        } else {
+          document.getElementById('field-bairro').classList.remove('error');
+          document.getElementById('error-bairro').classList.remove('show');
+        }
+
+        var modoEl = document.querySelector('.modo-card.selected');
+        modo = modoEl ? modoEl.dataset.val : null;
+        if (!modo) {
+          document.getElementById('error-modo').classList.add('show');
+          ok = false;
+        } else {
+          document.getElementById('error-modo').classList.remove('show');
+        }
+
+        diasVisita = [].slice.call(document.querySelectorAll('#dias-visita-grid .avail-chip.checked')).map(function(el) { return el.dataset.val; });
+        if (modo === 'ambos' && diasVisita.length === 0) {
+          document.getElementById('error-dias').classList.add('show');
+          ok = false;
+        } else {
+          document.getElementById('error-dias').classList.remove('show');
+        }
+
+        horariosEsp = [].slice.call(document.querySelectorAll('#horarios-espiritual-grid .avail-chip.checked')).map(function(el) { return el.dataset.val; });
+        if ((modo === 'intercessao' || modo === 'ambos') && horariosEsp.length === 0) {
+          document.getElementById('error-horarios-esp').classList.add('show');
+          ok = false;
+        } else {
+          document.getElementById('error-horarios-esp').classList.remove('show');
+        }
+
+        observacao = document.getElementById('field-obs-espiritual').value.trim();
       } else {
-        document.getElementById('error-avail').classList.remove('show');
+        avail = [].slice.call(document.querySelectorAll('#generic-avail-grid .avail-chip.checked'));
+        if (avail.length === 0) {
+          document.getElementById('error-avail').classList.add('show');
+          ok = false;
+        } else {
+          document.getElementById('error-avail').classList.remove('show');
+        }
       }
       if (!ok) return;
 
@@ -722,6 +870,19 @@
         var disponibilidade = avail.map(function(el) {
           return el.dataset.val;
         });
+        var dados = esp ? {
+          areas: areas,
+          areas_label: areas.map(textoArea),
+          bairro: bairro,
+          modalidade: modo,
+          dias_visita: diasVisita,
+          horarios: horariosEsp,
+          observacao: observacao
+        } : {
+          areas: areas,
+          areas_label: areas.map(textoArea),
+          disponibilidade: disponibilidade
+        };
         var payload = {
           nome: nome,
           telefone: document.getElementById('field-whats').value.trim(),
@@ -729,11 +890,7 @@
           tipo: areas[0] || 'voluntario',
           tipo_label: areas.map(textoArea).join(', '),
           status: 'ativo',
-          dados: {
-            areas: areas,
-            areas_label: areas.map(textoArea),
-            disponibilidade: disponibilidade
-          },
+          dados: dados,
           origem: 'voluntario-form',
           created_at: new Date().toISOString()
         };
@@ -750,7 +907,7 @@
       } finally {
         if (btnNext && pasoAtual !== 3) {
           btnNext.disabled = false;
-          btnNext.innerHTML = 'Enviar inscrição <i class="fas fa-paper-plane"></i>';
+          btnNext.innerHTML = esp ? 'Quero apoiar em oração <i class="fas fa-paper-plane"></i>' : 'Enviar inscrição <i class="fas fa-paper-plane"></i>';
         }
       }
     }
