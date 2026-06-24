@@ -13,6 +13,14 @@
       content="Plataforma de doações de alimentos da Ação Social Semear e Comunidade Evangélica Maanaim. Transformamos doações em esperança real em Belém, PA."
     />
     <meta name="theme-color" content="#0d0d0b" />
+    <!-- PWA: instalável na tela inicial do celular -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DoaVida" />
     <!-- Preload imagens críticas (above the fold) -->
     <link rel="preload" as="image" href="img/hero-banner.jpg" media="(min-width:769px)" />
     <link rel="preload" as="image" href="img/hero-banner-mobile.jpg" media="(max-width:768px)" />
@@ -2407,6 +2415,7 @@
               justify-content: center;
               background: #25d366;
               border-color: #25d366;
+            "
             onclick="compartilharComprovanteWA()"
           >
             <i class="fab fa-whatsapp" aria-hidden="true"></i>

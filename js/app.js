@@ -42,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
   inicializarFooterAno();
   inicializarFundoOndas();
   inicializarRipplesBotoes();
+  registrarServiceWorker();
+  inicializarInstalarApp();
 }); /* Fim do DOMContentLoaded */
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -180,9 +182,10 @@ function inicializarNavbarInjecao() {
       /* Injeta no início do body */
       var body = document.body;
       body.insertAdjacentHTML("afterbegin", html);
-      inicializarNavbar();     // reinicializa apos injecao
-      inicializarHamburguer(); // reinicializa apos injecao
-      inicializarJelloNav();   // ativa jello nav apos injecao
+      inicializarNavbar();      // reinicializa apos injecao
+      inicializarHamburguer();  // reinicializa apos injecao
+      inicializarJelloNav();    // ativa jello nav apos injecao
+      inicializarInstalarApp(); // botão "Instalar App" só existe após a injeção
     })
     .catch(function (error) {
       console.error("Erro ao injetar navbar:", error);
@@ -1355,6 +1358,83 @@ function inicializarRipplesBotoes() {
     setTimeout(function () {
       if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
     }, 600);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO 14 — PWA (Instalar no Celular)
+
+   registrarServiceWorker() : ativa o sw.js — pré-requisito do Chrome/
+     Edge/Android para considerar o site "instalável".
+   inicializarInstalarApp() : controla os botões ".btn-install-app"
+     (um no menu desktop, outro no drawer mobile — ver navbar.html).
+
+   Chamada duas vezes de propósito: uma no DOMContentLoaded (cobre
+   páginas com #nav já no HTML) e outra após a injeção do navbar.html
+   via fetch (cobre todas as outras, onde os botões só existem depois
+   da injeção assíncrona).
+   ══════════════════════════════════════════════════════════════════════ */
+function registrarServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("/sw.js").catch(function (erro) {
+      console.error("[DoaVida] Falha ao registrar Service Worker:", erro);
+    });
+  });
+}
+
+/* Guarda o evento beforeinstallprompt para disparar depois, no clique do botão */
+var _deferredInstallPrompt = null;
+
+function inicializarInstalarApp() {
+  var botoes = document.querySelectorAll(".btn-install-app");
+  if (!botoes.length) return;
+
+  /* App já instalado (aberto em modo standalone) → nunca mostra o botão */
+  var jaInstalado =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+  if (jaInstalado) return;
+
+  /* Safari iOS não dispara "beforeinstallprompt" — não há API nativa,
+     então o botão sempre aparece e ensina o passo a passo manual */
+  var ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (ehIOS) {
+    botoes.forEach(function (b) { b.hidden = false; });
+  }
+
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault(); /* impede o mini-infobar automático do Chrome */
+    _deferredInstallPrompt = e;
+    botoes.forEach(function (b) { b.hidden = false; });
+  });
+
+  botoes.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (_deferredInstallPrompt) {
+        _deferredInstallPrompt.prompt();
+        _deferredInstallPrompt.userChoice.then(function () {
+          _deferredInstallPrompt = null;
+        });
+      } else if (ehIOS) {
+        showToast(
+          'No Safari: toque em "Compartilhar" e depois em "Adicionar à Tela de Início".',
+          "info",
+          6000,
+        );
+      } else {
+        showToast(
+          'Use o menu do navegador e escolha "Instalar app" ou "Adicionar à tela inicial".',
+          "info",
+          5000,
+        );
+      }
+    });
+  });
+
+  window.addEventListener("appinstalled", function () {
+    botoes.forEach(function (b) { b.hidden = true; });
+    _deferredInstallPrompt = null;
   });
 }
 
