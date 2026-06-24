@@ -18,7 +18,7 @@
       js/voluntario.js    validação, máscara, mensagem personalizada   
   a
 --> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta
-      name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>Seja um Voluntário | Ação Social Semear + Maanaim</title> <!-- PWA: instalável na tela inicial do celular --> <link rel="manifest" href="manifest.json" /> <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" /> <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" /> <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" /> <meta name="theme-color" content="#1A3312" /> <meta name="apple-mobile-web-app-capable" content="yes" /> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <meta name="apple-mobile-web-app-title" content="DoaVida" /> <meta
+      name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>Seja um Voluntário | Ação Social Semear + Maanaim</title> <!-- PWA: instalável na tela inicial do celular --> <link rel="manifest" href="manifest.json" /> <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" /> <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" /> <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" /> <meta name="theme-color" content="#1A3312" /> <meta name="apple-mobile-web-app-capable" content="yes" /> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <meta name="apple-mobile-web-app-title" content="Maanaim" /> <meta
       name="description" content="Seja a resposta da oração de alguém. Junte-se à Ação Social Semear e
     Comunidade Maanaim. Ajude a transformar vidas em Belém, Pará." /> <!-- Preload --> <link rel="preload" as="image" href="img/hero-voluntario-desktop.jpg" media="(min-width:769px)" /> <link rel="preload" as="image" href="img/hero-voluntario-mobile.jpg" media="(max-width:768px)" /> <!-- Fontes --> <link rel="preconnect" href="https://fonts.googleapis.com" /> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript> <!-- Ícones Font Awesome --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript> <!-- CSS global (variáveis, navbar, footer, modal, botões) --> <link rel="stylesheet" href="css/global.css" /> <style> /*
          VARIÁVEIS EXTRAS
@@ -404,10 +404,10 @@
         }
         .vol-card-btn:hover { background: #4A7A3A; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(90,138,74,0.35); }
         .vol-card-btn i { font-size: 0.84rem; }
-        FASE 5  MODAIS DE DICAS
-         Reutiliza .modal-overlay e .modal-box do global.css.
-         Apenas estilos adicionais específicos aqui.
-       */
+        /* FASE 5 — MODAIS DE DICAS
+           Reutiliza .modal-overlay e .modal-box do global.css.
+           Apenas estilos adicionais específicos aqui.
+         */
       /* Lista de dicas dentro do modal */
       .modal-dicas { list-style:none; display:flex; flex-direction:column; gap:12px; margin:20px 0; }
       .modal-dica  { display:flex; align-items:flex-start; gap:12px; }
@@ -526,7 +526,7 @@
       .vf-field.ok  .vf-msg { color:#4caf50; }
       /* Select com seta personalizada */
       .vf-select {
-        cursor:appearance:none; -webkit-appearance:none;
+        cursor:pointer; -webkit-appearance:none;
         background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8c96a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         background-repeat:no-repeat; background-position:right 14px center;
         background-color:rgba(0,0,0,.25); padding-right:40px;
