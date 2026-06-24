@@ -1377,7 +1377,14 @@ function inicializarRipplesBotoes() {
 function registrarServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js").catch(function (erro) {
+    /*
+      Caminho RELATIVO (sem "/" no início) de propósito: o site roda em
+      GitHub Pages dentro de uma subpasta (ex: usuario.github.io/repo/).
+      Um caminho absoluto "/sw.js" resolveria para a raiz do domínio
+      (404) e o navegador nunca registraria o Service Worker — sem ele,
+      o Chrome não oferece "Instalar app", só "Criar atalho" (sem ícone).
+    */
+    navigator.serviceWorker.register("sw.js").catch(function (erro) {
       console.error("[DoaVida] Falha ao registrar Service Worker:", erro);
     });
   });

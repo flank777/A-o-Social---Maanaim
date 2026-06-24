@@ -12,10 +12,11 @@
   - Tudo que não é GET, ou que é de outra origem (Supabase, CDNs,
     fontes), nunca é interceptado — passa direto para a rede.
 */
-const CACHE_NAME = "doavida-v1";
+const CACHE_NAME = "doavida-v2";
 
 const APP_SHELL = [
-  "/index.html",
+  "./",
+  "index.html",
   "manifest.json",
   "css/global.css",
   "css/carousel.css",
@@ -79,7 +80,7 @@ self.addEventListener("fetch", function (event) {
         })
         .catch(function () {
           return caches.match(req).then(function (cached) {
-            return cached || caches.match("/index.html");
+            return cached || caches.match("index.html");
           });
         }),
     );

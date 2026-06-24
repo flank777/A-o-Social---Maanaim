@@ -2,9 +2,9 @@
   "name": "Ação Social Semear — Doe Alimentos",
   "short_name": "DoaVida",
   "description": "Doe alimentos, solicite uma cesta básica ou seja voluntário com a Ação Social Semear e Comunidade Maanaim em Belém, PA.",
-  "id": "/index.html",
-  "start_url": "/index.html",
-  "scope": "/",
+  "id": "./index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "lang": "pt-BR",
@@ -28,17 +28,17 @@
   "shortcuts": [
     {
       "name": "Fazer Doação",
-      "url": "/form.html",
+      "url": "./form.html",
       "icons": [{ "src": "img/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Solicitar Cesta Básica",
-      "url": "/cesta-form.html",
+      "url": "./cesta-form.html",
       "icons": [{ "src": "img/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Seja um Voluntário",
-      "url": "/voluntario.html",
+      "url": "./voluntario.html",
       "icons": [{ "src": "img/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
