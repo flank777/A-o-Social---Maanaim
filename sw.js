@@ -12,7 +12,7 @@
   - Tudo que não é GET, ou que é de outra origem (Supabase, CDNs,
     fontes), nunca é interceptado — passa direto para a rede.
 */
-const CACHE_NAME = "doavida-v2";
+const CACHE_NAME = "doavida-v3";
 
 const APP_SHELL = [
   "./",
