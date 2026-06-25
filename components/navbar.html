@@ -635,3 +635,45 @@
 ═══════════════════════════════════════════════════════════════════ -->
 <nav class="jello-nav" id="jello-nav" aria-label="Navegação rápida"> <div class="jello-track" id="jello-track"> <!-- Pill deslizante — posicionado via JS --> <div class="jello-pill" id="jello-pill" aria-hidden="true"></div> <!-- Item 0: Início --> <a href="index.html" class="jello-item" data-jello-index="0" aria-label="Início"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <polyline class="icon-home-roof" points="3,9.5 11,3 19,9.5"/> <path d="M5 9.5V19a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1V9.5"/> </svg> </div> <span>Início</span> </a> <!-- Item 1: Cesta Básica --> <a href="cesta-form.html" class="jello-item" data-jello-index="1" aria-label="Solicitar Cesta Básica"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <path d="M3 7h16l-1.5 11H4.5z"/> <path d="M8 7V5a3 3 0 016 0v2"/> <circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/> <circle cx="13" cy="13" r="1" fill="currentColor" stroke="none"/> </svg> </div> <span>Cesta</span> </a> <!-- Item 2: Doar — CTA central, pill verde --> <a href="form.html" class="jello-item is-cta" data-jello-index="2" aria-label="Fazer Doação"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <path class="icon-box-lid" d="M4 7h14l-1.5-4h-11z"/> <path d="M4 7v11a1 1 0 001 1h12a1 1 0 001-1V7"/> <line x1="11" y1="7" x2="11" y2="19"/> </svg> </div> <span>Doar</span> </a> <!-- Item 3: Voluntário --> <a href="voluntario.html" class="jello-item" data-jello-index="3" aria-label="Seja um Voluntário"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <circle cx="11" cy="6" r="3"/> <path class="icon-hand" d="M6 19v-2a5 5 0 0110 0v2"/> <path d="M2 14c1-2 3-3 5-2"/> <path d="M20 14c-1-2-3-3-5-2"/> </svg> </div> <span>Voluntário</span> </a> <!-- Item 4: Admin --> <a href="admin.html" class="jello-item" data-jello-index="4" aria-label="Área administrativa"> <div class="jello-icon"> <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"> <rect x="4" y="11" width="14" height="9" rx="2"/> <path class="icon-lock-shackle" d="M7 11V8a4 4 0 018 0v3"/> </svg> </div> <span>Admin</span> </a> </div><!-- fim .jello-track -->
 </nav><!-- fim .jello-nav -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL — Guia de instalação no iPhone (Safari não tem instalação
+     automática via JS; abrirModal()/fecharModal() já existem em app.js)
+═══════════════════════════════════════════════════════════════════ -->
+<div id="modal-instalar-ios" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-instalar-ios-title" aria-hidden="true">
+  <div class="modal-box" style="max-width:440px;">
+    <button type="button" class="modal-close" onclick="fecharModal('modal-instalar-ios')" aria-label="Fechar">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-instalar-ios-title">Instalar no iPhone</h2>
+    </div>
+    <p style="font-size:0.88rem; color:var(--text2); margin:-8px 0 4px;">O Safari não deixa instalar com 1 toque — são só 3 passos rápidos:</p>
+    <ul class="modal-dicas" role="list">
+      <li class="modal-dica">
+        <div class="modal-dica-icon" style="background:rgba(74,138,57,0.1); color:var(--gold);">1</div>
+        <div class="modal-dica-text">
+          <strong>Toque em Compartilhar <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i></strong>
+          <span>É o ícone na barra do Safari, geralmente embaixo da tela.</span>
+        </div>
+      </li>
+      <li class="modal-dica">
+        <div class="modal-dica-icon" style="background:rgba(74,138,57,0.1); color:var(--gold);">2</div>
+        <div class="modal-dica-text">
+          <strong>Toque em "Adicionar à Tela de Início" <i class="fas fa-square-plus" aria-hidden="true"></i></strong>
+          <span>Deslize a lista de opções para baixo até encontrar.</span>
+        </div>
+      </li>
+      <li class="modal-dica">
+        <div class="modal-dica-icon" style="background:rgba(74,138,57,0.1); color:var(--gold);">3</div>
+        <div class="modal-dica-text">
+          <strong>Toque em "Adicionar"</strong>
+          <span>No canto superior direito. O app aparece na tela inicial do celular.</span>
+        </div>
+      </li>
+    </ul>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="fecharModal('modal-instalar-ios')" style="width:100%; justify-content:center;">Entendi</button>
+    </div>
+  </div>
+</div>

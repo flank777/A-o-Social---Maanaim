@@ -1427,11 +1427,7 @@ function inicializarInstalarApp() {
         });
       } else if (ehIOS) {
         e.preventDefault(); /* Safari não tem prompt nem instala via link */
-        showToast(
-          'No Safari: toque em "Compartilhar" e depois em "Adicionar à Tela de Início".',
-          "info",
-          6000,
-        );
+        abrirModal("modal-instalar-ios"); /* guia visual — ver #modal-instalar-ios em navbar.html */
       }
       /* Sem prompt nativo disponível (ex: Firefox/desktop, navegador
          sem suporte, ou esta página aberta fora do domínio HTTPS de
