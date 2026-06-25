@@ -273,7 +273,7 @@
       '<div class="admin-sidebar-note"><i class="fa-solid fa-hands-holding-heart"></i><strong>Fazer o bem transforma vidas!</strong><span>Obrigado por fazer parte dessa corrente do bem.</span></div>';
 
     $("#admin-mobile-nav").innerHTML = PAGES.filter(function (p) {
-      return ["overview", "donations", "families", "tasks"].indexOf(p.id) >= 0;
+      return ["overview", "donations", "families", "volunteers", "spiritual"].indexOf(p.id) >= 0;
     }).map(navButton).join("");
 
     $all("[data-page]").forEach(function (btn) {
@@ -501,17 +501,17 @@
   function renderOverview() {
     var m = metrics();
     return '<div class="admin-view active">' +
-      '<div class="admin-action-row"><button class="admin-button" id="overview-site"><i class="fa-solid fa-arrow-up-right-from-square"></i>Voltar ao site</button><button class="admin-button primary js-export"><i class="fa-solid fa-download"></i>Exportar relatorio</button></div>' +
-      '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact">' +
+      '<div class="admin-action-row admin-overview-toolbar"><button class="admin-button" id="overview-site"><i class="fa-solid fa-arrow-up-right-from-square"></i>Voltar ao site</button><button class="admin-button primary js-export"><i class="fa-solid fa-download"></i>Exportar relatorio</button></div>' +
+      '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact admin-overview-kpis">' +
       kpiCard({ label: "Doações registradas", value: fmtInt(m.donations), icon: "fa-hand-holding-heart", tone: "linear-gradient(135deg,#a855f7,#7c3aed)", spark: "linear-gradient(90deg,transparent,#a855f7,transparent)", trend: realTrend(m.growth) }) +
       kpiCard({ label: "KG arrecadados", value: fmtKg(m.kg), icon: "fa-weight-hanging", tone: "linear-gradient(135deg,#3b82f6,#2563eb)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: realTrend(m.growth) }) +
       kpiCard({ label: "Famílias cadastradas", value: fmtInt(m.families), icon: "fa-users", tone: "linear-gradient(135deg,#14b8a6,#10b981)", spark: "linear-gradient(90deg,transparent,#22d3ee,transparent)", trend: realTrend(m.familyGrowth) }) +
       kpiCard({ label: "Voluntários ativos", value: fmtInt(m.volunteers), icon: "fa-user-check", tone: "linear-gradient(135deg,#22c55e,#16a34a)", spark: "linear-gradient(90deg,transparent,#22c55e,transparent)", trend: realTrend(m.volunteerGrowth) }) +
       '</div>' +
       '<div class="admin-grid admin-dashboard-layout">' +
-      chartPanel("Arrecadação mensal (kg)", "overview-line") +
-      chartPanel("Doações por categoria (kg)", "overview-bars") +
-      panel("Status das solicitações", '<div class="admin-donut-info"><canvas id="overview-status"></canvas><div class="admin-legend" id="overview-status-legend"></div></div>') +
+      chartPanel("Arrecadação mensal (kg)", "overview-line", { className: "admin-overview-chart" }) +
+      chartPanel("Doações por categoria (kg)", "overview-bars", { className: "admin-overview-chart" }) +
+      panel("Status das solicitações", '<div class="admin-donut-info"><div class="admin-donut-canvas-wrap"><canvas id="overview-status"></canvas><div class="admin-donut-center-label"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Resumo geral</span></div></div><div class="admin-legend" id="overview-status-legend"></div></div>', { className: "admin-overview-donut" }) +
       '</div>' +
       '<div class="admin-grid admin-dashboard-bottom" style="margin-top:16px">' +
       panel("Últimas atividades", renderActivities()) +
@@ -4254,7 +4254,7 @@
     if (page === "overview") {
       lineChart("overview-line", monthlyLabels(), monthlyValues());
       barChart("overview-bars", foodLabels(), foodValues(), [COLORS.blue, COLORS.cyan, COLORS.purple, COLORS.green, COLORS.yellow]);
-      donutChart("overview-status", familyStatusLabels(), familyStatusValues(), [COLORS.purple, COLORS.blue, COLORS.cyan], "overview-status-legend");
+      donutChart("overview-status", familyStatusLabels(), familyStatusValues(), [COLORS.blue, COLORS.cyan, COLORS.green], "overview-status-legend");
     } else if (page === "donations") {
       var kgData = computeKgByPeriodForAnalytics(state.analyticsPeriod);
       lineChart("analytics-line", kgData.labels, kgData.values);

@@ -986,6 +986,50 @@ button {
   max-height: 130px;
 }
 
+/* Centro com ícone + rótulo, sobreposto ao "buraco" do donut (cutout 67%) */
+.admin-donut-canvas-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin: 0 auto;
+}
+
+.admin-donut-canvas-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 124, 255, 0.32), rgba(34, 197, 94, 0.12) 62%, transparent 76%);
+  filter: blur(7px);
+  z-index: -1;
+}
+
+.admin-donut-center-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.admin-donut-center-label i {
+  font-size: 1.05rem;
+  color: var(--admin-blue);
+}
+
+.admin-donut-center-label span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.15;
+  max-width: 64px;
+  color: var(--admin-text-soft);
+}
+
 .admin-legend {
   display: grid;
   gap: 9px;
@@ -2147,6 +2191,24 @@ aside.admin-grid .admin-side-panel {
   .admin-bar-row {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+
+  /* Visão geral no mobile: some o toolbar, os KPIs e os gráficos de
+     linha/barra — fica só o donut "Resumo geral" + Atividades + Metas. */
+  .admin-overview-toolbar,
+  .admin-overview-kpis,
+  .admin-overview-chart {
+    display: none;
+  }
+
+  .admin-overview-donut .admin-panel-header {
+    display: none;
+  }
+
+  .admin-overview-donut .admin-donut-info {
+    grid-template-columns: 130px 1fr;
+    justify-items: stretch;
+    padding: 20px 18px;
   }
 }
 
