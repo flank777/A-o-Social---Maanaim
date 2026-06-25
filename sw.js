@@ -11,8 +11,12 @@
     (responde rápido com o cache, atualiza em segundo plano).
   - Tudo que não é GET, ou que é de outra origem (Supabase, CDNs,
     fontes), nunca é interceptado — passa direto para a rede.
+  - Área administrativa (admin.html, dashboard.html e seus JS/CSS):
+    nunca é cacheada. Não precisa funcionar offline, e cachear gerava
+    o bug de continuar mostrando a versão antiga do admin depois de
+    cada deploy, mesmo trocando o CACHE_NAME.
 */
-const CACHE_NAME = "doavida-v4";
+const CACHE_NAME = "doavida-v5";
 
 const APP_SHELL = [
   "./",
@@ -66,7 +70,11 @@ self.addEventListener("fetch", function (event) {
   /* Nunca intercepta POST/PUT (formulários) nem requisições de outra origem
      (Supabase, Google Fonts, Font Awesome CDN, backend da Dona Assunção) */
   if (req.method !== "GET") return;
-  if (new URL(req.url).origin !== self.location.origin) return;
+  var url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  /* Área administrativa: sempre direto pra rede, nunca cacheada. */
+  if (/\/(admin|dashboard)/i.test(url.pathname)) return;
 
   if (req.mode === "navigate") {
     event.respondWith(
