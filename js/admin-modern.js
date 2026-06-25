@@ -1339,26 +1339,31 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hands-holding"></i><p>Nenhum voluntário encontrado.</p></div>';
     }
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr>' +
-      '<th>Nome</th><th>Telefone</th><th>Tipo de ajuda</th><th>Disponibilidade</th><th>Cadastro</th><th>Status</th><th>Ações</th>' +
-      '</tr></thead><tbody>' +
+    /* Resumo (nome + status) sempre visível; telefone, tipo de ajuda,
+       disponibilidade, cadastro e ações só ao tocar para abrir a linha. */
+    return '<div class="admin-expand-list">' +
       rows.map(function (v) {
         var nome = v.nome || v.name || "Voluntário";
         var disponibilidade = volunteerDisponibilidade(v) || "—";
-        return '<tr>' +
-          '<td><div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><strong>' + esc(nome) + '</strong></div></td>' +
-          '<td>' + esc(v.telefone || v.whatsapp || "—") + '</td>' +
-          '<td>' + badge(v.tipo_label || v.tipo || "—", "blue") + '</td>' +
-          '<td>' + esc(disponibilidade) + '</td>' +
-          '<td>' + fmtDate(v.created_at || v.createdAt) + '</td>' +
-          '<td>' + statusBadge(v.status || "ativo") + '</td>' +
-          '<td><div class="admin-row-actions">' +
-            '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
-          '</div></td>' +
-          '</tr>';
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
+            statusBadge(v.status || "ativo") +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-expand-detail">' +
+            '<span><strong>Telefone:</strong> ' + esc(v.telefone || v.whatsapp || "—") + '</span>' +
+            '<span><strong>Tipo de ajuda:</strong> ' + badge(v.tipo_label || v.tipo || "—", "blue") + '</span>' +
+            '<span><strong>Disponibilidade:</strong> ' + esc(disponibilidade) + '</span>' +
+            '<span><strong>Cadastro:</strong> ' + fmtDate(v.created_at || v.createdAt) + '</span>' +
+            '<div class="admin-row-actions">' +
+              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
+              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</details>';
       }).join("") +
-      '</tbody></table></div>' +
+      '</div>' +
       '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.volunteers.length) + ' voluntários</p>';
   }
 
@@ -1458,28 +1463,33 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hands-praying"></i><p>Nenhum voluntário de apoio espiritual encontrado.</p></div>';
     }
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr>' +
-      '<th>Nome</th><th>WhatsApp</th><th>Bairro/Cidade</th><th>Modalidade</th><th>Dias disponíveis</th><th>Horário disponível</th><th>Status</th><th>Ações</th>' +
-      '</tr></thead><tbody>' +
+    /* Resumo (nome + status) sempre visível; whatsapp, bairro, modalidade,
+       dias/horário e ações só aparecem ao tocar para abrir a linha. */
+    return '<div class="admin-expand-list">' +
       rows.map(function (v) {
         var nome = v.nome || v.name || "Voluntário";
         var bairro = (v.dados && v.dados.bairro) || "—";
         var modalidade = spiritualModalidade(v);
-        return '<tr>' +
-          '<td><div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><strong>' + esc(nome) + '</strong></div></td>' +
-          '<td>' + esc(v.telefone || v.whatsapp || "—") + '</td>' +
-          '<td>' + esc(bairro) + '</td>' +
-          '<td>' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</td>' +
-          '<td>' + esc(spiritualDiasLabel(v)) + '</td>' +
-          '<td>' + esc(spiritualHorariosLabel(v)) + '</td>' +
-          '<td>' + statusBadge(v.status || "ativo") + '</td>' +
-          '<td><div class="admin-row-actions">' +
-            '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
-          '</div></td>' +
-          '</tr>';
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
+            statusBadge(v.status || "ativo") +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-expand-detail">' +
+            '<span><strong>WhatsApp:</strong> ' + esc(v.telefone || v.whatsapp || "—") + '</span>' +
+            '<span><strong>Bairro/Cidade:</strong> ' + esc(bairro) + '</span>' +
+            '<span><strong>Modalidade:</strong> ' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</span>' +
+            '<span><strong>Dias disponíveis:</strong> ' + esc(spiritualDiasLabel(v)) + '</span>' +
+            '<span><strong>Horário disponível:</strong> ' + esc(spiritualHorariosLabel(v)) + '</span>' +
+            '<div class="admin-row-actions">' +
+              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
+              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</details>';
       }).join("") +
-      '</tbody></table></div>' +
+      '</div>' +
       '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntários de apoio espiritual</p>';
   }
 
@@ -1574,16 +1584,16 @@
 
     /* <details>/<summary> nativo: a linha resumida (data + tipo + descricao)
        fica sempre visivel; responsavel + status só aparecem ao tocar/abrir. */
-    return '<div class="admin-activity-list">' +
+    return '<div class="admin-expand-list">' +
       activities.slice(0, 5).map(function (a) {
-        return '<details class="admin-activity-row">' +
-          '<summary class="admin-activity-summary">' +
-            '<span class="admin-activity-date">' + fmtDate(a.date, true) + '</span>' +
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<span class="admin-expand-lead">' + fmtDate(a.date, true) + '</span>' +
             badge(a.type, a.tone, a.icon) +
-            '<span class="admin-activity-desc">' + esc(a.desc) + '</span>' +
-            '<i class="fa-solid fa-chevron-down admin-activity-chevron" aria-hidden="true"></i>' +
+            '<span class="admin-expand-title">' + esc(a.desc) + '</span>' +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
           '</summary>' +
-          '<div class="admin-activity-detail">' +
+          '<div class="admin-expand-detail">' +
             '<span><strong>Responsável:</strong> ' + esc(a.who) + '</span>' +
             '<span><strong>Status:</strong> ' + statusBadge(a.status) + '</span>' +
           '</div>' +
@@ -1797,21 +1807,30 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hand-holding-heart"></i><p>Nenhuma doação encontrada para os filtros selecionados.</p></div>';
     }
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Protocolo</th><th>Doador</th><th>Itens</th><th>Kg</th><th>Entrega</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead><tbody>' +
+    /* Resumo (protocolo + doador + status) sempre visível; itens, kg,
+       entrega, data e ações só aparecem ao tocar para abrir a linha. */
+    return '<div class="admin-expand-list">' +
       rows.map(function (d) {
         var isCesta = d.tipo_doacao === "cesta_completa";
-        return '<tr><td><strong>' + esc(d.protocolo || d.id || "—") + '</strong></td>' +
-          '<td>' + esc(d.name || d.nome || "Doador anonimo") + '</td>' +
-          '<td>' + (isCesta ? badge("Cesta básica", "yellow", "fa-basket-shopping") + ' ' : "") + esc(donationFoodLabel(d)) + '</td>' +
-          '<td>' + fmtKg(getDonationKg(d)) + '</td>' +
-          '<td>' + esc(d.delivery || d.entrega || "—") + '</td>' +
-          '<td>' + statusBadge(d.status || "pendente") + '</td>' +
-          '<td>' + fmtDate(d.created_at || d.createdAt || d.data, true) + '</td>' +
-          '<td><div class="admin-row-actions">' +
-            '<button class="admin-mini-action" data-donation-view="' + esc(d.id) + '" aria-label="Ver comprovante" title="Ver comprovante"><i class="fa-regular fa-eye"></i></button>' +
-            '<button class="admin-mini-action danger" data-donation-delete="' + esc(d.id) + '" aria-label="Excluir" title="Excluir"><i class="fa-regular fa-trash-can"></i></button>' +
-          '</div></td></tr>';
-      }).join("") + '</tbody></table></div>' +
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<span class="admin-expand-lead">' + esc(d.protocolo || d.id || "—") + '</span>' +
+            '<span class="admin-expand-title">' + esc(d.name || d.nome || "Doador anonimo") + '</span>' +
+            statusBadge(d.status || "pendente") +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-expand-detail">' +
+            '<span><strong>Itens:</strong> ' + (isCesta ? badge("Cesta básica", "yellow", "fa-basket-shopping") + ' ' : "") + esc(donationFoodLabel(d)) + '</span>' +
+            '<span><strong>Kg:</strong> ' + fmtKg(getDonationKg(d)) + '</span>' +
+            '<span><strong>Entrega:</strong> ' + esc(d.delivery || d.entrega || "—") + '</span>' +
+            '<span><strong>Data:</strong> ' + fmtDate(d.created_at || d.createdAt || d.data, true) + '</span>' +
+            '<div class="admin-row-actions">' +
+              '<button class="admin-mini-action" data-donation-view="' + esc(d.id) + '" aria-label="Ver comprovante" title="Ver comprovante"><i class="fa-regular fa-eye"></i></button>' +
+              '<button class="admin-mini-action danger" data-donation-delete="' + esc(d.id) + '" aria-label="Excluir" title="Excluir"><i class="fa-regular fa-trash-can"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</details>';
+      }).join("") + '</div>' +
       '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.donations.length) + ' doações</p>';
   }
 
@@ -1927,10 +1946,29 @@
   }
 
   function renderFamiliesTable(rows) {
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Protocolo</th><th>Responsavel</th><th>Bairro</th><th>Pessoas</th><th>Necessidade</th><th>Status</th><th>Prioridade</th><th>Acoes</th></tr></thead><tbody>' +
+    /* Resumo (protocolo + responsavel + status) sempre visível; bairro,
+       pessoas, necessidade, prioridade e ações só ao tocar para abrir. */
+    return '<div class="admin-expand-list">' +
       rows.map(function (f) {
-        return '<tr><td><strong>' + esc(f.protocolo || f.id) + '</strong></td><td>' + esc(f.responsavel || f.nome) + '</td><td>' + esc(f.bairro) + '</td><td><i class="fa-solid fa-users"></i> ' + fmtInt(f.pessoas || f.pessoasNaCasa || 1) + '</td><td>' + esc(f.necessidade || "Cesta basica") + '</td><td>' + statusBadge(f.status || "em-analise") + '</td><td>' + priorityBadge(f.prioridade || "media") + '</td><td><div class="admin-row-actions"><button class="admin-mini-action" data-select-family="' + esc(f.id) + '" aria-label="Ver detalhes" title="Ver detalhes"><i class="fa-regular fa-eye"></i></button><button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar família" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button></div></td></tr>';
-      }).join("") + '</tbody></table></div>';
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<span class="admin-expand-lead">' + esc(f.protocolo || f.id) + '</span>' +
+            '<span class="admin-expand-title">' + esc(f.responsavel || f.nome) + '</span>' +
+            statusBadge(f.status || "em-analise") +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-expand-detail">' +
+            '<span><strong>Bairro:</strong> ' + esc(f.bairro) + '</span>' +
+            '<span><strong>Pessoas:</strong> <i class="fa-solid fa-users"></i> ' + fmtInt(f.pessoas || f.pessoasNaCasa || 1) + '</span>' +
+            '<span><strong>Necessidade:</strong> ' + esc(f.necessidade || "Cesta basica") + '</span>' +
+            '<span><strong>Prioridade:</strong> ' + priorityBadge(f.prioridade || "media") + '</span>' +
+            '<div class="admin-row-actions">' +
+              '<button class="admin-mini-action" data-select-family="' + esc(f.id) + '" aria-label="Ver detalhes" title="Ver detalhes"><i class="fa-regular fa-eye"></i></button>' +
+              '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar família" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</details>';
+      }).join("") + '</div>';
   }
 
   function renderFamilyDetail(f) {

@@ -912,28 +912,28 @@ button {
   font-size: 0.86rem;
 }
 
-/* Lista de atividades expansível: a linha (summary) mostra só
-   data + tipo + descrição; tocar nela abre o <details> e revela
-   responsável + status, sem precisar de nenhum JS de toggle. */
-.admin-activity-list {
+/* Lista expansível genérica (atividades, doações, famílias, voluntários,
+   apoio espiritual): a linha (summary) mostra só o essencial; tocar nela
+   abre o <details> e revela o resto dos dados + ações — sem JS de toggle. */
+.admin-expand-list {
   display: grid;
   gap: 10px;
   padding: 16px 20px 20px;
   min-width: 0;
 }
 
-.admin-activity-row {
+.admin-expand-row {
   border: 1px solid var(--admin-border);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.035);
   overflow: hidden;
 }
 
-.admin-activity-row[open] {
+.admin-expand-row[open] {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.admin-activity-summary {
+.admin-expand-summary {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -942,18 +942,23 @@ button {
   list-style: none;
 }
 
-.admin-activity-summary::-webkit-details-marker {
+.admin-expand-summary::-webkit-details-marker {
   display: none;
 }
 
-.admin-activity-date {
+.admin-expand-summary > .admin-person-row {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-expand-lead {
   flex: 0 0 auto;
   color: var(--admin-muted);
   font-size: 0.78rem;
   white-space: nowrap;
 }
 
-.admin-activity-desc {
+.admin-expand-title {
   flex: 1 1 auto;
   min-width: 0;
   color: var(--admin-text);
@@ -964,17 +969,17 @@ button {
   text-overflow: ellipsis;
 }
 
-.admin-activity-chevron {
+.admin-expand-chevron {
   flex: 0 0 auto;
   color: var(--admin-muted);
   transition: transform 0.2s ease;
 }
 
-.admin-activity-row[open] .admin-activity-chevron {
+.admin-expand-row[open] .admin-expand-chevron {
   transform: rotate(180deg);
 }
 
-.admin-activity-detail {
+.admin-expand-detail {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -983,12 +988,18 @@ button {
   font-size: 0.86rem;
 }
 
+.admin-expand-detail .admin-row-actions {
+  flex: 1 0 100%;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+
 @media (max-width: 480px) {
-  .admin-activity-summary {
+  .admin-expand-summary {
     flex-wrap: wrap;
   }
 
-  .admin-activity-desc {
+  .admin-expand-title {
     white-space: normal;
     order: 3;
     flex: 1 0 100%;
