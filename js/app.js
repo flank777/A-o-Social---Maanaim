@@ -1403,39 +1403,41 @@ function inicializarInstalarApp() {
     window.navigator.standalone === true;
   if (jaInstalado) return;
 
-  /* Safari iOS não dispara "beforeinstallprompt" — não há API nativa,
-     então o botão sempre aparece e ensina o passo a passo manual */
   var ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  if (ehIOS) {
-    botoes.forEach(function (b) { b.hidden = false; });
-  }
+
+  /* Botão sempre visível (em vez de esperar o "beforeinstallprompt",
+     que o Chrome só dispara quando critérios estritos de instalabilidade
+     são atendidos — e nunca dispara em Firefox/Safari/abertura local).
+     Os botões já são <a href> para o site publicado: funcionam como
+     link de download/instalação mesmo quando não há prompt nativo. */
+  botoes.forEach(function (b) { b.hidden = false; });
 
   window.addEventListener("beforeinstallprompt", function (e) {
     e.preventDefault(); /* impede o mini-infobar automático do Chrome */
     _deferredInstallPrompt = e;
-    botoes.forEach(function (b) { b.hidden = false; });
   });
 
   botoes.forEach(function (btn) {
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", function (e) {
       if (_deferredInstallPrompt) {
+        e.preventDefault(); /* usa o prompt nativo em vez de navegar pelo href */
         _deferredInstallPrompt.prompt();
         _deferredInstallPrompt.userChoice.then(function () {
           _deferredInstallPrompt = null;
         });
       } else if (ehIOS) {
+        e.preventDefault(); /* Safari não tem prompt nem instala via link */
         showToast(
           'No Safari: toque em "Compartilhar" e depois em "Adicionar à Tela de Início".',
           "info",
           6000,
         );
-      } else {
-        showToast(
-          'Use o menu do navegador e escolha "Instalar app" ou "Adicionar à tela inicial".',
-          "info",
-          5000,
-        );
       }
+      /* Sem prompt nativo disponível (ex: Firefox/desktop, navegador
+         sem suporte, ou esta página aberta fora do domínio HTTPS de
+         produção) → deixa o link seguir normalmente até o site
+         publicado, onde o Service Worker e o manifest garantem que a
+         instalação funciona de fato. */
     });
   });
 
