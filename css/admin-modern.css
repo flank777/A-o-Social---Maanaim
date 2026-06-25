@@ -912,6 +912,89 @@ button {
   font-size: 0.86rem;
 }
 
+/* Lista de atividades expansível: a linha (summary) mostra só
+   data + tipo + descrição; tocar nela abre o <details> e revela
+   responsável + status, sem precisar de nenhum JS de toggle. */
+.admin-activity-list {
+  display: grid;
+  gap: 10px;
+  padding: 16px 20px 20px;
+  min-width: 0;
+}
+
+.admin-activity-row {
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+}
+
+.admin-activity-row[open] {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-activity-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-activity-summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-activity-date {
+  flex: 0 0 auto;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.admin-activity-desc {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--admin-text);
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-activity-chevron {
+  flex: 0 0 auto;
+  color: var(--admin-muted);
+  transition: transform 0.2s ease;
+}
+
+.admin-activity-row[open] .admin-activity-chevron {
+  transform: rotate(180deg);
+}
+
+.admin-activity-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 13px 13px 13px;
+  color: var(--admin-text-soft);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 480px) {
+  .admin-activity-summary {
+    flex-wrap: wrap;
+  }
+
+  .admin-activity-desc {
+    white-space: normal;
+    order: 3;
+    flex: 1 0 100%;
+  }
+}
+
 .admin-progress-group {
   display: grid;
   gap: 22px;

@@ -1572,11 +1572,24 @@
       return '<div class="admin-empty">Nenhuma atividade encontrada no Firebase.</div>';
     }
 
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Data/hora</th><th>Tipo</th><th>Descricao</th><th>Responsavel</th><th>Status</th></tr></thead><tbody>' +
+    /* <details>/<summary> nativo: a linha resumida (data + tipo + descricao)
+       fica sempre visivel; responsavel + status só aparecem ao tocar/abrir. */
+    return '<div class="admin-activity-list">' +
       activities.slice(0, 5).map(function (a) {
-        return '<tr><td>' + fmtDate(a.date, true) + '</td><td>' + badge(a.type, a.tone, a.icon) + '</td><td><strong>' + esc(a.desc) + '</strong></td><td>' + esc(a.who) + '</td><td>' + statusBadge(a.status) + '</td></tr>';
+        return '<details class="admin-activity-row">' +
+          '<summary class="admin-activity-summary">' +
+            '<span class="admin-activity-date">' + fmtDate(a.date, true) + '</span>' +
+            badge(a.type, a.tone, a.icon) +
+            '<span class="admin-activity-desc">' + esc(a.desc) + '</span>' +
+            '<i class="fa-solid fa-chevron-down admin-activity-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-activity-detail">' +
+            '<span><strong>Responsável:</strong> ' + esc(a.who) + '</span>' +
+            '<span><strong>Status:</strong> ' + statusBadge(a.status) + '</span>' +
+          '</div>' +
+        '</details>';
       }).join("") +
-      '</tbody></table></div>';
+      '</div>';
   }
 
   function renderGoals() {
