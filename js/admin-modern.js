@@ -1145,7 +1145,7 @@
     var cfg = state.data.settings || {};
     return '<div class="admin-view active">' +
       '<div class="admin-action-row"><button class="admin-button primary" type="button" id="settings-save-top"><i class="fa-solid fa-floppy-disk"></i>Salvar alterações</button><button class="admin-button" type="button" id="settings-reset"><i class="fa-solid fa-rotate-left"></i>Restaurar padrão</button></div>' +
-      '<form id="settings-form">' +
+      '<form id="settings-form" novalidate>' +
       panel("Informações da instituição", renderInstitutionSettings(cfg)) +
       '<div class="admin-grid admin-two-column" style="margin-top:0">' +
         panel("Preferências de notificação", renderNotificationSettings(cfg)) +
