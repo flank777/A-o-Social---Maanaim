@@ -2243,8 +2243,25 @@ aside.admin-grid .admin-side-panel {
     display: none;
   }
 
+  .admin-filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .admin-filter-bar .admin-select,
   .admin-filter-bar .admin-input,
+  .admin-filter-bar .admin-filter-input {
+    width: auto;
+    min-width: 150px;
+    flex: 0 0 auto;
+  }
+
+  .admin-filter-bar button[data-clear-filter] {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
   .admin-segmented {
     width: 100%;
   }
