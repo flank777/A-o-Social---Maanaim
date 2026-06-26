@@ -123,6 +123,9 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Conecta os botões de navegação do formulário */
   conectarEventos();
 
+  /* Card "Doe com PIX" — fluxo independente, não faz parte dos 3 passos */
+  inicializarDoacaoPix();
+
   /* Atualiza dados quando o usuário volta para a aba (Page Visibility API)
      Captura metas atingidas ou estoques alterados pelo admin em tempo real */
   document.addEventListener('visibilitychange', function () {
@@ -1719,6 +1722,163 @@ function gerarProtocolo() {
   return 'DOA-' + data + '-' + codigo;
 }
 window.gerarProtocolo = gerarProtocolo;
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEÇÃO — DOAÇÃO EM DINHEIRO VIA PIX
+   Card independente do fluxo de 3 passos (alimentos). O doador informa
+   o valor, confirma nome + WhatsApp num modal, e a doação é salva com
+   tipo_doacao: "pix" (status "pendente" até o admin confirmar o
+   recebimento na aba Doações do painel).
+   ══════════════════════════════════════════════════════════════════════ */
+
+var _pixValorAtual = 0;
+
+function _normalizarNumeroWA(raw) {
+  var digits = String(raw || '').replace(/\D/g, '');
+  if (digits.length === 10 || digits.length === 11) digits = '55' + digits;
+  return digits;
+}
+
+async function inicializarDoacaoPix() {
+  var card = document.getElementById('doa-pix-card');
+  if (!card) return;
+
+  var chaveEl = document.getElementById('doa-pix-chave');
+  if (chaveEl) {
+    try {
+      var chave = window.DoaVidaSync ? await DoaVidaSync.getConfig('pix_chave') : null;
+      chaveEl.textContent = chave || 'Chave PIX ainda não configurada';
+    } catch (e) {
+      chaveEl.textContent = 'Chave PIX indisponível no momento';
+    }
+  }
+
+  var btnCopiar = document.getElementById('btn-copiar-pix');
+  if (btnCopiar) {
+    btnCopiar.addEventListener('click', function () {
+      var texto = (chaveEl ? chaveEl.textContent : '').trim();
+      if (!texto || texto.indexOf('configurada') >= 0 || texto.indexOf('indisponível') >= 0) {
+        showToast('Chave PIX ainda não disponível.', 'warning');
+        return;
+      }
+      navigator.clipboard.writeText(texto)
+        .then(function () { showToast(' Chave PIX copiada!', 'success'); })
+        .catch(function () { showToast('Não foi possível copiar. Copie manualmente.', 'warning'); });
+    });
+  }
+
+  var btnConfirmar = document.getElementById('btn-pix-confirmar');
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', function () {
+      var valorInput = document.getElementById('inp-pix-valor');
+      var valor = parseFloat((valorInput ? valorInput.value : '').replace(',', '.'));
+      if (!valor || valor <= 0) {
+        showToast('Informe um valor válido para a doação.', 'warning');
+        if (valorInput) valorInput.focus();
+        return;
+      }
+      _pixValorAtual = valor;
+      var valorEl = document.getElementById('modal-pix-valor');
+      if (valorEl) valorEl.textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      window.abrirModal('modal-pix');
+    });
+  }
+
+  var btnEnviar = document.getElementById('btn-pix-enviar');
+  if (btnEnviar) {
+    btnEnviar.addEventListener('click', _confirmarDoacaoPix);
+  }
+}
+window.inicializarDoacaoPix = inicializarDoacaoPix;
+
+async function _confirmarDoacaoPix() {
+  var nomeEl = document.getElementById('inp-pix-nome');
+  var telEl  = document.getElementById('inp-pix-tel');
+  var msgNomeEl = document.getElementById('msg-pix-nome');
+  var msgTelEl  = document.getElementById('msg-pix-tel');
+  var nome   = (nomeEl ? nomeEl.value : '').trim();
+  var tel    = (telEl ? telEl.value : '').trim();
+  var telDigits = tel.replace(/\D/g, '');
+
+  if (msgNomeEl) msgNomeEl.textContent = '';
+  if (msgTelEl) msgTelEl.textContent = '';
+
+  if (nome.length < 3) {
+    if (msgNomeEl) msgNomeEl.textContent = 'Informe seu nome completo.';
+    if (nomeEl) nomeEl.focus();
+    return;
+  }
+  if (telDigits.length < 8 || telDigits.length > 11) {
+    if (msgTelEl) msgTelEl.textContent = 'Informe um WhatsApp válido (DDD + número).';
+    if (telEl) telEl.focus();
+    return;
+  }
+
+  var btn = document.getElementById('btn-pix-enviar');
+  var labelOriginal = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Enviando...';
+  }
+
+  try {
+    var protocolo = gerarProtocolo();
+    var doacao = {
+      protocolo:   protocolo,
+      tipo_doacao: 'pix',
+      name:        nome,
+      nome:        nome,
+      phone:       telDigits,
+      telefone:    tel,
+      valor:       _pixValorAtual,
+      status:      'pendente',
+      createdAt:   new Date().toISOString(),
+    };
+
+    var doaSalva = await DoaVidaSync.addDoacao(doacao);
+    doaSalva = Object.assign({}, doacao, doaSalva);
+
+    /* Notifica os admins configurados via WhatsApp (assíncrono) */
+    try { DoaVidaAPI.notificarAdminWA(doaSalva); } catch (e) { /* ignora */ }
+
+    window.fecharModal('modal-pix');
+    showToast(' Doação registrada! Protocolo ' + protocolo + '.', 'success', 6000);
+
+    /* Reseta o card e o modal para uma nova doação */
+    var valorInput = document.getElementById('inp-pix-valor');
+    if (valorInput) valorInput.value = '';
+    if (nomeEl) nomeEl.value = '';
+    if (telEl) telEl.value = '';
+
+    /* Abre o WhatsApp de um admin configurado para o doador enviar o comprovante */
+    _abrirWhatsAppComprovantePix(doaSalva);
+  } catch (e) {
+    showToast('Não foi possível registrar a doação: ' + (e.message || e), 'error', 6000);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = labelOriginal;
+    }
+  }
+}
+
+async function _abrirWhatsAppComprovantePix(doacao) {
+  try {
+    if (!window.DoaVidaSync || typeof DoaVidaSync.getWhatsappAdmins !== 'function') return;
+    var admins = await DoaVidaSync.getWhatsappAdmins();
+    var destino = (admins || []).find(function (a) {
+      var ativo  = (a.status || 'ativo') === 'ativo';
+      var avisos = Array.isArray(a.avisos) ? a.avisos : [];
+      return ativo && avisos.indexOf('doacoes') >= 0 && (a.telefone || a.whatsapp);
+    });
+    if (!destino) return;
+    var numero  = _normalizarNumeroWA(destino.telefone || destino.whatsapp);
+    var valorFmt = doacao.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    var texto = 'Olá! Fiz uma doação em dinheiro via PIX de ' + valorFmt +
+      ' (protocolo ' + doacao.protocolo + '). Segue o comprovante:';
+    window.abrirWhatsApp('whatsapp://send?phone=' + numero + '&text=' + encodeURIComponent(texto));
+  } catch (e) { /* sem WhatsApp configurado — segue sem redirecionar */ }
+}
 
 /*
   Reinicia o formulário do zero (usado pelo botão "Nova Doação").

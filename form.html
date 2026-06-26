@@ -332,6 +332,75 @@
       transition: border-color .2s;
     }
     .doa-search:focus { border-color: #2d6e1f; }
+    /* -- Card "Doe com PIX" (passo 1, acima da grade de alimentos) -- */
+    .doa-pix-card {
+      background: #f5fbf2;
+      border: 1.5px solid #d7ecc9;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+    }
+    .doa-pix-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .doa-pix-icon {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #2d6e1f; color: #fff; font-size: 1.15rem;
+    }
+    .doa-pix-head h3 { margin: 0 0 3px; font-size: 1rem; font-weight: 800; color: #1a1a18; }
+    .doa-pix-head p  { margin: 0; font-size: .82rem; color: #666; line-height: 1.45; }
+    .doa-pix-body { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .doa-pix-key-box,
+    .doa-pix-value-box { flex: 1 1 220px; min-width: 0; }
+    .doa-pix-key-label,
+    .doa-pix-value-box label {
+      display: block; font-size: .72rem; font-weight: 700; color: #555;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
+    }
+    .doa-pix-key-row {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px;
+      padding: 9px 10px;
+    }
+    .doa-pix-key-row strong {
+      flex: 1 1 auto; min-width: 0; font-size: .85rem; color: #222;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-family: var(--ff-mono);
+    }
+    .doa-pix-copy {
+      flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px;
+      border: none; background: #eef7ea; color: #2d6e1f; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .doa-pix-copy:hover { background: #d7ecc9; }
+    .doa-pix-value-input {
+      display: flex; align-items: center; gap: 6px;
+      background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px;
+      padding: 9px 12px;
+    }
+    .doa-pix-value-input span { font-size: .85rem; color: #888; font-weight: 700; }
+    .doa-pix-value-input input {
+      flex: 1 1 auto; min-width: 0; border: none; outline: none;
+      font-size: .9rem; color: #222; font-family: var(--ff-body);
+    }
+    .doa-pix-confirm-btn {
+      flex: 1 1 100%; margin-top: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #2d6e1f; color: #fff; border: none; border-radius: 10px;
+      padding: 11px 16px; font-size: .85rem; font-weight: 700; cursor: pointer;
+      transition: filter .2s;
+    }
+    .doa-pix-confirm-btn:hover { filter: brightness(1.08); }
+    .doa-pix-confirm-btn:disabled { opacity: .55; cursor: not-allowed; }
+    .doa-pix-hint {
+      margin: 14px 0 0; font-size: .76rem; color: #5a6e52; line-height: 1.5;
+      display: flex; gap: 6px; align-items: flex-start;
+    }
+    .doa-pix-hint i { margin-top: 1px; flex-shrink: 0; }
+    @media (max-width: 480px) {
+      .doa-pix-card { padding: 16px; }
+      .doa-pix-body { flex-direction: column; align-items: stretch; }
+    }
     /* Right sidebar  fixo no canto direito */
     .doa-sidebar {
       background: #fff;
@@ -1018,6 +1087,38 @@
         <h2>O que você quer doar?</h2>
         <input class="doa-search" id="doa-search" type="search" placeholder="Buscar alimento..." />
       </div>
+      <!-- Doação em dinheiro via PIX — independente da grade de alimentos abaixo -->
+      <div class="doa-pix-card" id="doa-pix-card">
+        <div class="doa-pix-head">
+          <div class="doa-pix-icon"><i class="fa-solid fa-qrcode" aria-hidden="true"></i></div>
+          <div>
+            <h3>Doe com PIX</h3>
+            <p>Sua doação em dinheiro também faz a diferença na vida de muitas famílias.</p>
+          </div>
+        </div>
+        <div class="doa-pix-body">
+          <div class="doa-pix-key-box">
+            <span class="doa-pix-key-label">Chave PIX</span>
+            <div class="doa-pix-key-row">
+              <strong id="doa-pix-chave">Carregando chave PIX...</strong>
+              <button type="button" class="doa-pix-copy" id="btn-copiar-pix" aria-label="Copiar chave PIX" title="Copiar chave PIX">
+                <i class="fa-regular fa-copy" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="doa-pix-value-box">
+            <label for="inp-pix-valor">Valor da doação</label>
+            <div class="doa-pix-value-input">
+              <span>R$</span>
+              <input type="number" id="inp-pix-valor" min="1" step="0.01" inputmode="decimal" placeholder="0,00" />
+            </div>
+          </div>
+          <button type="button" class="doa-pix-confirm-btn" id="btn-pix-confirmar">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Já fiz o PIX
+          </button>
+        </div>
+        <p class="doa-pix-hint"><i class="fa-regular fa-circle-info" aria-hidden="true"></i> Após o pagamento, envie o comprovante pelo WhatsApp para confirmarmos sua doação.</p>
+      </div>
       <div class="foods-grid" id="foods-grid" role="list" aria-label="Alimentos para doação">
         <!-- JS injects cards here -->
       </div>
@@ -1381,6 +1482,33 @@
 <div id="toast" class="toast" role="alert"
   aria-live="assertive" aria-atomic="true" aria-hidden="true">
   <span id="toast-message"></span>
+</div>
+<!-- Modal: confirmacao da doacao via PIX (nome + WhatsApp do doador) -->
+<div id="modal-pix" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-pix-title" aria-hidden="true">
+  <div class="modal-box" style="max-width:420px;">
+    <button type="button" class="modal-close" onclick="fecharModal('modal-pix')" aria-label="Fechar">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-pix-title">Confirmar doação via PIX</h2>
+    </div>
+    <p style="font-size:.88rem; color:var(--text2); margin:-8px 0 18px;">
+      Valor informado: <strong id="modal-pix-valor">R$ 0,00</strong>
+    </p>
+    <div class="modal-form-group">
+      <label class="modal-label" for="inp-pix-nome">Nome completo</label>
+      <input class="modal-input" id="inp-pix-nome" type="text" placeholder="Seu nome" maxlength="100" autocomplete="name" />
+      <div class="field-msg" id="msg-pix-nome" aria-live="polite"></div>
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label" for="inp-pix-tel">WhatsApp (DDD + número)</label>
+      <input class="modal-input" id="inp-pix-tel" type="tel" placeholder="(91) 99999-9999" inputmode="numeric" maxlength="16" autocomplete="tel" />
+      <div class="field-msg" id="msg-pix-tel" aria-live="polite"></div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn-pix-enviar" style="width:100%; justify-content:center;">
+      <i class="fas fa-paper-plane" aria-hidden="true"></i> Confirmar doação
+    </button>
+  </div>
 </div>
 <!-- 
      SMART CART  Barra fixa + Gaveta (mobile/tablet)

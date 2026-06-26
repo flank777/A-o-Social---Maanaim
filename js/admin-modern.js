@@ -363,6 +363,8 @@
       : data.donations;
     var kg = donations.reduce(function (sum, d) { return sum + getDonationKg(d); }, 0);
     var cestasCompletas = donations.filter(function (d) { return d.tipo_doacao === "cesta_completa"; }).length;
+    var doacoesPix = donations.filter(function (d) { return d.tipo_doacao === "pix"; });
+    var valorPix = doacoesPix.reduce(function (sum, d) { return sum + number(d.valor); }, 0);
     var activeVols = data.volunteers.filter(function (v) {
       return ["ativo", "participando", "confirmado", "active"].indexOf(slug(v.status || "ativo")) >= 0;
     }).length || data.volunteers.length;
@@ -371,6 +373,8 @@
       kg: kg,
       avgKg: donations.length ? kg / donations.length : 0,
       cestasCompletas: cestasCompletas,
+      doacoesPix: doacoesPix.length,
+      valorPix: valorPix,
       families: data.families.length,
       volunteers: activeVols,
       growth: donationGrowthForPeriod(days || 30),
@@ -546,6 +550,10 @@
       kpiCard({ label: "Confirmadas", value: fmtInt(countWhere(state.data.donations, "status", ["confirmado"])), icon: "fa-circle-check", tone: "linear-gradient(135deg,#3b82f6,#2563eb)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: "Tempo real", trendNote: "Firebase" }) +
       kpiCard({ label: "Entregues", value: fmtInt(countWhere(state.data.donations, "status", ["entregue"])), icon: "fa-box", tone: "linear-gradient(135deg,#22c55e,#16a34a)", spark: "linear-gradient(90deg,transparent,#22c55e,transparent)", trend: "Tempo real", trendNote: "Firebase" }) +
       kpiCard({ label: "Canceladas", value: fmtInt(countWhere(state.data.donations, "status", ["cancelado"])), icon: "fa-circle-xmark", tone: "linear-gradient(135deg,#fb7185,#ef4444)", spark: "linear-gradient(90deg,transparent,#fb5d6b,transparent)", trend: "Tempo real", trendNote: "Firebase" }) +
+      '</div>' +
+      '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact" style="margin-top:16px">' +
+      kpiCard({ label: "Doações em dinheiro (PIX) · " + pLabel, value: fmtInt(m.doacoesPix), icon: "fa-qrcode", tone: "linear-gradient(135deg,#2f7cff,#1d4ed8)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: "Tempo real", trendNote: "Firebase" }) +
+      kpiCard({ label: "Total em PIX · " + pLabel, value: fmtMoney(m.valorPix), icon: "fa-money-bill-transfer", tone: "linear-gradient(135deg,#22c55e,#16a34a)", spark: "linear-gradient(90deg,transparent,#22c55e,transparent)", trend: "Tempo real", trendNote: "Firebase" }) +
       '</div>' +
       panel("Doações registradas · " + pLabel, renderDonationFilters() + renderDonationsTable(filteredDonations()), { className: "admin-full-panel" }) +
       '<div class="admin-grid admin-analytics-charts" style="margin-top:16px">' +
@@ -1148,6 +1156,7 @@
         panel("Backup e restauração", renderBackupSettings(cfg)) +
       '</div>' +
       panel("Video da Acao Social", renderVideoAcaoSettings(cfg)) +
+      panel("Doação via PIX", renderPixSettings(cfg)) +
       panel("Cloudflare R2 — Armazenamento de mídias", renderR2Settings(cfg)) +
       panel("Dona Assunção — Backend de IA (FastAPI + Gemini)", renderDonaBackendSettings(cfg)) +
       '<div class="admin-settings-actions"><button class="admin-button" type="button" id="settings-reset2"><i class="fa-solid fa-rotate-left"></i>Restaurar padrão</button><button class="admin-button primary" type="submit"><i class="fa-solid fa-check"></i>Salvar alterações</button></div>' +
@@ -1162,6 +1171,17 @@
       '<div class="admin-list-item admin-insight" style="margin-bottom:12px"><div class="admin-list-icon" style="--tone:linear-gradient(135deg,#7c3aed,#5b21b6)"><i class="fa-solid fa-robot"></i></div><div class="admin-list-body"><div class="admin-list-title">Backend da Dona Assuncao ' + badge(status, statusTone) + '</div><div class="admin-list-sub">Quando configurado, o chat publico chama esse backend (Gemini real, com memoria de conversa) em vez de responder so pelo matching local. Deixe em branco para manter apenas o matching local.</div></div></div>' +
       '<label>URL base do backend (ex: https://sua-api.exemplo.com)<input name="dona_assuncao_backend_url" type="url" value="' + esc(url) + '" placeholder="https://sua-api.exemplo.com"></label>' +
       '<div class="admin-form-row"><button class="admin-button" type="button" id="dona-backend-test"><i class="fa-solid fa-plug-circle-check"></i>Testar conexao</button></div>' +
+      '</div>';
+  }
+
+  function renderPixSettings(cfg) {
+    var chave = cfg["pix_chave"] || "";
+    var status = chave ? "Configurado" : "Nao configurado";
+    var statusTone = chave ? "green" : "yellow";
+    return '<div class="admin-form-grid">' +
+      '<div class="admin-list-item admin-insight" style="margin-bottom:12px"><div class="admin-list-icon" style="--tone:linear-gradient(135deg,#2f7cff,#1d4ed8)"><i class="fa-solid fa-qrcode"></i></div><div class="admin-list-body"><div class="admin-list-title">Chave PIX ' + badge(status, statusTone) + '</div><div class="admin-list-sub">Aparece no card "Doe com PIX" do formulário público. Doações em dinheiro ficam pendentes ate você confirmar o recebimento aqui no admin, na aba Doações.</div></div></div>' +
+      '<label>Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)<input name="pix_chave" type="text" value="' + esc(chave) + '" placeholder="Ex: 12.345.678/0001-90"></label>' +
+      '<label>Nome do titular (opcional, exibido como referência interna)<input name="pix_titular" type="text" value="' + esc(cfg["pix_titular"] || "") + '" placeholder="Ex: Ação Social Semear"></label>' +
       '</div>';
   }
 
@@ -1706,7 +1726,52 @@
     return (totalKg > 0 ? totalKg.toFixed(1) : "0").replace(".", ",") + " kg";
   }
 
+  function renderDonationReceiptPixHtml(d) {
+    var dt = donationDate(d) || new Date();
+    var dataFormatada = dt.toLocaleDateString("pt-BR");
+    var horaFormatada = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return '<div class="receipt" id="admin-receipt-paper">' +
+      '<div class="receipt-perf"></div>' +
+      '<div class="receipt-body">' +
+        '<div class="rcpt-header">' +
+          '<div class="rcpt-logos-row">' +
+            '<div class="rcpt-logo-item">' +
+              '<img src="logo-semear.jpeg" alt="Ação Social Semear" class="rcpt-logo-img semear" loading="lazy">' +
+              '<span class="rcpt-logo-label">Ação Social<br><strong>Semear</strong></span>' +
+            '</div>' +
+            '<div class="rcpt-logo-sep">+</div>' +
+            '<div class="rcpt-logo-item">' +
+              '<img src="logo-maanaim.jpeg" alt="Comunidade Maanaim" class="rcpt-logo-img" loading="lazy">' +
+              '<span class="rcpt-logo-label">Comunidade<br><strong>Maanaim</strong></span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rcpt-store-info">Belém, Pará — Brasil</div>' +
+        '</div>' +
+        '<div class="rcpt-dashes">- - - - - - - - - - - - - - - - - - - - -</div>' +
+        '<div class="rcpt-doc-title">COMPROVANTE DE DOAÇÃO EM DINHEIRO (PIX)</div>' +
+        '<div class="rcpt-dashes">- - - - - - - - - - - - - - - - - - - - -</div>' +
+        '<div class="rcpt-row"><span class="rcpt-k">PROTOCOLO :</span><span class="rcpt-v">' + esc(d.protocolo || "—") + '</span></div>' +
+        '<div class="rcpt-row"><span class="rcpt-k">DATA      :</span><span class="rcpt-v">' + esc(dataFormatada) + '</span>' +
+          '<span class="rcpt-k" style="margin-left:10px;">HORA:</span><span class="rcpt-v">' + esc(horaFormatada) + '</span></div>' +
+        '<div class="rcpt-dashes">- - - - - - - - - - - - - - - - - - - - -</div>' +
+        '<div class="rcpt-row"><span class="rcpt-k">DOADOR    :</span><span class="rcpt-v">' + esc(String(d.name || d.nome || "—").toUpperCase()) + '</span></div>' +
+        '<div class="rcpt-row"><span class="rcpt-k">WHATSAPP  :</span><span class="rcpt-v">' + esc(d.telefone || d.phone || "—") + '</span></div>' +
+        '<div class="rcpt-dashes">- - - - - - - - - - - - - - - - - - - - -</div>' +
+        '<div class="rcpt-total-row"><span class="rcpt-total-k">&gt;&gt;&gt; VALOR DOADO</span><span class="rcpt-total-v">' + fmtMoney(d.valor || 0) + '</span></div>' +
+        '<div class="rcpt-dashes">- - - - - - - - - - - - - - - - - - - - -</div>' +
+        '<div class="rcpt-spiritual">' +
+          '<p class="rcpt-verse">"Cada um contribua segundo determinou em seu coração,<br>não com tristeza, ou por necessidade, porque Deus ama<br>quem dá com alegria."</p>' +
+          '<p class="rcpt-ref">— 2 Coríntios 9:7</p>' +
+          '<div class="rcpt-thanks">*** OBRIGADO PELA SUA DOAÇÃO! ***</div>' +
+        '</div>' +
+        '<div class="rcpt-barcode-wrap"><div class="rcpt-barcode"></div><div class="rcpt-barcode-num">* ' + esc(d.protocolo || "DOA VIDA") + ' *</div></div>' +
+      '</div>' +
+      '<div class="receipt-perf bot"></div>' +
+    '</div>';
+  }
+
   function renderDonationReceiptHtml(d) {
+    if (d.tipo_doacao === "pix") return renderDonationReceiptPixHtml(d);
     var dt = donationDate(d) || new Date();
     var dataFormatada = dt.toLocaleDateString("pt-BR");
     var horaFormatada = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -1785,7 +1850,7 @@
     var f = state.filters.donations;
     var cutoff = f.periodo !== "todos" ? new Date(Date.now() - parseInt(f.periodo, 10) * 86400000) : null;
     return state.data.donations.filter(function (row) {
-      var tipo = row.tipo_doacao === "cesta_completa" ? "cesta" : "itens";
+      var tipo = row.tipo_doacao === "pix" ? "pix" : row.tipo_doacao === "cesta_completa" ? "cesta" : "itens";
       var dt = donationDate(row);
       return matchesSearch(row, ["name", "nome", "food", "protocolo", "telefone"]) &&
         (f.status === "todos" || slug(row.status || "pendente") === f.status) &&
@@ -1797,7 +1862,7 @@
   function renderDonationFilters() {
     return '<div class="admin-filter-bar">' +
       selectFilter("donations", "status", [["todos", "Status: todos"], ["pendente", "Pendente"], ["confirmado", "Confirmado"], ["entregue", "Entregue"], ["cancelado", "Cancelado"]]) +
-      selectFilter("donations", "tipo", [["todos", "Tipo: todos"], ["cesta", "Cesta básica completa"], ["itens", "Itens individuais"]]) +
+      selectFilter("donations", "tipo", [["todos", "Tipo: todos"], ["cesta", "Cesta básica completa"], ["itens", "Itens individuais"], ["pix", "Doação em dinheiro (PIX)"]]) +
       selectFilter("donations", "periodo", [["todos", "Periodo: todos"], ["7", "7 dias"], ["30", "30 dias"], ["90", "90 dias"]]) +
       '<button class="admin-button" data-clear-filter="donations"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
       '</div>';
@@ -1807,22 +1872,27 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hand-holding-heart"></i><p>Nenhuma doação encontrada para os filtros selecionados.</p></div>';
     }
-    /* Resumo (protocolo + doador + status) sempre visível; itens, kg,
-       entrega, data e ações só aparecem ao tocar para abrir a linha. */
+    /* Resumo (protocolo + doador + status) sempre visível; itens/valor,
+       kg, entrega, data e ações só aparecem ao tocar para abrir a linha. */
     return '<div class="admin-expand-list">' +
       rows.map(function (d) {
         var isCesta = d.tipo_doacao === "cesta_completa";
+        var isPix = d.tipo_doacao === "pix";
         return '<details class="admin-expand-row">' +
           '<summary class="admin-expand-summary">' +
             '<span class="admin-expand-lead">' + esc(d.protocolo || d.id || "—") + '</span>' +
             '<span class="admin-expand-title">' + esc(d.name || d.nome || "Doador anonimo") + '</span>' +
+            (isPix ? badge(fmtMoney(d.valor || 0), "blue", "fa-qrcode") + ' ' : "") +
             statusBadge(d.status || "pendente") +
             '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
           '</summary>' +
           '<div class="admin-expand-detail">' +
-            '<span><strong>Itens:</strong> ' + (isCesta ? badge("Cesta básica", "yellow", "fa-basket-shopping") + ' ' : "") + esc(donationFoodLabel(d)) + '</span>' +
-            '<span><strong>Kg:</strong> ' + fmtKg(getDonationKg(d)) + '</span>' +
-            '<span><strong>Entrega:</strong> ' + esc(d.delivery || d.entrega || "—") + '</span>' +
+            (isPix
+              ? '<span><strong>Tipo:</strong> ' + badge("Doação em dinheiro", "blue", "fa-qrcode") + '</span>' +
+                '<span><strong>Valor:</strong> ' + fmtMoney(d.valor || 0) + '</span>'
+              : '<span><strong>Itens:</strong> ' + (isCesta ? badge("Cesta básica", "yellow", "fa-basket-shopping") + ' ' : "") + esc(donationFoodLabel(d)) + '</span>' +
+                '<span><strong>Kg:</strong> ' + fmtKg(getDonationKg(d)) + '</span>' +
+                '<span><strong>Entrega:</strong> ' + esc(d.delivery || d.entrega || "—") + '</span>') +
             '<span><strong>Data:</strong> ' + fmtDate(d.created_at || d.createdAt || d.data, true) + '</span>' +
             '<div class="admin-row-actions">' +
               '<button class="admin-mini-action" data-donation-view="' + esc(d.id) + '" aria-label="Ver comprovante" title="Ver comprovante"><i class="fa-regular fa-eye"></i></button>' +
@@ -3292,6 +3362,8 @@
     cor_destaque: "#22c55e",
     cor_alerta: "#f59e0b",
     resumo_horario: "",
+    pix_chave: "",
+    pix_titular: "",
     r2_worker_url: "",
     r2_upload_token: "",
     r2_public_url: "",

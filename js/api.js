@@ -1260,37 +1260,62 @@ var DoaVidaAPI = {
         return;
       }
 
-      /* Monta lista de itens doados */
-      var itens = doacao.itens || [];
-      var itensLinhas = itens.length > 0
-        ? itens.map(function(i) {
-            return '  • ' + (i.nome || i.name || '?') + ' x' + (i.qty || 1) + ' = ' + (i.totalKg || 0).toFixed(1) + 'kg';
-          }).join('\n')
-        : '  • ' + (doacao.food || '—');
+      /* Doação em dinheiro via PIX tem mensagem própria (sem itens/kg) */
+      var ehPix = doacao.tipo_doacao === 'pix';
+      var msg;
 
-      var totalKg = doacao.total_kg || doacao.totalKg ||
-        itens.reduce(function(s, i){ return s + (i.totalKg || 0); }, 0);
+      if (ehPix) {
+        var valorFmt = Number(doacao.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        msg = [
+          '💰 *DOAÇÃO EM DINHEIRO (PIX)*',
+          '🏷️ Ação Social Semear + Maanaim',
+          '━━━━━━━━━━━━━━━━━━━━━━━━',
+          '',
+          '👤 *Doador:* ' + (doacao.name || doacao.nome || 'Anônimo'),
+          '📱 *WhatsApp:* ' + (doacao.phone || doacao.telefone || 'não informado'),
+          '🔢 *Protocolo:* ' + (doacao.protocolo || '—'),
+          '📅 *Data:* ' + new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
+          '',
+          '━━━━━━━━━━━━━━━━━━━━━━━━',
+          '💵 *VALOR: ' + valorFmt + '*',
+          '⏳ Aguardando comprovante do doador para confirmar no painel.',
+          '',
+          '🙏 Que Deus abençoe sua generosidade!',
+          '✉️ Ação Social Semear + Maanaim — Belém, PA',
+        ].join('\n');
+      } else {
+        /* Monta lista de itens doados */
+        var itens = doacao.itens || [];
+        var itensLinhas = itens.length > 0
+          ? itens.map(function(i) {
+              return '  • ' + (i.nome || i.name || '?') + ' x' + (i.qty || 1) + ' = ' + (i.totalKg || 0).toFixed(1) + 'kg';
+            }).join('\n')
+          : '  • ' + (doacao.food || '—');
 
-      var msg = [
-        '🌱 *COMPROVANTE DE DOAÇÃO*',
-        '🏷️ Ação Social Semear + Maanaim',
-        '━━━━━━━━━━━━━━━━━━━━━━━━',
-        '',
-        '👤 *Doador:* ' + (doacao.name || doacao.nome || 'Anônimo'),
-        '📱 *WhatsApp:* ' + (doacao.phone || doacao.telefone || 'não informado'),
-        '🚚 *Entrega:* ' + DoaVidaAPI._labelEntrega(doacao.delivery),
-        '🔢 *Protocolo:* ' + (doacao.protocolo || '—'),
-        '📅 *Data:* ' + new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
-        '',
-        '━━━━━━━━━━━━━━━━━━━━━━━━',
-        '🥫 *ITENS DOADOS:*',
-        itensLinhas,
-        '━━━━━━━━━━━━━━━━━━━━━━━━',
-        '⚖️ *TOTAL: ' + totalKg.toFixed(1) + ' kg*',
-        '',
-        '🙏 Que Deus abençoe sua generosidade!',
-        '✉️ Ação Social Semear + Maanaim — Belém, PA',
-      ].join('\n');
+        var totalKg = doacao.total_kg || doacao.totalKg ||
+          itens.reduce(function(s, i){ return s + (i.totalKg || 0); }, 0);
+
+        msg = [
+          '🌱 *COMPROVANTE DE DOAÇÃO*',
+          '🏷️ Ação Social Semear + Maanaim',
+          '━━━━━━━━━━━━━━━━━━━━━━━━',
+          '',
+          '👤 *Doador:* ' + (doacao.name || doacao.nome || 'Anônimo'),
+          '📱 *WhatsApp:* ' + (doacao.phone || doacao.telefone || 'não informado'),
+          '🚚 *Entrega:* ' + DoaVidaAPI._labelEntrega(doacao.delivery),
+          '🔢 *Protocolo:* ' + (doacao.protocolo || '—'),
+          '📅 *Data:* ' + new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}),
+          '',
+          '━━━━━━━━━━━━━━━━━━━━━━━━',
+          '🥫 *ITENS DOADOS:*',
+          itensLinhas,
+          '━━━━━━━━━━━━━━━━━━━━━━━━',
+          '⚖️ *TOTAL: ' + totalKg.toFixed(1) + ' kg*',
+          '',
+          '🙏 Que Deus abençoe sua generosidade!',
+          '✉️ Ação Social Semear + Maanaim — Belém, PA',
+        ].join('\n');
+      }
 
       destinatarios.forEach(function (admin) {
         var phone = admin.telefone || admin.whatsapp;
