@@ -27,7 +27,6 @@
       spiritual:  { modalidade: "todos", status: "todos" },
       donations:  { status: "todos", tipo: "todos", periodo: "todos" },
     },
-    selectedFamilyId: null,
     charts: {},
     calYear:  new Date().getFullYear(),
     calMonth: new Date().getMonth(),
@@ -262,7 +261,6 @@
     };
 
     state.data = data;
-    if (!state.selectedFamilyId && data.families[0]) state.selectedFamilyId = data.families[0].id;
   }
 
   function initLayout() {
@@ -434,23 +432,6 @@
     return Math.round(((current - previous) / previous) * 100 * 10) / 10;
   }
 
-  function computeTopHour(periodDays) {
-    var cutoff = periodDays ? new Date(Date.now() - periodDays * 86400000) : null;
-    var hourMap = {};
-    state.data.donations.forEach(function (d) {
-      var dt = donationDate(d);
-      if (!dt) return;
-      if (cutoff && dt < cutoff) return;
-      var h = dt.getHours();
-      hourMap[h] = (hourMap[h] || 0) + 1;
-    });
-    var best = null, bestCount = 0;
-    Object.keys(hourMap).forEach(function (h) {
-      if (hourMap[h] > bestCount) { bestCount = hourMap[h]; best = h; }
-    });
-    return best !== null ? parseInt(best, 10) : null;
-  }
-
   function computeKgByPeriod(numPeriods, daysEach) {
     var now = new Date();
     var labels = [], values = [];
@@ -558,7 +539,6 @@
       '<div class="admin-grid admin-analytics-bottom" style="margin-top:16px">' +
       panel("Metas x Resultado", renderGoalsCompact(p)) +
       panel("Principais doadores · " + pLabel, renderTopDonors(p)) +
-      panel("Insights do período", renderInsights(p)) +
       '</div>' +
       '</div>';
   }
@@ -570,7 +550,6 @@
     var reviewing = countWhere(state.data.families, "status", ["em-analise"]);
     var approved = countWhere(state.data.families, "status", ["aprovada", "aprovado"]);
     var delivered = countWhere(state.data.families, "status", ["entregue"]);
-    var selected = state.data.families.find(function (f) { return f.id === state.selectedFamilyId; }) || state.data.families[0] || {};
     return '<div class="admin-view active">' +
       '<div class="admin-action-row"><button class="admin-button primary" id="new-family"><i class="fa-solid fa-plus"></i>Nova família</button><button class="admin-button js-export"><i class="fa-solid fa-download"></i>Exportar</button></div>' +
       '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact">' +
@@ -579,10 +558,7 @@
       kpiCard({ label: "Aprovadas", value: fmtInt(approved), icon: "fa-circle-check", tone: "linear-gradient(135deg,#22c55e,#16a34a)", spark: "linear-gradient(90deg,transparent,#22c55e,transparent)", trend: "Tempo real" }) +
       kpiCard({ label: "Entregas concluidas", value: fmtInt(delivered), icon: "fa-box", tone: "linear-gradient(135deg,#22d3ee,#14b8a6)", spark: "linear-gradient(90deg,transparent,#22d3ee,transparent)", trend: "Tempo real" }) +
       '</div>' +
-      '<div class="admin-grid admin-families-layout">' +
       panel("Solicitacoes recentes", renderFamilyFilters() + renderFamiliesTable(rows)) +
-      renderFamilyDetail(selected) +
-      '</div>' +
       '<div class="admin-grid admin-families-bottom" style="margin-top:16px">' +
       panel("Distribuição por bairros", '<div class="admin-donut-info"><canvas id="families-neighborhoods"></canvas><div class="admin-legend" id="families-neighborhoods-legend"></div></div>') +
       panel("Mapa de atendimento",
@@ -591,7 +567,8 @@
           '<input id="family-map-search" class="admin-input admin-map-search-input" type="search" placeholder="Buscar por nome, bairro, endereço ou telefone..." />' +
           '<span id="family-map-count" class="admin-map-count-badge"></span>' +
         '</div>' +
-        '<div id="admin-family-map" class="admin-leaflet-map"></div>'
+        '<div id="admin-family-map" class="admin-leaflet-map"></div>',
+        { className: "admin-families-map" }
       ) +
       panel("Proximas entregas", renderCalendarAndDeliveries()) +
       '</div>' +
@@ -1849,40 +1826,6 @@
       }).join("") + '</tbody></table></div>';
   }
 
-  function renderInsights(periodDays) {
-    var m = metrics(periodDays);
-    var pLabel = periodLabel(periodDays || 30);
-    var growthPct = Math.abs(m.growth);
-    var growthDir = m.growth >= 0 ? "cresceu" : "recuou";
-    var growthText = m.donations > 0
-      ? "O volume arrecadado " + growthDir + " " + number(growthPct).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "% nos ultimos " + pLabel + " em relacao ao periodo anterior."
-      : "Sem registros suficientes para calcular crescimento. Registre doacoes para ver a analise.";
-
-    var topHour = computeTopHour(periodDays);
-    var topHourText = topHour !== null
-      ? "O maior volume de registros ocorre por volta das " + topHour + "h. Bom horario para divulgar campanhas."
-      : "Sem dados de horario ainda. Os horarios aparecerao conforme novas doacoes forem registradas.";
-
-    var totalPessoas = state.data.families.reduce(function (s, f) { return s + (number(f.pessoas) || 0); }, 0);
-    var socialText = m.families > 0
-      ? fmtInt(m.families) + " familias cadastradas" + (totalPessoas > 0 ? ", cobrindo aprox. " + fmtInt(totalPessoas) + " pessoas" : "") + " em Belem."
-      : "Nenhuma familia cadastrada ainda.";
-
-    var cestaText = m.cestasCompletas > 0
-      ? fmtInt(m.cestasCompletas) + " de " + fmtInt(m.donations) + " doacoes no periodo foram cesta basica completa (todos os itens em 1 unico registro)."
-      : "Nenhuma doacao de cesta basica completa neste periodo.";
-
-    var rows = [
-      [m.growth >= 0 ? "Crescimento no periodo" : "Variacao no periodo", growthText, m.growth >= 0 ? "fa-arrow-trend-up" : "fa-arrow-trend-down", "linear-gradient(135deg,#16a34a,#10b981)"],
-      ["Pico de registros", topHourText, "fa-clock", "linear-gradient(135deg,#8b5cf6,#6d5dfc)"],
-      ["Alcance social", socialText, "fa-users", "linear-gradient(135deg,#3b82f6,#2563eb)"],
-      ["Cestas completas", cestaText, "fa-basket-shopping", "linear-gradient(135deg,#f59e0b,#d97706)"],
-    ];
-    return '<div class="admin-list">' + rows.map(function (r) {
-      return '<div class="admin-list-item admin-insight"><div class="admin-list-icon" style="--tone:' + r[3] + '"><i class="fa-solid ' + r[2] + '"></i></div><div class="admin-list-body"><div class="admin-list-title">' + esc(r[0]) + '</div><div class="admin-list-sub">' + esc(r[1]) + '</div></div></div>';
-    }).join("") + '</div>';
-  }
-
   function renderFamilyFilters() {
     var bairros = unique(state.data.families.map(function (f) { return f.bairro; })).filter(Boolean);
     return '<div class="admin-filter-bar">' +
@@ -1960,40 +1903,21 @@
             '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
           '</summary>' +
           '<div class="admin-expand-detail">' +
-            '<span><strong>Bairro:</strong> ' + esc(f.bairro) + '</span>' +
+            '<span><strong>Contato:</strong> ' + esc(f.telefone || "—") + '</span>' +
+            '<span><strong>Bairro:</strong> ' + esc(f.bairro || "—") + '</span>' +
+            '<span><strong>Endereço:</strong> ' + esc(f.endereco || "—") + '</span>' +
             '<span><strong>Pessoas:</strong> <i class="fa-solid fa-users"></i> ' + fmtInt(f.pessoas || f.pessoasNaCasa || 1) + '</span>' +
+            '<span><strong>Renda familiar:</strong> ' + (f.renda ? fmtMoney(f.renda) : "—") + '</span>' +
             '<span><strong>Necessidade:</strong> ' + esc(f.necessidade || "Cesta basica") + '</span>' +
             '<span><strong>Prioridade:</strong> ' + priorityBadge(f.prioridade || "media") + '</span>' +
+            (f.observacao ? '<span><strong>Observação:</strong> ' + esc(f.observacao) + '</span>' : "") +
             '<div class="admin-row-actions">' +
-              '<button class="admin-mini-action" data-select-family="' + esc(f.id) + '" aria-label="Ver detalhes" title="Ver detalhes"><i class="fa-regular fa-eye"></i></button>' +
+              (f.telefone ? '<a class="admin-mini-action" href="whatsapp://send?phone=55' + esc((f.telefone || "").replace(/\D/g, "")) + '" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>' : "") +
               '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar família" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
             '</div>' +
           '</div>' +
         '</details>';
       }).join("") + '</div>';
-  }
-
-  function renderFamilyDetail(f) {
-    var hasF = f && (f.id || f.nome || f.responsavel);
-    if (!hasF) {
-      return panel("Detalhes da familia", '<div class="admin-empty"><i class="fa-solid fa-users"></i><p>Selecione uma familia na tabela para ver os detalhes.</p></div>', { className: "admin-side-panel" });
-    }
-    return panel("Detalhes da familia selecionada", '<div class="admin-detail">' +
-      '<div class="admin-detail-hero"><div class="admin-person-avatar">' + esc(initials(f.responsavel || f.nome)) + '</div><div><h3>' + esc(f.responsavel || f.nome || "Familia") + '</h3><p>' + (f.protocolo ? esc(f.protocolo) + ' — ' : '') + statusBadge(f.status || "pendente") + '</p></div></div>' +
-      '<div class="admin-detail-grid">' +
-      detailField("Contato", f.telefone || "—") +
-      detailField("Bairro", f.bairro || "—") +
-      detailField("Endereco", f.endereco || "—") +
-      detailField("Renda familiar", f.renda ? fmtMoney(f.renda) : "—") +
-      detailField("Composicao familiar", f.pessoas ? fmtInt(f.pessoas) + " pessoas" : "—") +
-      detailField("Necessidade", f.necessidade || "Cesta basica") +
-      '</div>' +
-      (f.observacao ? '<p style="font-size:0.875rem;color:var(--admin-text-soft);margin:0">' + esc(f.observacao) + '</p>' : '') +
-      '<div class="admin-detail-actions">' +
-        '<button class="admin-button primary" data-edit-family="' + esc(f.id) + '"><i class="fa-solid fa-pen-to-square"></i>Editar dados</button>' +
-        (f.telefone ? '<a href="whatsapp://send?phone=55' + (f.telefone || "").replace(/\D/g, "") + '" target="_blank" rel="noopener" class="admin-button success"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : '') +
-      '</div>' +
-      '</div>', { className: "admin-side-panel" });
   }
 
   function detailField(label, value) {
@@ -2169,17 +2093,8 @@
       });
     });
 
-    $all("[data-select-family]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        state.selectedFamilyId = btn.dataset.selectFamily;
-        renderActivePage();
-      });
-    });
-
     $all("[data-edit-family]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        /* Garante que o detalhe também atualiza ao abrir edição pela tabela */
-        if (btn.dataset.editFamily) state.selectedFamilyId = btn.dataset.editFamily;
         openFamilyEditModal(btn.dataset.editFamily);
       });
     });
@@ -4126,6 +4041,8 @@
 
   function initFamilyMap() {
     if (!window.L) return;
+    /* Painel fica escondido no mobile (CSS) — evita baixar os tiles do mapa à toa */
+    if (window.innerWidth <= 760) return;
     var container = document.getElementById("admin-family-map");
     if (!container) return;
 

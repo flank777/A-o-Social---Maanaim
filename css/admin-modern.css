@@ -757,7 +757,6 @@ button {
   grid-template-columns: 360px minmax(0, 1fr) minmax(0, 1.05fr);
 }
 
-.admin-families-layout,
 .admin-tasks-layout {
   grid-template-columns: minmax(0, 1fr) 410px;
   align-items: start;
@@ -2089,7 +2088,6 @@ aside.admin-grid .admin-side-panel {
     display: none;
   }
 
-  .admin-families-layout,
   .admin-tasks-layout,
   .admin-dashboard-bottom {
     grid-template-columns: 1fr;
@@ -2342,6 +2340,12 @@ aside.admin-grid .admin-side-panel {
   .admin-overview-toolbar,
   .admin-overview-kpis,
   .admin-overview-chart {
+    display: none;
+  }
+
+  /* Mapa de atendimento (Leaflet) some no mobile — tela pequena demais
+     para ser útil, e evita carregar os tiles do mapa sem necessidade. */
+  .admin-families-map {
     display: none;
   }
 
