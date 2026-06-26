@@ -269,6 +269,7 @@
     $("#admin-sidebar").innerHTML =
       '<div class="admin-brand">' + logoMark() +
       '<span><span class="admin-brand-kicker">Ação Social</span><span class="admin-brand-name">Semear</span><span class="admin-brand-city">Belém • PA</span></span></div>' +
+      '<button type="button" id="sidebar-back-site" class="admin-sidebar-back"><i class="fa-solid fa-arrow-left"></i>Voltar ao site</button>' +
       '<nav class="admin-nav" aria-label="Menu administrativo">' + PAGES.map(navButton).join("") + '</nav>' +
       '<div class="admin-sidebar-note"><i class="fa-solid fa-hands-holding-heart"></i><strong>Fazer o bem transforma vidas!</strong><span>Obrigado por fazer parte dessa corrente do bem.</span></div>';
 
@@ -286,6 +287,7 @@
     $("#admin-menu-button").addEventListener("click", function () {
       document.body.classList.toggle("admin-menu-open");
     });
+    $("#sidebar-back-site").addEventListener("click", goToSite);
     var globalExport = $("#admin-export-button");
     var globalSite = $("#admin-site-button");
     if (globalExport) globalExport.addEventListener("click", exportReport);

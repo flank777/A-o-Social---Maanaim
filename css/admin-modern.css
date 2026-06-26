@@ -247,6 +247,29 @@ button {
   border-radius: 14px;
 }
 
+.admin-sidebar-back {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 22px;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 16px;
+  color: var(--admin-text-soft);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.admin-sidebar-back:hover {
+  color: white;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.16);
+}
+
 .admin-nav {
   display: grid;
   gap: 7px;
