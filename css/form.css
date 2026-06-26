@@ -449,6 +449,26 @@
   border-color: var(--form-done);
 }
 
+/* Esqueleto de carregamento — mostrado enquanto os alimentos
+   ainda não chegaram do Firestore, evitando grade em branco */
+.fcard-skeleton { cursor: default; }
+.fcard-skeleton-line {
+  height: 11px;
+  border-radius: 6px;
+}
+.fcard-skeleton-shimmer {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: fcardShimmer 1.3s ease-in-out infinite;
+}
+@keyframes fcardShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fcard-skeleton-shimmer { animation: none; }
+}
+
 /* Container da imagem — reserva o espaço quadrado antes da imagem carregar,
    evitando o "corte" visual enquanto o lazy-load do Cloudinary não termina */
 .fcard-img-wrap {

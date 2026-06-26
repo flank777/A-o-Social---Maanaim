@@ -1,0 +1,132 @@
+rules_version = '2';
+
+/*
+  Regras de segurança do Firestore — projeto acao-social-ab5a6.
+
+  Contexto: o site é estático (GitHub Pages) e usa o Firebase Auth
+  (e-mail/senha) só para o login do admin. Não há sistema de papéis —
+  qualquer usuário autenticado é tratado como administrador, igual ao
+  que o painel admin.html já assume.
+
+  Princípio: o público (sem login) só pode CRIAR os registros que os
+  formulários do site geram (doação, cadastro de família, voluntário,
+  pedido de oração, log de WhatsApp, pergunta da Dona Assunção) e LER
+  o conteúdo que é exibido publicamente (catálogo de alimentos, galeria,
+  base de conhecimento, campanhas). Listar/ler dados sensíveis (doações,
+  famílias, voluntários, conversas administrativas) e qualquer escrita
+  fora desse escopo exige login.
+*/
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    /* ── Catálogo público de alimentos ──
+       Leitura livre (necessária para montar a grade de doação).
+       O formulário público só pode atualizar o campo `kg` (baixa de
+       estoque ao confirmar uma doação) — qualquer outra alteração
+       (nome, imagem, meta, etc.) exige login. */
+    match /alimentos/{id} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['kg', 'updated_at']);
+    }
+
+    match /modelo_cesta_itens/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ── Galeria, base de conhecimento e campanhas da Dona Assunção ──
+       Conteúdo institucional público; só o admin edita. */
+    match /galeria/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /base_conhecimento/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /campanhas/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ── Telefones dos admins (para o botão de WhatsApp) ──
+       Leitura pública necessária; cadastro é só do admin. */
+    match /whatsapp_admins/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ── Configurações (chave/valor) ──
+       Mantém leitura pública (o site já consome chaves como
+       pix_chave/instituicao_telefone direto do cliente), mas BLOQUEIA
+       qualquer escrita sem login — antes qualquer pessoa podia trocar
+       a chave PIX, a senha do admin ou desativar as notificações. */
+    match /configuracao/{chave} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ── Registros gerados pelos formulários públicos ──
+       Qualquer pessoa pode CRIAR (enviar uma doação, um cadastro de
+       família, um pedido de voluntariado, um pedido de oração, um log
+       de notificação). Ler a lista completa, editar ou excluir exige
+       login — sem isso, qualquer visitante conseguia ler nomes,
+       telefones e endereços de todas as famílias e doadores. */
+    match /doacoes/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /familias/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /voluntarios/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /oracoes/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /whatsapp_logs/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /registros/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    /* ── Conversas da Dona Assunção (chat público, sem auth anônima) ──
+       O widget de chat cria/atualiza a própria conversa pelo id de
+       sessão salvo no navegador do visitante. Sem Firebase Anonymous
+       Auth não é possível restringir "só o dono lê/escreve", então o
+       acesso fica aberto para criar/atualizar — exclusão exige login. */
+    match /conversas/{id} {
+      allow read, create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    /* ── Tudo o que é só do painel admin ── */
+    match /tarefas/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /eventos/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /cestas_formadas/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    /* ── Padrão: nega tudo que não foi listado explicitamente acima ── */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

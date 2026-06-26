@@ -366,13 +366,38 @@ function conectarEventos() {
   Renderiza os cards de alimentos na grade do passo 1.
   Chamada na inicialização e ao reiniciar o formulário.
 */
+/*
+  Gera N cards-esqueleto (shimmer) com a mesma estrutura visual dos
+  cards reais, para preencher a grade enquanto os dados carregam.
+*/
+function _skeletonAlimentos() {
+  var html = '';
+  for (var i = 0; i < 8; i++) {
+    html +=
+      '<div class="fcard fcard-skeleton" aria-hidden="true">' +
+        '<div class="fcard-img-wrap fcard-skeleton-shimmer"></div>' +
+        '<div class="fcard-body">' +
+          '<div class="fcard-skeleton-line fcard-skeleton-shimmer" style="width:70%"></div>' +
+          '<div class="fcard-skeleton-line fcard-skeleton-shimmer" style="width:45%;margin-top:6px"></div>' +
+        '</div>' +
+      '</div>';
+  }
+  return html;
+}
+
 async function doaRenderGrid() {
   var grid = document.getElementById('foods-grid');
   if (!grid) return;
 
+  /* Mostra um esqueleto de carregamento imediatamente — sem isso a grade
+     fica em branco por vários segundos enquanto o Firestore responde,
+     dando a impressão de que os cards "sumiram" ou que a página quebrou. */
+  grid.innerHTML = _skeletonAlimentos();
+
   /* Carrega alimentos e modelo da cesta em paralelo.
-     comTimeout(5000) garante que um Supabase travado não congele a tela —
-     depois de 5s cai no fallback alimentosPadrao() via alimentos.length === 0 abaixo. */
+     comTimeout garante que um Firestore travado não congele a tela —
+     depois do tempo limite cai no fallback alimentosPadrao() via
+     alimentos.length === 0 abaixo. */
   var resultados = await Promise.all([
     comTimeout(DoaVidaSync.getAlimentos(), 15000),
     comTimeout(DoaVidaSync.getModeloCestaItens(), 15000, []),
@@ -381,13 +406,10 @@ async function doaRenderGrid() {
   var alimentos   = resultados[0];
   var modeloCesta = resultados[1] || [];
 
-  /* Se Firestore retornou vazio, tenta 1× mais após 3 segundos */
+  /* Se Firestore retornou vazio, tenta 1× mais rápido antes de desistir */
   if ((!alimentos || alimentos.length === 0) && window._doaVidaFirestoreOk) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 0;color:var(--text2)">' +
-      '<div style="font-size:1.5rem;margin-bottom:8px"></div>' +
-      '<p style="font-size:.9rem">Carregando alimentos...</p></div>';
-    await new Promise(function (r) { setTimeout(r, 3000); });
-    var retry = await comTimeout(DoaVidaSync.getAlimentos(), 10000);
+    await new Promise(function (r) { setTimeout(r, 1200); });
+    var retry = await comTimeout(DoaVidaSync.getAlimentos(), 5000);
     if (retry && retry.length > 0) alimentos = retry;
   }
 
