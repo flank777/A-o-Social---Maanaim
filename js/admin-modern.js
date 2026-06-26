@@ -1322,9 +1322,9 @@
       '</div>' +
       '<div id="password-change-card" class="admin-form-grid">' +
       '<div class="admin-form-section-title"><i class="fa-solid fa-key"></i>Alterar senha de acesso</div>' +
-      '<label>Senha atual<input name="senha_atual" type="password" required autocomplete="current-password"></label>' +
-      '<label>Nova senha<input name="senha_nova" type="password" required minlength="6" autocomplete="new-password"></label>' +
-      '<label>Confirmar nova senha<input name="senha_confirma" type="password" required minlength="6" autocomplete="new-password"></label>' +
+      '<label>Senha atual<input name="senha_atual" type="password" autocomplete="current-password"></label>' +
+      '<label>Nova senha<input name="senha_nova" type="password" autocomplete="new-password"></label>' +
+      '<label>Confirmar nova senha<input name="senha_confirma" type="password" autocomplete="new-password"></label>' +
       '<button type="button" class="admin-button primary block" id="password-change-submit"><i class="fa-regular fa-floppy-disk"></i>Atualizar senha</button>' +
       '</div>';
   }
