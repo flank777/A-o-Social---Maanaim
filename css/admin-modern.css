@@ -2247,19 +2247,29 @@ aside.admin-grid .admin-side-panel {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    padding: 8px;
   }
 
   .admin-filter-bar .admin-select,
   .admin-filter-bar .admin-input,
   .admin-filter-bar .admin-filter-input {
     width: auto;
-    min-width: 150px;
-    flex: 0 0 auto;
+    min-width: 0;
+    flex: 1 1 90px;
+    font-size: 0.72rem;
+    padding: 7px 8px;
   }
 
   .admin-filter-bar button[data-clear-filter] {
     flex: 0 0 auto;
     white-space: nowrap;
+    padding: 7px 9px;
+    font-size: 0.72rem;
+  }
+
+  .admin-filter-bar .admin-clearfilter-label {
+    display: none;
   }
 
   .admin-segmented {

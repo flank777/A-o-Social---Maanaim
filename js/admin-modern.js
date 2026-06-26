@@ -777,7 +777,7 @@
       '<input class="admin-filter-input" id="foods-inline-search" placeholder="Buscar alimento..." value="' + esc(($("#admin-search") || {}).value || "") + '">' +
       selectFilter("foods", "categoria", [["todos", "Todas as categorias"]].concat(cats.map(function (c) { return [slug(c), c]; }))) +
       selectFilter("foods", "status", [["todos", "Todos os status"], ["em-dia", "Em dia"], ["baixo", "Baixo"], ["critico", "Critico"], ["meta-atingida", "Meta atingida"]]) +
-      '<button class="admin-button" data-clear-filter="foods"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="foods"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1034,7 +1034,7 @@
       '<input class="admin-filter-input" id="gallery-inline-search" placeholder="Buscar midias..." value="' + esc(($("#admin-search") || {}).value || "") + '">' +
       selectFilter("gallery", "categoria", [["todos", "Todas as categorias"]].concat(cats.map(function (c) { return [slug(c), c]; }))) +
       selectFilter("gallery", "tipo", [["todos", "Todos os tipos"], ["imagem", "Imagens"], ["video", "Videos"]]) +
-      '<button class="admin-button" data-clear-filter="gallery"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="gallery"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1345,7 +1345,7 @@
       '<input class="admin-filter-input" id="volunteers-inline-search" placeholder="Buscar voluntário..." value="' + esc(($("#admin-search") || {}).value || "") + '">' +
       selectFilter("volunteers", "tipo", [["todos", "Todos os tipos"]].concat(tipos.map(function (t) { return [slug(t), t]; }))) +
       selectFilter("volunteers", "status", [["todos", "Todos os status"], ["ativo", "Ativo"], ["inativo", "Inativo"], ["aguardando", "Aguardando"]]) +
-      '<button class="admin-button" data-clear-filter="volunteers"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="volunteers"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1477,7 +1477,7 @@
       '<input class="admin-filter-input" id="spiritual-inline-search" placeholder="Buscar voluntário..." value="' + esc(($("#admin-search") || {}).value || "") + '">' +
       selectFilter("spiritual", "modalidade", [["todos", "Todas as modalidades"]].concat(Object.keys(SPIRITUAL_MODALIDADE_LABELS).map(function (k) { return [k, SPIRITUAL_MODALIDADE_LABELS[k]]; }))) +
       selectFilter("spiritual", "status", [["todos", "Todos os status"], ["ativo", "Ativo"], ["inativo", "Inativo"], ["aguardando", "Aguardando"]]) +
-      '<button class="admin-button" data-clear-filter="spiritual"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="spiritual"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1866,7 +1866,7 @@
       selectFilter("donations", "status", [["todos", "Status: todos"], ["pendente", "Pendente"], ["confirmado", "Confirmado"], ["entregue", "Entregue"], ["cancelado", "Cancelado"]]) +
       selectFilter("donations", "tipo", [["todos", "Tipo: todos"], ["cesta", "Cesta básica completa"], ["itens", "Itens individuais"], ["pix", "Doação em dinheiro (PIX)"]]) +
       selectFilter("donations", "periodo", [["todos", "Periodo: todos"], ["7", "7 dias"], ["30", "30 dias"], ["90", "90 dias"]]) +
-      '<button class="admin-button" data-clear-filter="donations"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="donations"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1960,7 +1960,7 @@
       selectFilter("families", "prioridade", [["todos", "Prioridade: todas"], ["alta", "Alta"], ["media", "Media"], ["baixa", "Baixa"]]) +
       selectFilter("families", "bairro", [["todos", "Bairro: todos"]].concat(bairros.map(function (b) { return [slug(b), b]; }))) +
       selectFilter("families", "periodo", [["todos", "Periodo"], ["7", "7 dias"], ["30", "30 dias"]]) +
-      '<button class="admin-button" data-clear-filter="families"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="families"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
@@ -1971,7 +1971,7 @@
       selectFilter("tasks", "tipo", [["todos", "Todos os tipos"], ["organizacao", "Organizacao"], ["atendimento", "Atendimento"], ["logistica", "Logistica"], ["comunicacao", "Comunicacao"], ["entrega", "Entrega"], ["compras", "Compras"], ["financeiro", "Financeiro"], ["captacao", "Captacao de doacoes"], ["eventos", "Eventos"], ["espiritual", "Espiritual"], ["outro", "Outro"]]) +
       selectFilter("tasks", "responsavel", [["todos", "Todos os responsaveis"]].concat(people.map(function (p) { return [slug(p), p]; }))) +
       selectFilter("tasks", "prioridade", [["todos", "Todas as prioridades"], ["alta", "Alta"], ["media", "Media"], ["baixa", "Baixa"]]) +
-      '<button class="admin-button" data-clear-filter="tasks"><i class="fa-solid fa-filter-circle-xmark"></i>Limpar filtros</button>' +
+      '<button class="admin-button" data-clear-filter="tasks"><i class="fa-solid fa-filter-circle-xmark"></i><span class="admin-clearfilter-label">Limpar filtros</span></button>' +
       '</div>';
   }
 
