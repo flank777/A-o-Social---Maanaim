@@ -1,6 +1,7 @@
 node_modules/
 .claude/
 .netlify/
+.wrangler/
 *.log
 .env
 .env.local
