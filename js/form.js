@@ -507,6 +507,66 @@ async function doaRenderGrid() {
   atualizarBotaoContinuar();
 }
 
+async function _obterNumeroWhatsAppPix() {
+  if (!window.DoaVidaSync) return '';
+
+  if (typeof DoaVidaSync.getWhatsappAdmins === 'function') {
+    var admins = await DoaVidaSync.getWhatsappAdmins();
+    var destino = (admins || []).find(function (a) {
+      var ativo = (a.status || 'ativo') === 'ativo';
+      var avisos = Array.isArray(a.avisos) ? a.avisos : String(a.avisos || '').split(',').filter(Boolean);
+      return ativo && avisos.indexOf('doacoes') >= 0 && (a.telefone || a.whatsapp || a.phone);
+    });
+    if (destino) return destino.telefone || destino.whatsapp || destino.phone;
+  }
+
+  if (typeof DoaVidaSync.getWAConfig === 'function') {
+    var cfg = await DoaVidaSync.getWAConfig();
+    var adminPhone = Array.isArray(cfg.adminPhone) ? cfg.adminPhone[0] : cfg.adminPhone;
+    if (adminPhone) return adminPhone;
+  }
+
+  if (typeof DoaVidaSync.getConfig === 'function') {
+    return await DoaVidaSync.getConfig('instituicao_telefone');
+  }
+
+  return '';
+}
+
+async function _abrirWhatsAppComprovantePix() {
+  var btn = document.getElementById('btn-pix-comprovante');
+  var labelOriginal = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Abrindo WhatsApp...';
+  }
+
+  try {
+    var numero = _normalizarNumeroWA(await _obterNumeroWhatsAppPix());
+    if (!numero) {
+      showToast('WhatsApp para comprovante ainda nao configurado.', 'warning', 6000);
+      return;
+    }
+
+    var chaveEl = document.getElementById('doa-pix-chave');
+    var chave = (chaveEl ? chaveEl.textContent : '').trim();
+    var texto = 'Ola! Fiz uma doacao via PIX para a Acao Social Semear. Segue o comprovante.';
+    if (chave && chave.indexOf('configurada') < 0 && chave.indexOf('indispon') < 0) {
+      texto += '\n\nChave PIX utilizada: ' + chave;
+    }
+
+    window.abrirWhatsApp('whatsapp://send?phone=' + numero + '&text=' + encodeURIComponent(texto));
+    showToast('WhatsApp aberto. Anexe o comprovante do PIX na conversa.', 'success', 6000);
+  } catch (e) {
+    showToast('Nao foi possivel abrir o WhatsApp agora.', 'warning', 6000);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = labelOriginal;
+    }
+  }
+}
+
 /*
   Retorna true se o alimento com o dado id atingiu a meta (bloqueado).
   @param {string} id - ID do alimento
@@ -1731,19 +1791,113 @@ window.gerarProtocolo = gerarProtocolo;
    recebimento na aba Doações do painel).
    ══════════════════════════════════════════════════════════════════════ */
 
-var _pixValorAtual = 0;
-
 function _normalizarNumeroWA(raw) {
   var digits = String(raw || '').replace(/\D/g, '');
   if (digits.length === 10 || digits.length === 11) digits = '55' + digits;
   return digits;
 }
 
+var PIX_FIXO = {
+  payload: '00020126580014BR.GOV.BCB.PIX0136736e99a7-993f-4935-a872-98665faed6815204000053039865802BR5922Flank Kaua Santos Dias6009SAO PAULO621405108VJZBLD7AJ63044F57',
+  chave: '736e99a7-993f-4935-a872-98665faed681',
+  titular: 'Flank Kaua Santos Dias',
+  banco: 'Banco nao informado'
+};
+
+function _aplicarPixFixo() {
+  var chaveEl = document.getElementById('doa-pix-chave');
+  var titularEl = document.getElementById('doa-pix-titular');
+  var bancoEl = document.getElementById('doa-pix-banco');
+
+  if (chaveEl) chaveEl.textContent = PIX_FIXO.chave;
+  if (titularEl) titularEl.textContent = PIX_FIXO.titular;
+  if (bancoEl) bancoEl.textContent = PIX_FIXO.banco;
+  _atualizarQrPix(PIX_FIXO.payload);
+}
+
+function _atualizarQrPix(chave) {
+  var qr = document.getElementById('doa-pix-qr');
+  var placeholder = document.getElementById('doa-pix-qr-placeholder');
+  var texto = String(chave || '').trim();
+  var invalida = !texto || texto.indexOf('configurada') >= 0 || texto.indexOf('indispon') >= 0;
+
+  if (!qr) return;
+
+  if (invalida) {
+    qr.removeAttribute('src');
+    qr.style.display = 'none';
+    if (placeholder) {
+      placeholder.style.display = 'block';
+      placeholder.textContent = 'QR Code aguardando a chave PIX';
+    }
+    return;
+  }
+
+  qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' + encodeURIComponent(texto);
+  qr.style.display = 'block';
+  if (placeholder) placeholder.style.display = 'none';
+}
+
+function _campoPix(id, valor) {
+  valor = String(valor || '');
+  return id + String(valor.length).padStart(2, '0') + valor;
+}
+
+function _crc16Pix(payload) {
+  var crc = 0xFFFF;
+  for (var i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (var j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function _montarPayloadPix(chave, titular, cidade) {
+  var chaveLimpa = String(chave || '').trim();
+  if (!chaveLimpa) return '';
+
+  var merchantName = String(titular || 'ACAO SOCIAL SEMEAR')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase().slice(0, 25);
+  var merchantCity = String(cidade || 'BELEM')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase().slice(0, 15);
+
+  var gui = _campoPix('00', 'BR.GOV.BCB.PIX');
+  var key = _campoPix('01', chaveLimpa);
+  var merchantAccount = _campoPix('26', gui + key);
+  var txid = _campoPix('62', _campoPix('05', '***'));
+  var semCrc =
+    _campoPix('00', '01') +
+    merchantAccount +
+    _campoPix('52', '0000') +
+    _campoPix('53', '986') +
+    _campoPix('58', 'BR') +
+    _campoPix('59', merchantName) +
+    _campoPix('60', merchantCity) +
+    txid +
+    '6304';
+
+  return semCrc + _crc16Pix(semCrc);
+}
+
 async function inicializarDoacaoPix() {
   var card = document.getElementById('doa-pix-card');
   if (!card) return;
 
+  var toggle = document.getElementById('doa-pix-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      var fechado = card.classList.toggle('is-closed');
+      toggle.setAttribute('aria-expanded', fechado ? 'false' : 'true');
+    });
+  }
+
   var chaveEl = document.getElementById('doa-pix-chave');
+  _aplicarPixFixo();
   if (chaveEl) {
     try {
       var chave = window.DoaVidaSync ? await DoaVidaSync.getConfig('pix_chave') : null;
@@ -1751,6 +1905,20 @@ async function inicializarDoacaoPix() {
     } catch (e) {
       chaveEl.textContent = 'Chave PIX indisponível no momento';
     }
+  }
+
+  _aplicarPixFixo();
+  _atualizarQrPix(PIX_FIXO.payload);
+
+  if (window.DoaVidaSync && typeof DoaVidaSync.getConfig === 'function') {
+    Promise.all([
+      DoaVidaSync.getConfig('pix_chave'),
+      DoaVidaSync.getConfig('pix_titular')
+    ]).then(function (dadosPix) {
+      var payloadPix = _montarPayloadPix(dadosPix[0], dadosPix[1], 'BELEM');
+      if (payloadPix) _atualizarQrPix(payloadPix);
+      _aplicarPixFixo();
+    }).catch(function () {});
   }
 
   var btnCopiar = document.getElementById('btn-copiar-pix');
@@ -1762,8 +1930,17 @@ async function inicializarDoacaoPix() {
         return;
       }
       navigator.clipboard.writeText(texto)
-        .then(function () { showToast(' Chave PIX copiada!', 'success'); })
+        .then(function () { showToast('Chave PIX copiada. Depois envie o comprovante pelo WhatsApp.', 'success', 6000); })
         .catch(function () { showToast('Não foi possível copiar. Copie manualmente.', 'warning'); });
+    });
+  }
+
+  var btnCopiarCopiaCola = document.getElementById('btn-copiar-pix-copia-cola');
+  if (btnCopiarCopiaCola) {
+    btnCopiarCopiaCola.addEventListener('click', function () {
+      navigator.clipboard.writeText(PIX_FIXO.payload)
+        .then(function () { showToast('Pix Copia e Cola copiado. Abra seu banco e cole no Pix.', 'success', 7000); })
+        .catch(function () { showToast('Nao foi possivel copiar o Pix Copia e Cola.', 'warning'); });
     });
   }
 
@@ -1787,6 +1964,11 @@ async function inicializarDoacaoPix() {
   var btnEnviar = document.getElementById('btn-pix-enviar');
   if (btnEnviar) {
     btnEnviar.addEventListener('click', _confirmarDoacaoPix);
+  }
+
+  var btnComprovante = document.getElementById('btn-pix-comprovante');
+  if (btnComprovante) {
+    btnComprovante.addEventListener('click', _abrirWhatsAppComprovantePix);
   }
 }
 window.inicializarDoacaoPix = inicializarDoacaoPix;
@@ -1862,7 +2044,7 @@ async function _confirmarDoacaoPix() {
   }
 }
 
-async function _abrirWhatsAppComprovantePix(doacao) {
+async function _abrirWhatsAppComprovantePixLegado(doacao) {
   try {
     if (!window.DoaVidaSync || typeof DoaVidaSync.getWhatsappAdmins !== 'function') return;
     var admins = await DoaVidaSync.getWhatsappAdmins();
