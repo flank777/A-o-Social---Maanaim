@@ -435,7 +435,7 @@ async function doaRenderGrid() {
         '<button class="fcard-order-btn" id="btn-cesta-completa" type="button" ' +
           'onclick="doaSelecionarCestaCompleta()" ' +
           'style="background:' + (cestaAtiva ? '#e8c96a;color:#1a1a1a' : '#1a1a1a') + '">' +
-          (cestaAtiva ? ' Cesta Selecionada' : 'Selecionar Tudo') +
+          (cestaAtiva ? ' Cesta Selecionada' : 'Adicionar') +
         '</button>' +
       '</div>' +
     '</div>';
@@ -595,7 +595,7 @@ function doaCP(id) {
     FormState.cestaCompleta = false;
     alimentosAtuais.forEach(function (f) { FormState.qtds[f.id] = 0; });
     var btnCesta = document.getElementById('btn-cesta-completa');
-    if (btnCesta) { btnCesta.textContent = 'Selecionar Tudo'; btnCesta.style.background = '#1a1a1a'; btnCesta.style.color = '#fff'; }
+    if (btnCesta) { btnCesta.textContent = 'Adicionar'; btnCesta.style.background = '#1a1a1a'; btnCesta.style.color = '#fff'; }
     doaRenderGrid();
     showToast(' Cesta completa removida — escolha os itens manualmente.', 'info');
   }
@@ -2211,7 +2211,7 @@ function doaSelecionarCestaCompleta() {
       FormState.qtds[f.id] = 0;
       atualizarCard(f.id);
     });
-    if (btn) { btn.textContent = 'Selecionar Tudo'; btn.style.background = '#1a1a1a'; btn.style.color = '#fff'; }
+    if (btn) { btn.textContent = 'Adicionar'; btn.style.background = '#1a1a1a'; btn.style.color = '#fff'; }
     showToast(' Cesta removida do carrinho.', 'info');
   } else {
     /* Ativa: marca 1 unidade de cada item (cálculo interno), sem
@@ -2245,7 +2245,7 @@ function _sincronizarBotaoCesta() {
     btn.style.background = '#e8c96a';
     btn.style.color = '#1a1a1a';
   } else {
-    btn.textContent = 'Selecionar Tudo';
+    btn.textContent = 'Adicionar';
     btn.style.background = '#1a1a1a';
     btn.style.color = '#fff';
   }
