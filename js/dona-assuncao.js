@@ -568,6 +568,27 @@
     document.body.appendChild(chat);
     renderSuggestions(QUICK_DEFAULT);
     bindEvents();
+    setupKeyboardFix(chat);
+  }
+
+  /*
+    No Android/iOS, o teclado virtual encolhe a "visual viewport" mas o
+    chat (position:fixed, ancorado por inset) continua medindo a partir
+    da viewport cheia — o teclado sobe e cobre a parte de baixo do chat.
+    Aqui empurramos o `bottom` do chat para cima exatamente pela altura
+    que o teclado está ocupando, usando a Visual Viewport API (suportada
+    nos dois sistemas, ao contrário do meta interactive-widget, que só
+    funciona em navegadores Chromium).
+  */
+  function setupKeyboardFix(chat) {
+    if (!window.visualViewport) return;
+    var vv = window.visualViewport;
+    function ajustar() {
+      var coberto = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      chat.style.bottom = coberto > 0 ? coberto + "px" : "";
+    }
+    vv.addEventListener("resize", ajustar);
+    vv.addEventListener("scroll", ajustar);
   }
 
   function refreshIdentity() {
