@@ -273,7 +273,7 @@
       '<div class="admin-sidebar-note"><i class="fa-solid fa-hands-holding-heart"></i><strong>Fazer o bem transforma vidas!</strong><span>Obrigado por fazer parte dessa corrente do bem.</span></div>';
 
     $("#admin-mobile-nav").innerHTML = PAGES.filter(function (p) {
-      return ["overview", "donations", "families", "volunteers", "spiritual"].indexOf(p.id) >= 0;
+      return ["overview", "donations", "families", "volunteers"].indexOf(p.id) >= 0;
     }).map(navButton).join("");
 
     $all("[data-page]").forEach(function (btn) {
