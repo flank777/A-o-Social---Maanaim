@@ -618,6 +618,25 @@ button {
   display: none;
 }
 
+.admin-kpi-grid-stacked {
+  grid-template-columns: 1fr !important;
+}
+
+.admin-kpi-grid-stacked .admin-kpi {
+  min-height: 0;
+}
+
+.admin-kpi-grid-stacked .admin-kpi-head {
+  flex-direction: row;
+  align-items: center;
+}
+
+.admin-kpi-grid-stacked .admin-kpi-label {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .admin-kpi {
   min-height: 154px;
   border: 1px solid var(--admin-border);
@@ -763,7 +782,7 @@ button {
 }
 
 .admin-families-bottom {
-  grid-template-columns: 360px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .admin-filter-bar {
@@ -851,6 +870,21 @@ button {
 .admin-row-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-button.compact {
+  min-height: 34px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.admin-button.compact.danger {
+  color: #fecdd3;
+  border-color: rgba(251, 93, 107, 0.42);
+  background: rgba(251, 93, 107, 0.12);
 }
 
 .admin-mini-action {
@@ -915,6 +949,46 @@ button {
   font-weight: 900;
 }
 
+.admin-family-avatar {
+  width: 54px;
+  height: 42px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.admin-family-avatar i {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(134, 239, 172, 0.4);
+  border-radius: 50%;
+  color: #dcfce7;
+  background: linear-gradient(135deg, rgba(22, 101, 52, 0.96), rgba(20, 184, 166, 0.82));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  font-size: 0.72rem;
+}
+
+.admin-family-avatar i:nth-child(1),
+.admin-family-avatar i:nth-child(3) {
+  width: 22px;
+  height: 22px;
+  margin-top: 10px;
+  font-size: 0.62rem;
+  opacity: 0.92;
+}
+
+.admin-family-avatar i:nth-child(1) {
+  margin-right: -5px;
+}
+
+.admin-family-avatar i:nth-child(3) {
+  margin-left: -5px;
+}
+
 .admin-list-body {
   min-width: 0;
   flex: 1;
@@ -940,26 +1014,79 @@ button {
 .admin-expand-list {
   display: grid;
   gap: 10px;
-  padding: 16px 20px 20px;
+  margin: 0 18px 18px;
+  padding: 18px;
   min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(47, 124, 255, 0.16), transparent 30%),
+    linear-gradient(145deg, #08111f 0%, #101827 48%, #07101b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .admin-expand-row {
-  border: 1px solid var(--admin-border);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.035);
+  position: relative;
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 18px;
+  background: rgba(8, 17, 31, 0.82);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
   overflow: hidden;
 }
 
+.admin-expand-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #2f7cff, #22d3ee);
+}
+
+.admin-family-state--waiting {
+  border-color: rgba(245, 158, 11, 0.42);
+}
+
+.admin-family-state--waiting::before {
+  background: linear-gradient(180deg, #f59e0b, #fde047);
+}
+
+.admin-family-state--waiting .admin-expand-lead {
+  color: #fde68a;
+}
+
+.admin-family-state--danger {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.admin-family-state--danger::before {
+  background: linear-gradient(180deg, #ef4444, #fb7185);
+}
+
+.admin-family-state--danger .admin-expand-lead {
+  color: #fda4af;
+}
+
+.admin-family-state--received {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.admin-family-state--received::before {
+  background: linear-gradient(180deg, #22c55e, #86efac);
+}
+
+.admin-family-state--received .admin-expand-lead {
+  color: #86efac;
+}
+
 .admin-expand-row[open] {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.9);
 }
 
 .admin-expand-summary {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 13px;
+  gap: 12px;
+  padding: 18px 20px 18px 28px;
   cursor: pointer;
   list-style: none;
 }
@@ -975,17 +1102,19 @@ button {
 
 .admin-expand-lead {
   flex: 0 0 auto;
-  color: var(--admin-muted);
-  font-size: 0.78rem;
+  color: #60a5fa;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
 .admin-expand-title {
   flex: 1 1 auto;
   min-width: 0;
-  color: var(--admin-text);
-  font-weight: 700;
-  font-size: 0.88rem;
+  color: #f8fafc;
+  font-weight: 900;
+  font-size: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -993,7 +1122,7 @@ button {
 
 .admin-expand-chevron {
   flex: 0 0 auto;
-  color: var(--admin-muted);
+  color: #e2e8f0;
   transition: transform 0.2s ease;
 }
 
@@ -1005,15 +1134,571 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  padding: 0 13px 13px 13px;
-  color: var(--admin-text-soft);
+  padding: 0 20px 20px 28px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
   font-size: 0.86rem;
+}
+
+.admin-expand-detail > span {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.11);
+}
+
+.admin-expand-detail strong {
+  color: #f8fafc;
 }
 
 .admin-expand-detail .admin-row-actions {
   flex: 1 0 100%;
   justify-content: flex-start;
   margin-top: 4px;
+}
+
+.admin-donation-board {
+  margin: 0 18px 18px;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(47, 124, 255, 0.18), transparent 30%),
+    linear-gradient(145deg, #08111f 0%, #101827 48%, #07101b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.admin-donation-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-donation-list-head h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.admin-donation-list-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.72);
+  white-space: nowrap;
+}
+
+.admin-donation-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-donation-card {
+  --donation-accent: #2f7cff;
+  --donation-accent-soft: rgba(47, 124, 255, 0.16);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 18px;
+  background: rgba(8, 17, 31, 0.82);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+}
+
+.admin-donation-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--donation-accent), color-mix(in srgb, var(--donation-accent), white 28%));
+}
+
+.admin-donation-card--green {
+  --donation-accent: #22c55e;
+  --donation-accent-soft: rgba(34, 197, 94, 0.15);
+}
+
+.admin-donation-card--purple {
+  --donation-accent: #a855f7;
+  --donation-accent-soft: rgba(168, 85, 247, 0.16);
+}
+
+.admin-donation-card--cyan {
+  --donation-accent: #22d3ee;
+  --donation-accent-soft: rgba(34, 211, 238, 0.14);
+}
+
+.admin-donation-summary {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) minmax(220px, 0.75fr) auto;
+  grid-template-areas:
+    "protocol protocol status chevron"
+    "avatar person meta chevron";
+  gap: 8px 16px;
+  align-items: center;
+  padding: 20px 22px 20px 34px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-donation-summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-donation-protocol {
+  grid-area: protocol;
+  color: var(--donation-accent);
+  font-weight: 900;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+}
+
+.admin-donation-status {
+  grid-area: status;
+  justify-self: end;
+}
+
+.admin-donation-avatar {
+  grid-area: avatar;
+  width: 62px;
+  height: 62px;
+  border: 1px solid color-mix(in srgb, var(--donation-accent), white 20%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-weight: 950;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.95), var(--donation-accent-soft));
+  box-shadow: 0 0 0 7px rgba(15, 23, 42, 0.64);
+}
+
+.admin-donation-summary > .admin-family-avatar {
+  grid-area: avatar;
+}
+
+.admin-donation-person {
+  grid-area: person;
+  min-width: 0;
+}
+
+.admin-donation-person strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 1.08rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-donation-person small,
+.admin-donation-meta small {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 8px;
+  color: #a8b3c7;
+  font-size: 0.9rem;
+}
+
+.admin-donation-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 100%;
+  margin-top: 8px;
+  color: #86efac;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-donation-phone:hover {
+  color: #bbf7d0;
+  text-decoration: underline;
+}
+
+.admin-donation-person i,
+.admin-donation-meta i {
+  width: 16px;
+  color: #93a4bd;
+}
+
+.admin-donation-phone i {
+  color: #22c55e;
+}
+
+.admin-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #86efac;
+  font-weight: 850;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.admin-contact-link:hover {
+  color: #bbf7d0;
+  text-decoration: underline;
+}
+
+.admin-contact-link i {
+  color: #22c55e;
+}
+
+.admin-family-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.admin-family-profile > span {
+  width: auto;
+}
+
+.admin-family-profile-main,
+.admin-family-cycle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.admin-family-profile-main span,
+.admin-family-cycle span {
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.11);
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.admin-family-profile-main strong,
+.admin-family-cycle strong {
+  color: #f8fafc;
+}
+
+.admin-family-cycle {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-family-cycle em {
+  display: block;
+  margin-top: 6px;
+  color: #86efac;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.admin-family-cycle span:nth-child(1) em {
+  color: #86efac;
+}
+
+.admin-family-cycle span:nth-child(2) em,
+.admin-family-cycle span:nth-child(3) em {
+  color: #fde68a;
+}
+
+.admin-family-state--danger .admin-family-cycle span:nth-child(3) em {
+  color: #fda4af;
+}
+
+.admin-basket-history {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.admin-basket-history h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.admin-basket-history-item {
+  display: grid;
+  gap: 6px;
+  padding: 13px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.admin-basket-history-item strong {
+  color: #60a5fa;
+  font-size: 0.98rem;
+}
+
+.admin-basket-history-item--received {
+  border-color: rgba(34, 197, 94, 0.36);
+  background: rgba(22, 101, 52, 0.18);
+}
+
+.admin-basket-history-item--received strong {
+  color: #86efac;
+}
+
+.admin-basket-history-item--waiting {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(120, 53, 15, 0.18);
+}
+
+.admin-basket-history-item--waiting strong {
+  color: #fde68a;
+}
+
+.admin-basket-history-item--danger {
+  border-color: rgba(239, 68, 68, 0.42);
+  background: rgba(127, 29, 29, 0.18);
+}
+
+.admin-basket-history-item--danger strong {
+  color: #fda4af;
+}
+
+.admin-basket-history-item span {
+  color: #cbd5e1;
+  font-size: 0.88rem;
+}
+
+.admin-basket-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.admin-basket-status--waiting {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.admin-basket-status--scheduled {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.17);
+}
+
+.admin-basket-status--received {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.17);
+}
+
+.admin-basket-status--danger {
+  color: #fda4af;
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.admin-donation-meta {
+  grid-area: meta;
+  min-width: 0;
+}
+
+.admin-donation-chevron {
+  grid-area: chevron;
+  color: #e2e8f0;
+  transition: transform 0.2s ease;
+}
+
+.admin-donation-card[open] .admin-donation-chevron {
+  transform: rotate(180deg);
+}
+
+.admin-donation-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 32px 24px 34px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.admin-donation-info {
+  min-width: 0;
+}
+
+.admin-donation-info span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #a8b3c7;
+  font-size: 0.9rem;
+}
+
+.admin-donation-info span i {
+  width: 18px;
+  color: #b9c4d6;
+}
+
+.admin-donation-info strong {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 10px;
+  padding: 8px 13px;
+  border-radius: 12px;
+  color: #eef2ff;
+  background: rgba(148, 163, 184, 0.15);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.admin-donation-items-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.admin-donation-items-list span {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 13px;
+  border-radius: 12px;
+  color: #eef2ff;
+  background: rgba(148, 163, 184, 0.15);
+  font-size: 0.92rem;
+  font-weight: 850;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.admin-donation-info small {
+  display: block;
+  margin-top: 8px;
+  color: #8fa0b8;
+  line-height: 1.35;
+}
+
+.admin-donation-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(180px, 280px);
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.admin-donation-action {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  font-weight: 900;
+  background: transparent;
+}
+
+.admin-donation-action.view {
+  color: #2f7cff;
+  background: rgba(47, 124, 255, 0.08);
+}
+
+.admin-donation-action.danger {
+  color: #fb5d6b;
+  background: rgba(251, 93, 107, 0.08);
+}
+
+@media (max-width: 760px) {
+  .admin-expand-list {
+    margin: 0 10px 14px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-expand-summary {
+    padding: 16px 14px 16px 22px;
+  }
+
+  .admin-expand-detail {
+    padding: 12px 14px 16px 22px;
+  }
+
+  .admin-expand-detail > span {
+    width: 100%;
+  }
+
+  .admin-family-profile-main,
+  .admin-family-cycle {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-donation-board {
+    margin: 0 10px 14px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-donation-list-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-donation-list-head h3 {
+    font-size: 1.18rem;
+  }
+
+  .admin-donation-list-head span {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.84rem;
+  }
+
+  .admin-donation-summary {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "protocol protocol chevron"
+      "status status chevron"
+      "avatar person chevron"
+      "meta meta meta";
+    gap: 9px 12px;
+    padding: 17px 15px 17px 23px;
+  }
+
+  .admin-donation-status {
+    justify-self: start;
+  }
+
+  .admin-donation-avatar {
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 0 0 5px rgba(15, 23, 42, 0.6);
+  }
+
+  .admin-donation-person strong {
+    font-size: 1rem;
+  }
+
+  .admin-donation-person small,
+  .admin-donation-meta small {
+    font-size: 0.84rem;
+  }
+
+  .admin-donation-detail {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 15px 15px 18px 23px;
+  }
+
+  .admin-donation-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2241,6 +2926,47 @@ aside.admin-grid .admin-side-panel {
     display: none;
   }
 
+  .admin-kpi-grid-stacked {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi {
+    padding: 12px 12px;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi-head {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi-label {
+    width: auto;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi-value {
+    margin-top: 6px;
+    font-size: 1.05rem;
+  }
+
+  .admin-kpi-grid-stacked .admin-kpi-trend {
+    margin-top: 3px;
+    font-size: 0.64rem;
+  }
+
   .admin-filter-bar {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -2427,6 +3153,10 @@ aside.admin-grid .admin-side-panel {
   flex-direction: column;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.56);
   animation: modalIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.admin-modal-wide {
+  max-width: 760px;
 }
 
 @keyframes modalIn {
