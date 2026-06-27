@@ -483,6 +483,7 @@
     location.hash = state.activePage;
     updateShell();
     renderActivePage();
+    window.scrollTo(0, 0);
   }
 
   function updateShell() {
