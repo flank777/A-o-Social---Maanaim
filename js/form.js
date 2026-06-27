@@ -123,6 +123,9 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Conecta os botões de navegação do formulário */
   conectarEventos();
 
+  /* Card PIX publico: mostra dados e pede comprovante no WhatsApp, sem registrar no admin */
+  inicializarDoacaoPixPublica();
+
   /* Atualiza dados quando o usuário volta para a aba (Page Visibility API)
      Captura metas atingidas ou estoques alterados pelo admin em tempo real */
   document.addEventListener('visibilitychange', function () {
@@ -1741,6 +1744,181 @@ function gerarProtocolo() {
   return 'DOA-' + data + '-' + codigo;
 }
 window.gerarProtocolo = gerarProtocolo;
+
+/*
+  PIX publico: apenas exibe dados, QR Code, copia chave/copia-e-cola e abre WhatsApp.
+  Nao salva doacao no banco e nao cria card/registro na area do admin.
+*/
+var PIX_PUBLICO = {
+  payload: '00020126580014BR.GOV.BCB.PIX0136736e99a7-993f-4935-a872-98665faed6815204000053039865802BR5922Flank Kaua Santos Dias6009SAO PAULO621405108VJZBLD7AJ63044F57',
+  chave: '736e99a7-993f-4935-a872-98665faed681',
+  titular: 'Flank Kaua Santos Dias',
+  banco: 'Banco nao informado',
+  whatsappFallback: '5591986054141'
+};
+
+function aplicarPixPublico() {
+  var chaveEl = document.getElementById('doa-pix-chave');
+  var titularEl = document.getElementById('doa-pix-titular');
+  var bancoEl = document.getElementById('doa-pix-banco');
+
+  if (chaveEl) chaveEl.textContent = PIX_PUBLICO.chave;
+  if (titularEl) titularEl.textContent = PIX_PUBLICO.titular;
+  if (bancoEl) bancoEl.textContent = PIX_PUBLICO.banco;
+  atualizarQrPixPublico(PIX_PUBLICO.payload);
+}
+
+function atualizarQrPixPublico(payload) {
+  var qr = document.getElementById('doa-pix-qr');
+  var placeholder = document.getElementById('doa-pix-qr-placeholder');
+  var texto = String(payload || '').trim();
+
+  if (!qr) return;
+
+  if (!texto) {
+    qr.removeAttribute('src');
+    qr.style.display = 'none';
+    if (placeholder) {
+      placeholder.style.display = 'block';
+      placeholder.textContent = 'QR Code aguardando a chave PIX';
+    }
+    return;
+  }
+
+  qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=' + encodeURIComponent(texto);
+  qr.style.display = 'block';
+  if (placeholder) placeholder.style.display = 'none';
+}
+
+function copiarTextoPixPublico(texto, mensagemOk, mensagemErro) {
+  texto = String(texto || '').trim();
+  if (!texto) {
+    showToast(mensagemErro || 'Nada para copiar.', 'warning');
+    return;
+  }
+
+  function ok() { showToast(mensagemOk || 'Copiado.', 'success', 6000); }
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = texto;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      ok();
+    } catch (e) {
+      showToast(mensagemErro || 'Nao foi possivel copiar.', 'warning');
+    }
+    document.body.removeChild(ta);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(ok).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+function normalizarNumeroWAPixPublico(raw) {
+  var digits = String(raw || '').replace(/\D/g, '');
+  if (digits.length === 10 || digits.length === 11) digits = '55' + digits;
+  return digits;
+}
+
+async function obterNumeroWhatsAppPixPublico() {
+  try {
+    if (window.DoaVidaSync && typeof DoaVidaSync.getWhatsappAdmins === 'function') {
+      var admins = await DoaVidaSync.getWhatsappAdmins();
+      var destino = (admins || []).find(function (a) {
+        var ativo = (a.status || 'ativo') === 'ativo';
+        var avisos = Array.isArray(a.avisos) ? a.avisos : [];
+        return ativo && (avisos.indexOf('doacoes') >= 0 || avisos.indexOf('pix') >= 0 || avisos.length === 0);
+      });
+      var numero = normalizarNumeroWAPixPublico(destino && (destino.telefone || destino.whatsapp));
+      if (numero) return numero;
+    }
+  } catch (e) {}
+  return PIX_PUBLICO.whatsappFallback;
+}
+
+async function abrirWhatsAppComprovantePixPublico() {
+  var btn = document.getElementById('btn-pix-comprovante');
+  var labelOriginal = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Abrindo WhatsApp...';
+  }
+
+  try {
+    var numero = await obterNumeroWhatsAppPixPublico();
+    var texto = 'Ola! Fiz uma doacao via PIX para a Acao Social Semear. Segue o comprovante.\n\nChave PIX utilizada: ' + PIX_PUBLICO.chave;
+    var url = 'whatsapp://send?phone=' + numero + '&text=' + encodeURIComponent(texto);
+    if (typeof window.abrirWhatsApp === 'function') {
+      window.abrirWhatsApp(url);
+    } else {
+      window.location.href = url;
+    }
+    showToast('WhatsApp aberto. Anexe o comprovante do PIX na conversa.', 'success', 6000);
+  } catch (e) {
+    showToast('Nao foi possivel abrir o WhatsApp agora.', 'warning', 6000);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = labelOriginal;
+    }
+  }
+}
+
+function inicializarDoacaoPixPublica() {
+  var card = document.getElementById('doa-pix-card');
+  if (!card) return;
+
+  aplicarPixPublico();
+
+  var toggle = document.getElementById('doa-pix-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      var fechado = card.classList.toggle('is-closed');
+      toggle.setAttribute('aria-expanded', fechado ? 'false' : 'true');
+    });
+  }
+
+  var btnCopiar = document.getElementById('btn-copiar-pix');
+  if (btnCopiar) {
+    btnCopiar.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      copiarTextoPixPublico(
+        PIX_PUBLICO.chave,
+        'Chave PIX copiada. Depois envie o comprovante pelo WhatsApp.',
+        'Nao foi possivel copiar a chave PIX.'
+      );
+    });
+  }
+
+  var btnCopiaCola = document.getElementById('btn-copiar-pix-copia-cola');
+  if (btnCopiaCola) {
+    btnCopiaCola.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      copiarTextoPixPublico(
+        PIX_PUBLICO.payload,
+        'Pix Copia e Cola copiado. Abra seu banco e cole no Pix.',
+        'Nao foi possivel copiar o Pix Copia e Cola.'
+      );
+    });
+  }
+
+  var btnComprovante = document.getElementById('btn-pix-comprovante');
+  if (btnComprovante) {
+    btnComprovante.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      abrirWhatsAppComprovantePixPublico();
+    });
+  }
+}
+window.inicializarDoacaoPixPublica = inicializarDoacaoPixPublica;
 
 /*
   Reinicia o formulário do zero (usado pelo botão "Nova Doação").
