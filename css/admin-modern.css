@@ -825,44 +825,6 @@ button {
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(47, 124, 255, 0.62));
 }
 
-.admin-table-scroll {
-  overflow-x: auto;
-}
-
-.admin-table {
-  width: 100%;
-  min-width: 800px;
-  border-collapse: collapse;
-}
-
-.admin-table th,
-.admin-table td {
-  padding: 14px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--admin-border);
-  vertical-align: middle;
-}
-
-.admin-table th {
-  color: var(--admin-muted);
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.admin-table td {
-  color: var(--admin-text-soft);
-  font-size: 0.9rem;
-}
-
-.admin-table tr:hover td {
-  background: rgba(255, 255, 255, 0.028);
-}
-
-.admin-table strong {
-  color: white;
-}
-
 .admin-row-actions {
   display: flex;
   gap: 8px;

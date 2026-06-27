@@ -1094,14 +1094,32 @@
   }
 
   function renderWhatsAppAdmins(admins) {
-    var body = admins.length ? admins.map(function (a) {
-      var name = a.nome || a.name || "Administrador";
-      var tags = Array.isArray(a.avisos) ? a.avisos : String(a.avisos || "").split(",").filter(Boolean);
-      var phone = a.telefone || a.whatsapp || a.phone || "";
-      var wa = whatsappUrl(phone);
-      return '<tr><td><div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(name)) + '</span><strong>' + esc(name) + '</strong></div></td><td>' + (wa ? '<a class="admin-contact-link" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>' + esc(phone) + '</a>' : esc(phone)) + '</td><td>' + esc(a.funcao || a.role || "") + '</td><td>' + (tags.length ? tags.map(function (t) { return badge(WA_AVISO_LABELS[t] || t, "blue"); }).join(" ") : '<span class="admin-field-hint">Nenhum</span>') + '</td><td>' + statusBadge(a.status || "ativo") + '</td><td><div class="admin-row-actions"><button class="admin-mini-action" data-wa-admin-edit="' + esc(a.id) + '" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button><button class="admin-mini-action danger" data-wa-admin-delete="' + esc(a.id) + '" title="Excluir"><i class="fa-regular fa-trash-can"></i></button></div></td></tr>';
-    }).join("") : '<tr><td colspan="6"><div class="admin-empty">Nenhum administrador de WhatsApp cadastrado no Firebase.</div></td></tr>';
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th>Telefone / WhatsApp</th><th>Funcao</th><th>Tipo de aviso</th><th>Status</th><th>Acoes</th></tr></thead><tbody>' + body + '</tbody></table></div>';
+    if (!admins.length) {
+      return '<div class="admin-empty"><i class="fa-solid fa-users"></i><p>Nenhum administrador de WhatsApp cadastrado no Firebase.</p></div>';
+    }
+    return '<div class="admin-expand-list">' +
+      admins.map(function (a) {
+        var name = a.nome || a.name || "Administrador";
+        var tags = Array.isArray(a.avisos) ? a.avisos : String(a.avisos || "").split(",").filter(Boolean);
+        var phone = a.telefone || a.whatsapp || a.phone || "";
+        return '<details class="admin-expand-row">' +
+          '<summary class="admin-expand-summary">' +
+            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(name)) + '</span><span class="admin-expand-title">' + esc(name) + '</span></div>' +
+            statusBadge(a.status || "ativo") +
+            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
+          '</summary>' +
+          '<div class="admin-expand-detail">' +
+            contactLinkHtml("WhatsApp", phone) +
+            '<span><strong>Função:</strong> ' + esc(a.funcao || a.role || "—") + '</span>' +
+            '<span><strong>Tipo de aviso:</strong> ' + (tags.length ? tags.map(function (t) { return badge(WA_AVISO_LABELS[t] || t, "blue"); }).join(" ") : '<span class="admin-field-hint">Nenhum</span>') + '</span>' +
+            '<div class="admin-row-actions">' +
+              '<button class="admin-mini-action" data-wa-admin-edit="' + esc(a.id) + '" aria-label="Editar administrador"><i class="fa-regular fa-pen-to-square"></i></button>' +
+              '<button class="admin-mini-action danger" data-wa-admin-delete="' + esc(a.id) + '" aria-label="Excluir administrador"><i class="fa-regular fa-trash-can"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</details>';
+      }).join("") +
+      '</div>';
   }
 
   function renderWhatsAppSettings(cfg) {
@@ -1131,10 +1149,22 @@
   }
 
   function renderWhatsAppLogs(logs) {
-    var body = logs.length ? logs.slice(0, 8).map(function (l) {
-      return '<tr><td>' + fmtDate(l.created_at || l.createdAt, true) + '</td><td>' + badge(l.tipo || l.type || "Mensagem", "purple") + '</td><td>' + esc(l.destinatario || l.to || "") + '</td><td>' + statusBadge(l.status || "enviado") + '</td><td>' + esc(l.detalhes || l.message || "") + '</td></tr>';
-    }).join("") : '<tr><td colspan="5"><div class="admin-empty">Nenhum log de WhatsApp encontrado no Firebase.</div></td></tr>';
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Data/hora</th><th>Tipo</th><th>Destinatario</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>' + body + '</tbody></table></div>';
+    if (!logs.length) {
+      return '<div class="admin-empty"><i class="fa-solid fa-comment-slash"></i><p>Nenhum log de WhatsApp encontrado no Firebase.</p></div>';
+    }
+    return '<div class="admin-list">' +
+      logs.slice(0, 8).map(function (l) {
+        var destinatario = esc(l.destinatario || l.to || "—");
+        var detalhes = l.detalhes || l.message || "";
+        return '<div class="admin-list-item">' +
+          '<div class="admin-list-icon"><i class="fa-solid fa-paper-plane"></i></div>' +
+          '<div class="admin-list-body">' +
+            '<div class="admin-list-title">' + badge(l.tipo || l.type || "Mensagem", "purple") + ' ' + statusBadge(l.status || "enviado") + '</div>' +
+            '<div class="admin-list-sub">' + fmtDate(l.created_at || l.createdAt, true) + ' · ' + destinatario + (detalhes ? ' · ' + esc(detalhes) : '') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join("") +
+      '</div>';
   }
 
   function galleryUrl(item) { return item.url || item.src || item.image || item.imagem || ""; }
@@ -1674,44 +1704,10 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hands-praying"></i><p>Nenhum voluntário de apoio espiritual encontrado.</p></div>';
     }
-    /* Resumo (nome + status) sempre visível; whatsapp, bairro, modalidade,
-       dias/horário e ações só aparecem ao tocar para abrir a linha. */
     return '<div class="admin-expand-list">' +
       rows.map(function (v) {
         var nome = v.nome || v.name || "Voluntário";
         var bairro = (v.dados && v.dados.bairro) || "—";
-        var modalidade = spiritualModalidade(v);
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
-            statusBadge(v.status || "ativo") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            '<span><strong>WhatsApp:</strong> ' + esc(v.telefone || v.whatsapp || "—") + '</span>' +
-            '<span><strong>Bairro/Cidade:</strong> ' + esc(bairro) + '</span>' +
-            '<span><strong>Modalidade:</strong> ' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</span>' +
-            '<span><strong>Dias disponíveis:</strong> ' + esc(spiritualDiasLabel(v)) + '</span>' +
-            '<span><strong>Horário disponível:</strong> ' + esc(spiritualHorariosLabel(v)) + '</span>' +
-            '<div class="admin-row-actions">' +
-              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
-              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") +
-      '</div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntários de apoio espiritual</p>';
-  }
-
-  function renderSpiritualTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-hands-praying"></i><p>Nenhum voluntario de apoio espiritual encontrado.</p></div>';
-    }
-    return '<div class="admin-expand-list">' +
-      rows.map(function (v) {
-        var nome = v.nome || v.name || "Voluntario";
-        var bairro = (v.dados && v.dados.bairro) || "-";
         var modalidade = spiritualModalidade(v);
         var wa = whatsappUrl(v.telefone || v.whatsapp);
         return '<details class="admin-expand-row">' +
@@ -1723,19 +1719,19 @@
           '<div class="admin-expand-detail">' +
             contactLinkHtml("WhatsApp", v.telefone || v.whatsapp) +
             '<span><strong>Bairro/Cidade:</strong> ' + esc(bairro) + '</span>' +
-            '<span><strong>Modalidade:</strong> ' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "-", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</span>' +
-            '<span><strong>Dias disponiveis:</strong> ' + esc(spiritualDiasLabel(v)) + '</span>' +
-            '<span><strong>Horario disponivel:</strong> ' + esc(spiritualHorariosLabel(v)) + '</span>' +
+            '<span><strong>Modalidade:</strong> ' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</span>' +
+            '<span><strong>Dias disponíveis:</strong> ' + esc(spiritualDiasLabel(v)) + '</span>' +
+            '<span><strong>Horário disponível:</strong> ' + esc(spiritualHorariosLabel(v)) + '</span>' +
             '<div class="admin-row-actions">' +
               (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntario"><i class="fa-regular fa-pen-to-square"></i></button>' +
-              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntario"><i class="fa-regular fa-trash-can"></i></button>' +
+              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
+              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
             '</div>' +
           '</div>' +
         '</details>';
       }).join("") +
       '</div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntarios de apoio espiritual</p>';
+      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntários de apoio espiritual</p>';
   }
 
   function renderSpiritualRequests(all) {
@@ -1789,7 +1785,7 @@
       kpiCard({ label: "Visitas agendadas na semana", value: fmtInt(visitasSemana), icon: "fa-calendar-week", tone: "linear-gradient(135deg,#f7b731,#f59e0b)", spark: "linear-gradient(90deg,transparent,#f7b731,transparent)", trend: "Disponibilidade recorrente", trendNote: "Baseado nos dias marcados" }) +
       '</div>' +
       '<div class="admin-grid admin-tasks-layout">' +
-      '<div>' + panel("Lista de voluntários", renderSpiritualFilters() + renderSpiritualTable(rows)) + '</div>' +
+      '<div>' + panel("Lista de voluntários de apoio espiritual", renderSpiritualFilters() + renderSpiritualTable(rows)) + '</div>' +
       '<aside class="admin-grid">' +
       panel("Distribuição por modalidade", '<div class="admin-donut-info"><canvas id="spiritual-modalidade"></canvas><div class="admin-legend" id="spiritual-modalidade-legend"></div></div>', { sub: "Como cada voluntário deseja ajudar" }) +
       panel("Pedidos e acompanhamento", renderSpiritualRequests(all), { sub: "Pedidos de oração e observações recebidas" }) +
@@ -2225,10 +2221,21 @@
       .map(function (d) { return { name: d.name || d.nome || "Doador anonimo", kg: getDonationKg(d) }; })
       .sort(function (a, b) { return b.kg - a.kg; }).slice(0, 5);
     var totalKg = donors.reduce(function (s, d) { return s + d.kg; }, 0) || 1;
-    return '<div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>Pos.</th><th>Doador</th><th>KG doados</th><th>% total</th></tr></thead><tbody>' +
+    if (!donors.length) {
+      return '<div class="admin-empty"><i class="fa-solid fa-trophy"></i><p>Nenhum doador no período selecionado.</p></div>';
+    }
+    return '<div class="admin-list">' +
       donors.map(function (d, i) {
-        return '<tr><td>' + badge(String(i + 1), i === 0 ? "yellow" : i === 1 ? "blue" : "purple") + '</td><td><strong>' + esc(d.name) + '</strong></td><td>' + fmtKg(d.kg) + '</td><td>' + (Math.round((d.kg / totalKg) * 1000) / 10) + '%</td></tr>';
-      }).join("") + '</tbody></table></div>';
+        var pct = Math.round((d.kg / totalKg) * 1000) / 10;
+        return '<div class="admin-list-item">' +
+          '<div class="admin-list-icon">' + (i + 1) + '</div>' +
+          '<div class="admin-list-body">' +
+            '<div class="admin-list-title">' + esc(d.name) + '</div>' +
+            '<div class="admin-list-sub">' + fmtKg(d.kg) + ' · ' + pct + '% do total</div>' +
+          '</div>' +
+        '</div>';
+      }).join("") +
+      '</div>';
   }
 
   function renderFamilyFilters() {
