@@ -1545,69 +1545,6 @@
     return "";
   }
 
-  function renderVolunteersTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-hands-holding"></i><p>Nenhum voluntário encontrado.</p></div>';
-    }
-    /* Resumo (nome + status) sempre visível; telefone, tipo de ajuda,
-       disponibilidade, cadastro e ações só ao tocar para abrir a linha. */
-    return '<div class="admin-expand-list">' +
-      rows.map(function (v) {
-        var nome = v.nome || v.name || "Voluntário";
-        var disponibilidade = volunteerDisponibilidade(v) || "—";
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
-            statusBadge(v.status || "ativo") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            '<span><strong>Telefone:</strong> ' + esc(v.telefone || v.whatsapp || "—") + '</span>' +
-            '<span><strong>Tipo de ajuda:</strong> ' + badge(v.tipo_label || v.tipo || "—", "blue") + '</span>' +
-            '<span><strong>Disponibilidade:</strong> ' + esc(disponibilidade) + '</span>' +
-            '<span><strong>Cadastro:</strong> ' + fmtDate(v.created_at || v.createdAt) + '</span>' +
-            '<div class="admin-row-actions">' +
-              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
-              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") +
-      '</div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.volunteers.length) + ' voluntários</p>';
-  }
-
-  function renderVolunteersTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-hands-holding"></i><p>Nenhum voluntario encontrado.</p></div>';
-    }
-    return '<div class="admin-expand-list">' +
-      rows.map(function (v) {
-        var nome = v.nome || v.name || "Voluntario";
-        var disponibilidade = volunteerDisponibilidade(v) || "-";
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
-            statusBadge(v.status || "ativo") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            contactLinkHtml("Telefone", v.telefone || v.whatsapp) +
-            '<span><strong>Tipo de ajuda:</strong> ' + badge(v.tipo_label || v.tipo || "-", "blue") + '</span>' +
-            '<span><strong>Disponibilidade:</strong> ' + esc(disponibilidade) + '</span>' +
-            '<span><strong>Cadastro:</strong> ' + fmtDate(v.created_at || v.createdAt) + '</span>' +
-            '<div class="admin-row-actions">' +
-              (whatsappUrl(v.telefone || v.whatsapp) ? '<a class="admin-button compact" href="' + esc(whatsappUrl(v.telefone || v.whatsapp)) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntario"><i class="fa-regular fa-pen-to-square"></i></button>' +
-              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntario"><i class="fa-regular fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") +
-      '</div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.volunteers.length) + ' voluntarios</p>';
-  }
-
   function renderVolunteers() {
     var rows = filteredVolunteers();
     var all = state.data.volunteers;
@@ -1704,33 +1641,41 @@
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hands-praying"></i><p>Nenhum voluntário de apoio espiritual encontrado.</p></div>';
     }
-    return '<div class="admin-expand-list">' +
-      rows.map(function (v) {
-        var nome = v.nome || v.name || "Voluntário";
-        var bairro = (v.dados && v.dados.bairro) || "—";
-        var modalidade = spiritualModalidade(v);
-        var wa = whatsappUrl(v.telefone || v.whatsapp);
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(nome)) + '</span><span class="admin-expand-title">' + esc(nome) + '</span></div>' +
-            statusBadge(v.status || "ativo") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            contactLinkHtml("WhatsApp", v.telefone || v.whatsapp) +
-            '<span><strong>Bairro/Cidade:</strong> ' + esc(bairro) + '</span>' +
-            '<span><strong>Modalidade:</strong> ' + badge(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "—", modalidade === "visita" ? "blue" : modalidade === "ambos" ? "green" : "purple") + '</span>' +
-            '<span><strong>Dias disponíveis:</strong> ' + esc(spiritualDiasLabel(v)) + '</span>' +
-            '<span><strong>Horário disponível:</strong> ' + esc(spiritualHorariosLabel(v)) + '</span>' +
-            '<div class="admin-row-actions">' +
-              (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-mini-action" data-volunteer-edit="' + esc(v.id) + '" aria-label="Ver ficha do voluntário"><i class="fa-regular fa-pen-to-square"></i></button>' +
-              '<button class="admin-mini-action danger" data-volunteer-delete="' + esc(v.id) + '" aria-label="Excluir voluntário"><i class="fa-regular fa-trash-can"></i></button>' +
-            '</div>' +
+    return adminPeopleBoard("Lista de voluntários de apoio espiritual", rows.map(function (v, index) {
+      var nome = v.nome || v.name || "Voluntário";
+      var bairro = (v.dados && v.dados.bairro) || "Bairro não informado";
+      var modalidade = spiritualModalidade(v);
+      var phone = v.telefone || v.whatsapp || "Telefone não informado";
+      var wa = whatsappUrl(phone);
+      var tone = ["blue", "green", "purple", "cyan"][index % 4];
+      return '<details class="admin-donation-card admin-donation-card--' + tone + '">' +
+        '<summary class="admin-donation-summary">' +
+          '<span class="admin-donation-protocol">' + esc(v.protocolo || ("ESP-" + String(v.id || index + 1).slice(-6).toUpperCase())) + '</span>' +
+          '<span class="admin-donation-status">' + statusBadge(v.status || "ativo") + '</span>' +
+          '<span class="admin-donation-avatar" aria-hidden="true">' + esc(initials(nome)) + '</span>' +
+          '<span class="admin-donation-person">' +
+            '<strong>' + esc(nome) + '</strong>' +
+            (wa ? '<a class="admin-donation-phone" href="' + esc(wa) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-brands fa-whatsapp"></i>' + esc(phone) + '</a>' : '<small><i class="fa-solid fa-phone"></i>' + esc(phone) + '</small>') +
+          '</span>' +
+          '<span class="admin-donation-meta">' +
+            '<small><i class="fa-solid fa-hands-praying"></i>' + esc(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "Modalidade não informada") + '</small>' +
+            '<small><i class="fa-solid fa-location-dot"></i>' + esc(bairro) + '</small>' +
+          '</span>' +
+          '<i class="fa-solid fa-chevron-down admin-donation-chevron" aria-hidden="true"></i>' +
+        '</summary>' +
+        '<div class="admin-donation-detail">' +
+          '<div class="admin-donation-info">' + contactLinkHtml("WhatsApp", v.telefone || v.whatsapp) + '</div>' +
+          '<div class="admin-donation-info"><span><i class="fa-solid fa-hands-praying"></i>Modalidade</span><strong>' + esc(SPIRITUAL_MODALIDADE_LABELS[modalidade] || "-") + '</strong></div>' +
+          '<div class="admin-donation-info"><span><i class="fa-regular fa-calendar"></i>Dias disponíveis</span><strong>' + esc(spiritualDiasLabel(v)) + '</strong></div>' +
+          '<div class="admin-donation-info"><span><i class="fa-regular fa-clock"></i>Horário disponível</span><strong>' + esc(spiritualHorariosLabel(v)) + '</strong></div>' +
+          '<div class="admin-donation-actions">' +
+            (wa ? '<a class="admin-donation-action view" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span></a>' : "") +
+            '<button class="admin-donation-action view" data-volunteer-edit="' + esc(v.id) + '"><i class="fa-regular fa-pen-to-square"></i><span>Ver ficha</span></button>' +
+            '<button class="admin-donation-action danger" data-volunteer-delete="' + esc(v.id) + '"><i class="fa-regular fa-trash-can"></i><span>Excluir</span></button>' +
           '</div>' +
-        '</details>';
-      }).join("") +
-      '</div>' +
+        '</div>' +
+      '</details>';
+    }).join("")) +
       '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(allSpiritualVolunteers().length) + ' voluntários de apoio espiritual</p>';
   }
 
@@ -2067,95 +2012,6 @@
       '</div>';
   }
 
-  function renderDonationsTableLegacy(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-hand-holding-heart"></i><p>Nenhuma doação encontrada para os filtros selecionados.</p></div>';
-    }
-    /* Resumo (protocolo + doador + status) sempre visível; itens/valor,
-       kg, entrega, data e ações só aparecem ao tocar para abrir a linha. */
-    return '<div class="admin-expand-list">' +
-      rows.map(function (d) {
-        var isCesta = d.tipo_doacao === "cesta_completa";
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<span class="admin-expand-lead">' + esc(d.protocolo || d.id || "—") + '</span>' +
-            '<span class="admin-expand-title">' + esc(d.name || d.nome || "Doador anonimo") + '</span>' +
-            statusBadge(d.status || "pendente") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            '<span><strong>Itens:</strong> ' + (isCesta ? badge("Cesta básica", "yellow", "fa-basket-shopping") + ' ' : "") + esc(donationFoodLabel(d)) + '</span>' +
-            '<span><strong>Kg:</strong> ' + fmtKg(getDonationKg(d)) + '</span>' +
-            '<span><strong>Entrega:</strong> ' + esc(d.delivery || d.entrega || "—") + '</span>' +
-            '<span><strong>Data:</strong> ' + fmtDate(d.created_at || d.createdAt || d.data, true) + '</span>' +
-            '<div class="admin-row-actions">' +
-              '<button class="admin-mini-action" data-donation-view="' + esc(d.id) + '" aria-label="Ver comprovante" title="Ver comprovante"><i class="fa-regular fa-eye"></i></button>' +
-              '<button class="admin-mini-action danger" data-donation-delete="' + esc(d.id) + '" aria-label="Excluir" title="Excluir"><i class="fa-regular fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.donations.length) + ' doações</p>';
-  }
-
-  function renderDonationsTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-hand-holding-heart"></i><p>Nenhuma doação encontrada para os filtros selecionados.</p></div>';
-    }
-    return '<div class="admin-donation-board">' +
-      '<div class="admin-donation-list-head">' +
-        '<h3>Lista de doações</h3>' +
-        '<span><i class="fa-solid fa-arrow-down-wide-short"></i>Mais recentes</span>' +
-      '</div>' +
-      '<div class="admin-donation-list">' +
-      rows.map(function (d, index) {
-        var isCesta = d.tipo_doacao === "cesta_completa";
-        var name = d.name || d.nome || "Doador anonimo";
-        var phone = d.phone || d.telefone || d.whatsapp || "Telefone nao informado";
-        var wa = whatsappUrl(phone);
-        var delivery = d.delivery || d.entrega || d.tipoEntrega || "";
-        var deliveryLabel = ENTREGA_LABELS_ADMIN[delivery] || delivery || "Nao informado";
-        var note = d.observacao || d.note || d.obs || "Sem observação.";
-        var tone = ["blue", "green", "purple", "cyan"][index % 4];
-        return '<details class="admin-donation-card admin-donation-card--' + tone + '"' + (index === 0 ? " open" : "") + '>' +
-          '<summary class="admin-donation-summary">' +
-            '<span class="admin-donation-protocol">' + esc(d.protocolo || d.id || "DOA-" + (index + 1)) + '</span>' +
-            '<span class="admin-donation-status">' + statusBadge(d.status || "pendente") + '</span>' +
-            '<span class="admin-donation-avatar" aria-hidden="true">' + esc(initials(name)) + '</span>' +
-            '<span class="admin-donation-person">' +
-              '<strong>' + esc(name) + '</strong>' +
-              (wa ? '<a class="admin-donation-phone" href="' + esc(wa) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-brands fa-whatsapp"></i>' + esc(phone) + '</a>' : '<small><i class="fa-solid fa-phone"></i>' + esc(phone) + '</small>') +
-            '</span>' +
-            '<span class="admin-donation-meta">' +
-              '<small><i class="fa-regular fa-calendar-days"></i>' + fmtDate(d.created_at || d.createdAt || d.data, true) + '</small>' +
-              '<small><i class="fa-solid fa-location-dot"></i>Entrega: ' + esc(deliveryLabel) + '</small>' +
-            '</span>' +
-            '<i class="fa-solid fa-chevron-down admin-donation-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-donation-detail">' +
-            '<div class="admin-donation-info">' +
-              '<span><i class="fa-solid fa-cube"></i>Itens doados</span>' +
-              '<strong>' + (isCesta ? 'Cesta básica' : esc(donationFoodLabel(d))) + '</strong>' +
-              (isCesta ? '<small>' + esc(donationFoodLabel(d)) + '</small>' : '') +
-            '</div>' +
-            '<div class="admin-donation-info">' +
-              '<span><i class="fa-solid fa-scale-balanced"></i>Quantidade</span>' +
-              '<strong>' + fmtKg(getDonationKg(d)) + '</strong>' +
-            '</div>' +
-            '<div class="admin-donation-info">' +
-              '<span><i class="fa-regular fa-message"></i>Observação</span>' +
-              '<strong>' + esc(note) + '</strong>' +
-            '</div>' +
-            '<div class="admin-donation-actions">' +
-              '<button class="admin-donation-action view" data-donation-view="' + esc(d.id) + '"><i class="fa-regular fa-eye"></i><span>Ver detalhes</span></button>' +
-              '<button class="admin-donation-action danger" data-donation-delete="' + esc(d.id) + '"><i class="fa-regular fa-trash-can"></i><span>Excluir</span></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div></div>' +
-      '<p class="admin-table-foot">Mostrando ' + fmtInt(rows.length) + ' de ' + fmtInt(state.data.donations.length) + ' doações</p>';
-  }
-
   function renderDonationsTable(rows) {
     if (!rows.length) {
       return '<div class="admin-empty"><i class="fa-solid fa-hand-holding-heart"></i><p>Nenhuma doação encontrada para os filtros selecionados.</p></div>';
@@ -2320,88 +2176,6 @@
     });
   }
 
-  function renderFamiliesTable(rows) {
-    /* Resumo (protocolo + responsavel + status) sempre visível; bairro,
-       pessoas, necessidade, prioridade e ações só ao tocar para abrir. */
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-users"></i><span>Nenhuma familia aprovada para receber cesta neste mes.</span></div>';
-    }
-    return '<div class="admin-expand-list">' +
-      rows.map(function (f) {
-        var phone = String(f.telefone || f.whatsapp || "").replace(/\D/g, "");
-        var wa = phone ? "https://wa.me/55" + phone : "";
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<span class="admin-expand-lead">' + esc(f.protocolo || f.id) + '</span>' +
-            familyAvatarHtml() +
-            '<span class="admin-expand-title">' + esc(f.responsavel || f.nome) + '</span>' +
-            statusBadge(f.status || "em-analise") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail">' +
-            '<span><strong>Contato:</strong> ' + esc(f.telefone || "—") + '</span>' +
-            '<span><strong>Bairro:</strong> ' + esc(f.bairro || "—") + '</span>' +
-            '<span><strong>Endereço:</strong> ' + esc(f.endereco || "—") + '</span>' +
-            '<span><strong>Pessoas:</strong> <i class="fa-solid fa-users"></i> ' + fmtInt(f.pessoas || f.pessoasNaCasa || 1) + '</span>' +
-            '<span><strong>Renda familiar:</strong> ' + (f.renda ? fmtMoney(f.renda) : "—") + '</span>' +
-            '<span><strong>Necessidade:</strong> ' + esc(f.necessidade || "Cesta basica") + '</span>' +
-            '<span><strong>Mes da cesta:</strong> ' + esc(f.mes_referencia || monthKey()) + '</span>' +
-            '<span><strong>Recebeu em:</strong> ' + esc(f.entregue_em ? fmtDate(f.entregue_em, true) : "Ainda nao recebeu") + '</span>' +
-            '<span><strong>Prioridade:</strong> ' + priorityBadge(f.prioridade || "media") + '</span>' +
-            (f.observacao ? '<span><strong>Observação:</strong> ' + esc(f.observacao) + '</span>' : "") +
-            '<div class="admin-row-actions">' +
-              (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-button compact" data-family-delivery="' + esc(f.id) + '" data-status="entregue"><i class="fa-solid fa-box"></i>Recebeu</button>' +
-              '<button class="admin-button compact" data-family-delivery="' + esc(f.id) + '" data-status="aguardando-entrega"><i class="fa-solid fa-hourglass-half"></i>Aguardando</button>' +
-              '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar família" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div>';
-  }
-
-  function renderBasketRequestsTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-basket-shopping"></i><span>Nenhuma solicitacao de cesta encontrada.</span></div>';
-    }
-    return '<div class="admin-expand-list admin-request-list">' +
-      rows.map(function (f) {
-        var phone = String(f.telefone || f.whatsapp || "").replace(/\D/g, "");
-        var wa = phone ? "https://wa.me/55" + phone : "";
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<span class="admin-expand-lead">' + esc(f.protocolo || f.id || "SOL") + '</span>' +
-            familyAvatarHtml() +
-            '<span class="admin-expand-title">' + esc(f.responsavel || f.nome || "Solicitante") + '</span>' +
-            statusBadge(f.status || "em-analise") +
-            '<span class="admin-expand-lead">' + esc(fmtDate(f.created_at || f.createdAt, true)) + '</span>' +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail admin-request-detail">' +
-            '<span><strong>Telefone:</strong> ' + esc(f.telefone || f.whatsapp || "-") + '</span>' +
-            '<span><strong>Bairro:</strong> ' + esc(f.bairro || "-") + '</span>' +
-            '<span><strong>Endereco:</strong> ' + esc(f.endereco || f.logradouro || "-") + '</span>' +
-            '<span><strong>Referencia:</strong> ' + esc(f.referencia || "-") + '</span>' +
-            '<span><strong>Pessoas:</strong> ' + esc(f.pessoas_texto || fmtInt(f.pessoas || f.pessoasNaCasa || 1)) + '</span>' +
-            '<span><strong>Criancas:</strong> ' + esc(f.criancas || "-") + '</span>' +
-            '<span><strong>Idosos:</strong> ' + esc(f.idosos || "-") + '</span>' +
-            '<span><strong>Deficiencia:</strong> ' + esc(f.deficiencia || "-") + '</span>' +
-            '<span><strong>Renda:</strong> ' + esc(requestIncome(f)) + '</span>' +
-            '<span><strong>Trabalho:</strong> ' + esc(f.trabalho || "-") + '</span>' +
-            '<span><strong>Beneficio:</strong> ' + esc(f.beneficio || "-") + '</span>' +
-            '<span><strong>Necessidade:</strong> ' + esc(f.necessidade || "Cesta basica") + '</span>' +
-            '<span><strong>Prioridade:</strong> ' + priorityBadge(f.prioridade || "media") + '</span>' +
-            '<div class="admin-row-actions">' +
-              (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-button compact" data-request-status="' + esc(f.id) + '" data-status="aguardando-entrega"><i class="fa-solid fa-circle-check"></i>Aprovar para receber</button>' +
-              '<button class="admin-button compact" data-request-status="' + esc(f.id) + '" data-status="aguardando-documentos"><i class="fa-solid fa-file-circle-exclamation"></i>Documentos</button>' +
-              '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar solicitacao" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div>';
-  }
-
   function renderBasketHistoryHtml(f) {
     return '<div class="admin-basket-history"><h4>Histórico de Cestas</h4>' +
       familyBasketHistory(f).map(function (r) {
@@ -2414,95 +2188,6 @@
         '</div>';
       }).join("") +
       '</div>';
-  }
-
-  function renderFamiliesTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-users"></i><span>Nenhuma familia aprovada para receber cesta neste mes.</span></div>';
-    }
-    return '<div class="admin-expand-list">' +
-      rows.map(function (f) {
-        var wa = whatsappUrl(f.telefone || f.whatsapp);
-        var familyName = f.familia || f.nome_familia || f.responsavel || f.nome || "Família";
-        var responsible = f.responsavel || f.nome || familyName;
-        var last = lastReceivedBasket(f);
-        var next = nextBasket(f);
-        var situation = "Aguardando entrega de " + monthLabelFromKey(next.mes_referencia).replace(/\/.*/, "");
-        var familyState = basketStatusClass(f.status || next.status);
-        if (familyState === "danger") situation = "Não recebeu a cesta de " + monthLabelFromKey(f.mes_referencia || monthKey()).replace(/\/.*/, "");
-        return '<details class="admin-expand-row admin-family-state admin-family-state--' + esc(familyState) + '">' +
-          '<summary class="admin-expand-summary">' +
-            '<span class="admin-expand-lead">' + esc(f.protocolo || f.id) + '</span>' +
-            familyAvatarHtml() +
-            '<span class="admin-expand-title">' + esc("Família: " + familyName) + '</span>' +
-            statusBadge(f.status || "em-analise") +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail admin-family-profile">' +
-            '<div class="admin-family-profile-main">' +
-              '<span><strong>Família:</strong> ' + esc(familyName) + '</span>' +
-              '<span><strong>Responsável:</strong> ' + esc(responsible) + '</span>' +
-              contactLinkHtml("Telefone", f.telefone || f.whatsapp) +
-              '<span><strong>Endereço:</strong> ' + esc(f.endereco || "-") + '</span>' +
-              '<span><strong>Status da família:</strong> ' + esc(f.status_familia || "Ativa") + '</span>' +
-            '</div>' +
-            '<div class="admin-family-cycle">' +
-              '<span><strong>Última cesta recebida:</strong><em>' + esc(last ? monthLabelFromKey(last.mes_referencia) : "Nenhuma registrada") + '</em></span>' +
-              '<span><strong>Próxima cesta prevista:</strong><em>' + esc(monthLabelFromKey(next.mes_referencia)) + '</em></span>' +
-              '<span><strong>Situação:</strong><em>' + esc(situation) + '</em></span>' +
-            '</div>' +
-            renderBasketHistoryHtml(f) +
-            '<div class="admin-row-actions">' +
-              (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-button compact" data-family-delivery="' + esc(f.id) + '" data-status="entregue"><i class="fa-solid fa-box"></i>Recebeu</button>' +
-              '<button class="admin-button compact" data-family-delivery="' + esc(f.id) + '" data-status="aguardando-entrega"><i class="fa-solid fa-hourglass-half"></i>Aguardando</button>' +
-              '<button class="admin-button compact danger" data-family-delivery="' + esc(f.id) + '" data-status="nao-retirada"><i class="fa-solid fa-circle-xmark"></i>Não recebeu</button>' +
-              '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar familia" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div>';
-  }
-
-  function renderBasketRequestsTable(rows) {
-    if (!rows.length) {
-      return '<div class="admin-empty"><i class="fa-solid fa-basket-shopping"></i><span>Nenhuma solicitacao de cesta encontrada.</span></div>';
-    }
-    return '<div class="admin-expand-list admin-request-list">' +
-      rows.map(function (f) {
-        var wa = whatsappUrl(f.telefone || f.whatsapp);
-        return '<details class="admin-expand-row">' +
-          '<summary class="admin-expand-summary">' +
-            '<span class="admin-expand-lead">' + esc(f.protocolo || f.id || "SOL") + '</span>' +
-            familyAvatarHtml() +
-            '<span class="admin-expand-title">' + esc(f.responsavel || f.nome || "Solicitante") + '</span>' +
-            statusBadge(f.status || "em-analise") +
-            '<span class="admin-expand-lead">' + esc(fmtDate(f.created_at || f.createdAt, true)) + '</span>' +
-            '<i class="fa-solid fa-chevron-down admin-expand-chevron" aria-hidden="true"></i>' +
-          '</summary>' +
-          '<div class="admin-expand-detail admin-request-detail">' +
-            contactLinkHtml("Telefone", f.telefone || f.whatsapp) +
-            '<span><strong>Bairro:</strong> ' + esc(f.bairro || "-") + '</span>' +
-            '<span><strong>Endereco:</strong> ' + esc(f.endereco || f.logradouro || "-") + '</span>' +
-            '<span><strong>Referencia:</strong> ' + esc(f.referencia || "-") + '</span>' +
-            '<span><strong>Pessoas:</strong> ' + esc(f.pessoas_texto || fmtInt(f.pessoas || f.pessoasNaCasa || 1)) + '</span>' +
-            '<span><strong>Criancas:</strong> ' + esc(f.criancas || "-") + '</span>' +
-            '<span><strong>Idosos:</strong> ' + esc(f.idosos || "-") + '</span>' +
-            '<span><strong>Deficiencia:</strong> ' + esc(f.deficiencia || "-") + '</span>' +
-            '<span><strong>Renda:</strong> ' + esc(requestIncome(f)) + '</span>' +
-            '<span><strong>Trabalho:</strong> ' + esc(f.trabalho || "-") + '</span>' +
-            '<span><strong>Beneficio:</strong> ' + esc(f.beneficio || "-") + '</span>' +
-            '<span><strong>Necessidade:</strong> ' + esc(f.necessidade || "Cesta basica") + '</span>' +
-            '<span><strong>Prioridade:</strong> ' + priorityBadge(f.prioridade || "media") + '</span>' +
-            '<div class="admin-row-actions">' +
-              (wa ? '<a class="admin-button compact" href="' + esc(wa) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>' : "") +
-              '<button class="admin-button compact" data-request-status="' + esc(f.id) + '" data-status="aguardando-entrega"><i class="fa-solid fa-circle-check"></i>Aprovar para receber</button>' +
-              '<button class="admin-button compact" data-request-status="' + esc(f.id) + '" data-status="aguardando-documentos"><i class="fa-solid fa-file-circle-exclamation"></i>Documentos</button>' +
-              '<button class="admin-mini-action" data-edit-family="' + esc(f.id) + '" aria-label="Editar solicitacao" title="Editar"><i class="fa-regular fa-pen-to-square"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</details>';
-      }).join("") + '</div>';
   }
 
   function adminPeopleBoard(title, rowsHtml) {
@@ -2664,22 +2349,33 @@
     return '<div class="admin-kanban">' + cols.map(function (col) {
       var colTasks = tasks.filter(function (t) { return slug(t.status) === col[0] || (col[0] === "concluido" && slug(t.status) === "concluida"); });
       return '<section class="admin-kanban-column"><div class="admin-kanban-head"><span class="admin-dot" style="--dot:' + COLORS[col[2]] + '"></span>' + esc(col[1]) + badge(String(colTasks.length), col[2]) + '</div><div class="admin-task-list">' +
-        (colTasks.length ? colTasks.map(renderTaskCard).join("") : '<div class="admin-empty">Nenhuma tarefa</div>') +
+        (colTasks.length ? colTasks.map(function (t) { return renderTaskCard(t, col[2]); }).join("") : '<div class="admin-empty">Nenhuma tarefa</div>') +
         '<button class="admin-button block" data-add-task="' + col[0] + '"><i class="fa-solid fa-plus"></i>Adicionar tarefa</button></div></section>';
     }).join("") + '</div>';
   }
 
-  function renderTaskCard(t) {
-    return '<article class="admin-task-card">' +
-      '<div class="admin-task-card-head"><h3>' + esc(t.titulo || t.title || "Tarefa") + '</h3>' +
+  function renderTaskCard(t, tone) {
+    var nome = t.responsavel || "Equipe Semear";
+    var titulo = t.titulo || t.title || "Tarefa";
+    var descricao = t.descricao || t.description || "";
+    return '<details class="admin-donation-card admin-donation-card--' + (tone || "blue") + ' admin-task-card">' +
+      '<summary class="admin-task-card-summary">' +
+        '<span class="admin-donation-avatar admin-task-card-avatar" aria-hidden="true">' + esc(initials(nome)) + '</span>' +
+        '<span class="admin-task-card-body">' +
+          '<strong>' + esc(titulo) + '</strong>' +
+          '<small><i class="fa-regular fa-calendar"></i>' + fmtDate(t.data || t.dueDate) + ' · ' + esc(nome) + '</small>' +
+          '<span class="admin-task-card-priority">' + priorityBadge(t.prioridade || "media") + '</span>' +
+        '</span>' +
+        '<i class="fa-solid fa-chevron-down admin-donation-chevron" aria-hidden="true"></i>' +
+      '</summary>' +
+      '<div class="admin-task-card-detail">' +
+        (descricao ? '<p>' + esc(descricao) + '</p>' : '') +
         '<div class="admin-row-actions">' +
           '<button class="admin-mini-action" data-task-edit="' + esc(t.id) + '" aria-label="Editar tarefa"><i class="fa-regular fa-pen-to-square"></i></button>' +
           '<button class="admin-mini-action danger" data-task-delete="' + esc(t.id) + '" aria-label="Excluir tarefa"><i class="fa-regular fa-trash-can"></i></button>' +
         '</div>' +
       '</div>' +
-      '<p>' + esc(t.descricao || t.description || "") + '</p>' +
-      '<div class="admin-person-row"><span class="admin-person-avatar">' + esc(initials(t.responsavel)) + '</span><span>' + esc(t.responsavel || "Equipe") + '</span></div>' +
-      '<div class="admin-task-meta">' + priorityBadge(t.prioridade || "media") + '<span><i class="fa-regular fa-calendar"></i> ' + fmtDate(t.data || t.dueDate) + '</span></div></article>';
+    '</details>';
   }
 
   function renderDeadlines() {

@@ -1969,46 +1969,76 @@ aside.admin-grid .admin-side-panel {
 
 .admin-task-card {
   min-width: 0;
-  border: 1px solid var(--admin-border);
-  border-radius: 14px;
-  padding: 14px;
-  background: rgba(8, 18, 39, 0.72);
 }
 
-.admin-task-card-head {
+.admin-task-card-summary {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  padding: 14px 14px 14px 20px;
+  cursor: pointer;
+  list-style: none;
 }
 
-.admin-task-card-head .admin-row-actions {
-  flex-shrink: 0;
+.admin-task-card-summary::-webkit-details-marker {
+  display: none;
 }
 
-.admin-task-card h3 {
-  margin: 0;
-  font-size: 0.98rem;
+.admin-task-card .admin-task-card-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 0.7rem;
+  flex: 0 0 auto;
+}
+
+.admin-task-card-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-task-card-body strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 0.92rem;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-.admin-task-card p {
-  margin: 0 0 12px;
+.admin-task-card-body small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: #a8b3c7;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-task-card-priority {
+  display: block;
+  margin-top: 8px;
+}
+
+.admin-task-card .admin-donation-chevron {
+  flex: 0 0 auto;
+  margin-top: 6px;
+}
+
+.admin-task-card-detail {
+  padding: 0 16px 16px 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.admin-task-card-detail p {
+  margin: 14px 0 12px;
   color: var(--admin-text-soft);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
-.admin-task-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+.admin-task-card-detail .admin-row-actions {
   margin-top: 12px;
-  color: var(--admin-muted);
-  font-size: 0.82rem;
 }
 
 .admin-person-row {
