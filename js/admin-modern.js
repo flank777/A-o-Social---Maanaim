@@ -2409,7 +2409,11 @@
 
     $all("[data-family-delivery]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        updateBasketRequestStatus(btn.dataset.familyDelivery, btn.dataset.status);
+        if (btn.dataset.status === "entregue") {
+          openDeliveryConfirmModal(btn.dataset.familyDelivery);
+        } else {
+          updateBasketRequestStatus(btn.dataset.familyDelivery, btn.dataset.status);
+        }
       });
     });
 
@@ -2962,13 +2966,14 @@
     } catch (err) { notify("Erro ao salvar: " + (err.message || err)); }
   }
 
-  async function updateBasketRequestStatus(id, status) {
+  async function updateBasketRequestStatus(id, status, extra) {
     if (!id || !status) return;
     try {
       if (!window.DoaVidaSync || typeof DoaVidaSync.updateFamilia !== "function") throw new Error("Servico indisponivel.");
       var now = new Date().toISOString();
       var payload = { status: status, updated_at: now };
       var currentFamily = (state.data.families || []).find(function (f) { return f.id === id; }) || {};
+      if (extra && extra.itens_doados) currentFamily = Object.assign({}, currentFamily, extra);
       var history = familyBasketHistory(currentFamily);
       var currentMonth = monthKey();
       var nextMonth = nextMonthKey(currentMonth);
@@ -4753,6 +4758,48 @@
     });
   }
 
+  function renderDeliveryConfirmModal() {
+    return '<div id="delivery-confirm-backdrop" class="admin-modal-backdrop" aria-hidden="true">' +
+      '<div class="admin-modal" role="dialog" aria-modal="true" aria-label="Confirmar entrega da cesta">' +
+        '<div class="admin-modal-header">' +
+          '<h2><i class="fa-solid fa-box"></i><span>Confirmar entrega da cesta</span></h2>' +
+          '<button class="admin-icon-button" id="delivery-confirm-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>' +
+        '</div>' +
+        '<div class="admin-modal-body">' +
+          '<form id="delivery-confirm-form" class="admin-form-grid">' +
+            '<input type="hidden" name="family-id" value="">' +
+            '<label>Itens doados<textarea name="itens_doados" rows="2" placeholder="Ex.: 1 pacote de arroz, 2 garrafas de óleo"></textarea></label>' +
+            '<label>Observação<textarea name="observacao" rows="2" placeholder="Ex.: Entregue normalmente"></textarea></label>' +
+            '<button type="submit" class="admin-button primary block"><i class="fa-regular fa-floppy-disk"></i>Confirmar entrega</button>' +
+          '</form>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function openDeliveryConfirmModal(familyId) {
+    var f = (state.data.families || []).find(function (x) { return x.id === familyId; });
+    var form = document.getElementById("delivery-confirm-form");
+    if (!f || !form) return;
+    form.querySelector("[name='family-id']").value = familyId;
+    form.querySelector("[name='itens_doados']").value = f.itens_doados || "";
+    form.querySelector("[name='observacao']").value = "";
+    openModal("delivery-confirm-backdrop");
+  }
+
+  async function saveDeliveryConfirm(e) {
+    e.preventDefault();
+    var form = e.target;
+    var familyId = form.querySelector("[name='family-id']").value;
+    var itensDoados = form.querySelector("[name='itens_doados']").value.trim();
+    var observacao = form.querySelector("[name='observacao']").value.trim();
+    closeModal("delivery-confirm-backdrop");
+    await updateBasketRequestStatus(familyId, "entregue", {
+      itens_doados: itensDoados || "Ainda não informado",
+      observacao: observacao || "Entregue normalmente",
+    });
+  }
+
   function renderTaskModal() {
     return '<div id="task-modal-backdrop" class="admin-modal-backdrop" aria-hidden="true">' +
       '<div class="admin-modal" role="dialog" aria-modal="true" aria-label="Cadastrar tarefa">' +
@@ -4980,6 +5027,7 @@
       { id: "donation-modal-backdrop",  html: renderDonationModal() },
       { id: "gallery-edit-backdrop",    html: renderGalleryEditModal() },
       { id: "task-modal-backdrop",      html: renderTaskModal() },
+      { id: "delivery-confirm-backdrop", html: renderDeliveryConfirmModal() },
       { id: "family-modal-backdrop",    html: renderFamilyModal() },
       { id: "volunteer-modal-backdrop", html: renderVolunteerModal() },
       { id: "wa-admin-modal-backdrop",  html: renderWhatsappAdminModal() },
@@ -4996,7 +5044,7 @@
 
   function bindModalBackdrops() {
     ["food-modal-backdrop", "cesta-img-modal-backdrop", "donation-modal-backdrop", "gallery-edit-backdrop",
-     "task-modal-backdrop",
+     "task-modal-backdrop", "delivery-confirm-backdrop",
      "family-modal-backdrop", "volunteer-modal-backdrop",
      "wa-admin-modal-backdrop"].forEach(function (id) {
       var el = document.getElementById(id);
@@ -5008,10 +5056,12 @@
       ["food-modal-close",      function () { closeFoodModal(); }],
       ["gallery-edit-close",    function () { closeGalleryEdit(); }],
       ["task-modal-close",      function () { closeModal("task-modal-backdrop"); }],
+      ["delivery-confirm-close", function () { closeModal("delivery-confirm-backdrop"); }],
       ["family-modal-close",    function () { closeModal("family-modal-backdrop"); }],
       ["volunteer-modal-close", function () { closeModal("volunteer-modal-backdrop"); }],
       ["wa-admin-modal-close",  function () { closeModal("wa-admin-modal-backdrop"); }],
       ["task-quick-form",        null, "submit", saveTask],
+      ["delivery-confirm-form",  null, "submit", saveDeliveryConfirm],
       ["family-quick-form",     null, "submit", saveFamily],
       ["volunteer-quick-form",  null, "submit", saveVolunteer],
       ["wa-admin-form",         null, "submit", saveWhatsappAdmin],
