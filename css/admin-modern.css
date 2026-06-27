@@ -2521,6 +2521,10 @@ aside.admin-grid .admin-side-panel {
     grid-template-columns: 1fr;
   }
 
+  .admin-gallery-layout > * {
+    min-width: 0;
+  }
+
   aside.admin-grid {
     position: static;
   }
@@ -2585,7 +2589,7 @@ aside.admin-grid .admin-side-panel {
     grid-template-columns: 1fr;
   }
 
-  .admin-tasks-layout > .admin-grid {
+  .admin-tasks-layout > * {
     min-width: 0;
   }
 
