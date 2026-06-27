@@ -862,12 +862,8 @@
     var low = all.filter(function (f) { var s = slug(foodStatus(f)[0]); return s === "baixo" || s === "critico"; }).length;
     var active = all.filter(function (f) { return f.ativo !== false && slug(f.status || "ativo") !== "inativo"; }).length;
     var cats = unique(all.map(foodCategory)).filter(Boolean);
-    var hasDefaults = window.DoaVidaAPI && Array.isArray(DoaVidaAPI.ALIMENTOS_PADRAO);
-    var seedBtn = hasDefaults
-      ? '<button class="admin-button" id="seed-foods"><i class="fa-solid fa-seedling"></i>Cadastrar alimentos padrão</button>'
-      : "";
     return '<div class="admin-view active">' +
-      '<div class="admin-action-row"><button class="admin-button success" id="open-food-form"><i class="fa-solid fa-plus"></i>Novo alimento</button>' + seedBtn + '<button class="admin-button js-export"><i class="fa-solid fa-download"></i>Exportar</button></div>' +
+      '<div class="admin-action-row"><button class="admin-button success" id="open-food-form"><i class="fa-solid fa-plus"></i>Novo alimento</button><button class="admin-button js-export"><i class="fa-solid fa-download"></i>Exportar</button></div>' +
       '<div class="admin-grid admin-kpi-grid admin-kpi-grid-compact admin-kpi-grid-stacked">' +
       kpiCard({ label: "Total de alimentos", value: fmtInt(all.length), icon: "fa-box-open", tone: "linear-gradient(135deg,#a855f7,#7c3aed)", spark: "linear-gradient(90deg,transparent,#a855f7,transparent)", trend: "Firebase" }) +
       kpiCard({ label: "Alimentos ativos", value: fmtInt(active), icon: "fa-circle-check", tone: "linear-gradient(135deg,#10b981,#059669)", spark: "linear-gradient(90deg,transparent,#10b981,transparent)", trend: all.length ? Math.round((active / all.length) * 100) + "% do total" : "0% do total" }) +
@@ -981,8 +977,7 @@
   function renderFoodCards(rows) {
     if (!rows.length) {
       return '<div class="admin-food-grid">' + renderCestaCompletaCard() + '</div>' +
-        '<div class="admin-empty"><i class="fa-solid fa-box-open"></i><p>Nenhum alimento encontrado no Firebase.</p>' +
-        '<button class="admin-button primary" id="seed-foods-empty"><i class="fa-solid fa-seedling"></i>Cadastrar alimentos padrao agora</button></div>';
+        '<div class="admin-empty"><i class="fa-solid fa-box-open"></i><p>Nenhum alimento encontrado no Firebase.</p></div>';
     }
     var cards = rows.map(function (f) {
       var img = foodImage(f);
@@ -1579,7 +1574,6 @@
   var SPIRITUAL_DIAS_LABELS = {
     seg: "Seg", ter: "Ter", qua: "Qua", qui: "Qui", sex: "Sex", sab: "Sáb", dom: "Dom",
   };
-  var SPIRITUAL_DIAS_ORDEM = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
   var SPIRITUAL_HORARIOS_LABELS = {
     manha: "Manhã", tarde: "Tarde", noite: "Noite", flexivel: "Flexível",
   };
@@ -1694,21 +1688,6 @@
       '</div>';
   }
 
-  function renderSpiritualAgenda(all) {
-    var visitantes = all.filter(function (v) { var m = spiritualModalidade(v); return m === "visita" || m === "ambos"; });
-    return '<div class="admin-list">' +
-      SPIRITUAL_DIAS_ORDEM.map(function (dia) {
-        var count = visitantes.filter(function (v) {
-          var dias = (v.dados && v.dados.dias_visita) || [];
-          return Array.isArray(dias) && dias.indexOf(dia) >= 0;
-        }).length;
-        return '<div class="admin-list-item"><div class="admin-list-icon">' + count + '</div>' +
-          '<div class="admin-list-body"><div class="admin-list-title">' + SPIRITUAL_DIAS_LABELS[dia] + '</div>' +
-          '<div class="admin-list-sub">voluntário' + (count === 1 ? "" : "s") + ' disponível' + (count === 1 ? "" : "is") + ' para visitar</div></div></div>';
-      }).join("") +
-      '</div>';
-  }
-
   function renderSpiritual() {
     var all = allSpiritualVolunteers();
     var rows = filteredSpiritual();
@@ -1732,9 +1711,7 @@
       '<div class="admin-grid admin-tasks-layout">' +
       '<div>' + panel("Lista de voluntários de apoio espiritual", renderSpiritualFilters() + renderSpiritualTable(rows)) + '</div>' +
       '<aside class="admin-grid">' +
-      panel("Distribuição por modalidade", '<div class="admin-donut-info"><canvas id="spiritual-modalidade"></canvas><div class="admin-legend" id="spiritual-modalidade-legend"></div></div>', { sub: "Como cada voluntário deseja ajudar" }) +
       panel("Pedidos e acompanhamento", renderSpiritualRequests(all), { sub: "Pedidos de oração e observações recebidas" }) +
-      panel("Agenda da semana", renderSpiritualAgenda(all), { sub: "Disponibilidade de visitas por dia" }) +
       '</aside>' +
       '</div>' +
       '</div>';
@@ -2579,12 +2556,6 @@
         saveDonationStatus({ preventDefault: function () {}, target: donationStatusForm }, { keepOpen: true });
       });
     }
-
-    /* Botão "Cadastrar alimentos padrão" (na action row e no estado vazio) */
-    ["seed-foods", "seed-foods-empty"].forEach(function (id) {
-      var btn = $("#" + id);
-      if (btn) btn.addEventListener("click", seedDefaultFoods);
-    });
 
     /* Card "Cesta Básica Completa" — abre o modal de troca de imagem */
     var editCestaImg = $("#edit-cesta-img");
@@ -4091,53 +4062,6 @@
     }, 50);
   }
 
-  async function seedDefaultFoods() {
-    if (!window.DoaVidaAPI || !DoaVidaAPI.ALIMENTOS_PADRAO) {
-      notify("api.js nao carregado — dados padrao indisponiveis.");
-      return;
-    }
-    if (!window.DoaVidaSync || typeof DoaVidaSync.addAlimento !== "function") {
-      notify("Firebase nao disponivel.");
-      return;
-    }
-    var padrao = DoaVidaAPI.ALIMENTOS_PADRAO;
-    var existentes = state.data.foods.map(function (f) { return slug(foodName(f)); });
-    var faltando = padrao.filter(function (p) {
-      return existentes.indexOf(slug(p.name || p.nome || "")) < 0;
-    });
-    if (!faltando.length) {
-      notify("Todos os alimentos padrao ja estao cadastrados no Firebase.");
-      return;
-    }
-    notify("Cadastrando " + faltando.length + " alimentos padrao...");
-    var salvos = 0;
-    for (var i = 0; i < faltando.length; i++) {
-      try {
-        var p = faltando[i];
-        var payload = {
-          name:        p.name || p.nome,
-          nome:        p.name || p.nome,
-          categoria:   p.categoria || "Cesta básica",
-          unidade:     p.unidade || "kg",
-          qtdPorCesta: p.qtdPorCesta || String(p.peso || ""),
-          kg:          p.kg || 0,
-          minimo:      p.minimo || 0,
-          meta:        p.goal || p.meta || 0,
-          imagem:      p.img || p.imagem || "",
-          img:         p.img || p.imagem || "",
-          peso:        p.peso || 0,
-          ativo:       true,
-          emoji:       p.emoji || "",
-        };
-        var saved = await DoaVidaSync.addAlimento(payload);
-        state.data.foods.unshift(saved || payload);
-        salvos++;
-      } catch (e) {}
-    }
-    notify(salvos + " alimento(s) cadastrado(s) com imagens no Firebase!");
-    renderActivePage();
-  }
-
   function updateGalleryEditPreview(url) {
     var preview = $("#gallery-edit-preview");
     if (!preview) return;
@@ -4651,9 +4575,6 @@
       if (prodData.labels.length) {
         barChart("tasks-productivity", prodData.labels, prodData.values, [COLORS.purple, COLORS.blue, COLORS.purple2, COLORS.blue, COLORS.purple]);
       }
-    } else if (page === "spiritual") {
-      var modCounts = spiritualModalidadeCounts(allSpiritualVolunteers());
-      donutChart("spiritual-modalidade", ["Intercessão em oração", "Visita presencial", "Ambas as formas"], [modCounts.intercessao, modCounts.visita, modCounts.ambos], [COLORS.purple, COLORS.blue, COLORS.green], "spiritual-modalidade-legend");
     }
   }
 
