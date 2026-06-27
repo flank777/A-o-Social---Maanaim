@@ -29,8 +29,6 @@
       donations:  { status: "todos", tipo: "todos", periodo: "todos" },
     },
     charts: {},
-    calYear:  new Date().getFullYear(),
-    calMonth: new Date().getMonth(),
   };
 
   var COLORS = {
@@ -434,7 +432,6 @@
       families: await readRemote("getFamilias"),
       volunteers: await readRemote("getVoluntarios"),
       tasks: await readRemote("getTarefas"),
-      eventos: await readRemote("getEventos"),
       gallery: await readRemote("getGaleria"),
       whatsappAdmins: await readRemote("getWhatsappAdmins"),
       whatsappLogs: await readRemote("getWhatsappLogs"),
@@ -742,7 +739,6 @@
       kpiCard({ label: "Aguardando documentos", value: fmtInt(documents), icon: "fa-file-circle-exclamation", tone: "linear-gradient(135deg,#3b82f6,#2563eb)", spark: "linear-gradient(90deg,transparent,#2f7cff,transparent)", trend: "Volta para solicitacoes" }) +
       '</div>' +
       panel("Familias que recebem cesta em " + currentMonthLabel(), renderFamilyFilters() + renderFamiliesTable(rows), { sub: "Controle quem ja recebeu e quem ainda esta aguardando a cesta basica." }) +
-      '<div class="admin-grid admin-families-bottom" style="margin-top:16px">' +
       panel("Mapa de atendimento",
         '<div class="admin-map-toolbar">' +
           '<i class="fa-solid fa-magnifying-glass admin-map-search-icon"></i>' +
@@ -752,8 +748,6 @@
         '<div id="admin-family-map" class="admin-leaflet-map"></div>',
         { className: "admin-families-map" }
       ) +
-      panel("Proximas entregas", renderCalendarAndDeliveries()) +
-      '</div>' +
       '</div>';
   }
 
@@ -2652,107 +2646,6 @@
     return '<div><span class="admin-detail-label">' + esc(label) + '</span><span class="admin-detail-value">' + esc(value) + '</span></div>';
   }
 
-  var TIPO_EVENTO_COLORS = {
-    "reuniao":   "blue",
-    "entrega":   "green",
-    "culto":     "purple",
-    "campanha":  "yellow",
-    "visita":    "cyan",
-    "outro":     "gray",
-  };
-
-  function renderCalendarAndDeliveries() {
-    var year  = state.calYear;
-    var month = state.calMonth;
-    var now   = new Date();
-    var isCurrentMonth = now.getFullYear() === year && now.getMonth() === month;
-    var todayDay = now.getDate();
-
-    var daysInMonth  = new Date(year, month + 1, 0).getDate();
-    var firstWeekDay = new Date(year, month, 1).getDay();
-    var monthLabel   = new Date(year, month, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-    monthLabel = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
-
-    /* Índice de eventos por dia */
-    var eventsByDay = {};
-    (state.data.eventos || []).forEach(function (ev) {
-      if (!ev.data) return;
-      var parts = ev.data.split("-");
-      if (parseInt(parts[0]) !== year || parseInt(parts[1]) - 1 !== month) return;
-      var day = parseInt(parts[2]);
-      if (!eventsByDay[day]) eventsByDay[day] = [];
-      eventsByDay[day].push(ev);
-    });
-
-    var DOW = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-    var header = DOW.map(function (d) {
-      return '<span class="admin-cal-dow">' + d + '</span>';
-    }).join("");
-
-    var cells = "";
-    for (var i = 0; i < firstWeekDay; i++) {
-      cells += '<span class="admin-calendar-day empty"></span>';
-    }
-    for (var d = 1; d <= daysInMonth; d++) {
-      var isToday  = isCurrentMonth && d === todayDay;
-      var hasEvent = !!eventsByDay[d];
-      var iso = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
-      var cls = "admin-calendar-day" +
-        (isToday  ? " active"    : "") +
-        (hasEvent ? " has-event" : "");
-      cells += '<button class="' + cls + '" data-cal-day="' + d + '" data-cal-date="' + iso + '" aria-label="' + d + ' de ' + monthLabel + '">' +
-        d + (hasEvent ? '<i class="admin-cal-dot"></i>' : '') +
-      '</button>';
-    }
-
-    /* Lista ordenada de eventos do mês */
-    var allEvents = [];
-    Object.keys(eventsByDay).sort(function (a, b) { return a - b; }).forEach(function (day) {
-      eventsByDay[day].forEach(function (ev) { allEvents.push({ day: parseInt(day), ev: ev }); });
-    });
-
-    var listHtml;
-    if (allEvents.length) {
-      listHtml = allEvents.slice(0, 6).map(function (item) {
-        var isToday2 = isCurrentMonth && item.day === todayDay;
-        var isPast   = !isCurrentMonth || item.day < todayDay;
-        var dayLabel = isToday2 ? "Hoje" : item.day + "/" + String(month + 1).padStart(2, "0");
-        var tone     = isToday2 ? "purple" : isPast ? "gray" : "blue";
-        var tipo     = item.ev.tipo || "outro";
-        return '<div class="admin-list-item">' +
-          '<div class="admin-list-icon" style="flex-shrink:0;font-size:0.8rem;line-height:1.2;text-align:center">' +
-            '<strong>' + item.day + '</strong>' +
-            '<small style="display:block;font-size:0.6rem;opacity:.65">' + DOW[new Date(year, month, item.day).getDay()] + '</small>' +
-          '</div>' +
-          '<div class="admin-list-body">' +
-            '<div class="admin-list-title">' + esc(item.ev.titulo) + '</div>' +
-            '<div class="admin-list-sub">' + (item.ev.hora ? item.ev.hora + ' · ' : '') + esc(item.ev.local || item.ev.responsavel || "Ação Social Semear") + '</div>' +
-          '</div>' +
-          '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
-            badge(dayLabel, tone) +
-            '<button class="admin-mini-action" style="width:28px;height:28px;border-radius:8px" data-del-evento="' + esc(item.ev.id) + '" title="Remover"><i class="fa-solid fa-trash" style="font-size:0.7rem"></i></button>' +
-          '</div>' +
-        '</div>';
-      }).join("");
-    } else {
-      listHtml = '<div class="admin-empty" style="padding:20px 12px;text-align:center">' +
-        '<i class="fa-regular fa-calendar-xmark" style="font-size:1.6rem;opacity:.35;display:block;margin-bottom:8px"></i>' +
-        'Nenhum agendamento neste mês.<br><small style="opacity:.6">Clique em um dia para adicionar.</small>' +
-      '</div>';
-    }
-
-    return '<div class="admin-calendar">' +
-      '<div class="admin-cal-nav">' +
-        '<button class="admin-icon-button" id="cal-prev" aria-label="Mês anterior"><i class="fa-solid fa-chevron-left"></i></button>' +
-        '<strong>' + monthLabel + '</strong>' +
-        '<button class="admin-icon-button" id="cal-next" aria-label="Próximo mês"><i class="fa-solid fa-chevron-right"></i></button>' +
-      '</div>' +
-      '<div class="admin-calendar-grid">' + header + cells + '</div>' +
-      '<div class="admin-cal-hint"><i class="fa-solid fa-circle-info"></i> Clique em um dia para agendar</div>' +
-    '</div>' +
-    '<div class="admin-list">' + listHtml + '</div>';
-  }
-
   function renderKanban(tasks) {
     var cols = [
       ["a-fazer", "A fazer", "purple"],
@@ -3212,40 +3105,6 @@
     var volCardsSave = $("#vol-cards-save");
     if (volCardsSave) volCardsSave.addEventListener("click", saveVolunteerCards);
 
-    /* Navegação do calendário */
-    var calPrev = $("#cal-prev");
-    if (calPrev) calPrev.addEventListener("click", function () {
-      state.calMonth--;
-      if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
-      renderActivePage();
-    });
-    var calNext = $("#cal-next");
-    if (calNext) calNext.addEventListener("click", function () {
-      state.calMonth++;
-      if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
-      renderActivePage();
-    });
-
-    /* Clique em dia do calendário → abre modal de evento com data pré-preenchida */
-    $all("[data-cal-date]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var form = document.getElementById("evento-quick-form");
-        if (form) {
-          var dataInput = form.querySelector("[name='data']");
-          if (dataInput) dataInput.value = btn.dataset.calDate;
-        }
-        openModal("evento-modal-backdrop");
-      });
-    });
-
-    /* Botão de excluir evento do calendário */
-    $all("[data-del-evento]").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        deleteEvento(btn.dataset.delEvento);
-      });
-    });
-
     /* Botões das novas páginas */
     var newFamily = $("#new-family");
     if (newFamily) newFamily.addEventListener("click", function () { openFamilyNewModal(); });
@@ -3275,51 +3134,6 @@
 
     /* Vincula close/backdrop dos modais novos (idempotente via _modalBound) */
     bindModalBackdrops();
-  }
-
-  async function saveEvento(e) {
-    e.preventDefault();
-    var form = e.target;
-    var d = new FormData(form);
-    var payload = {
-      titulo:      d.get("titulo") || "",
-      data:        d.get("data")   || "",
-      hora:        d.get("hora")   || "",
-      tipo:        d.get("tipo")   || "outro",
-      responsavel: d.get("responsavel") || "Equipe Semear",
-      local:       d.get("local")       || "",
-      descricao:   d.get("descricao")   || "",
-    };
-    if (!payload.data) { notify("Informe a data do evento."); return; }
-    try {
-      if (window.DoaVidaSync && typeof DoaVidaSync.addEvento === "function") {
-        var saved = await DoaVidaSync.addEvento(payload);
-        payload = saved || Object.assign({ id: "evt-" + Date.now() }, payload);
-      } else {
-        payload = Object.assign({ id: "evt-" + Date.now() }, payload);
-      }
-      if (!state.data.eventos) state.data.eventos = [];
-      state.data.eventos.unshift(payload);
-      /* Navega para o mês do evento salvo */
-      var parts = payload.data.split("-");
-      state.calYear  = parseInt(parts[0]);
-      state.calMonth = parseInt(parts[1]) - 1;
-      notify("Agendamento salvo!");
-      closeModal("evento-modal-backdrop");
-      renderActivePage();
-    } catch (err) { notify("Erro ao salvar: " + (err.message || err)); }
-  }
-
-  async function deleteEvento(id) {
-    if (!id) return;
-    try {
-      if (window.DoaVidaSync && typeof DoaVidaSync.deleteEvento === "function") {
-        await DoaVidaSync.deleteEvento(id);
-      }
-      state.data.eventos = (state.data.eventos || []).filter(function (ev) { return ev.id !== id; });
-      notify("Agendamento removido.");
-      renderActivePage();
-    } catch (err) { notify("Erro ao remover: " + (err.message || err)); }
   }
 
   function openFamilyNewModal() {
@@ -5314,40 +5128,6 @@
     });
   }
 
-  function renderEventoModal() {
-    return '<div id="evento-modal-backdrop" class="admin-modal-backdrop" aria-hidden="true">' +
-      '<div class="admin-modal" role="dialog" aria-modal="true" aria-label="Novo agendamento">' +
-        '<div class="admin-modal-header">' +
-          '<h2 id="evento-modal-title">Novo agendamento</h2>' +
-          '<button class="admin-icon-button" id="evento-modal-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>' +
-        '</div>' +
-        '<div class="admin-modal-body">' +
-          '<form id="evento-quick-form" class="admin-form-grid">' +
-            '<label>Título do evento<input name="titulo" required placeholder="Ex.: Entrega de cestas, Reunião de voluntários..."></label>' +
-            '<div class="admin-form-row">' +
-              '<label>Data<input name="data" type="date" required></label>' +
-              '<label>Horário<input name="hora" type="time" placeholder="08:00"></label>' +
-            '</div>' +
-            '<div class="admin-form-row">' +
-              '<label>Tipo<select name="tipo">' +
-                '<option value="entrega">Entrega de cestas</option>' +
-                '<option value="reuniao">Reunião</option>' +
-                '<option value="culto">Culto / Momento espiritual</option>' +
-                '<option value="campanha">Campanha</option>' +
-                '<option value="visita">Visita domiciliar</option>' +
-                '<option value="outro">Outro</option>' +
-              '</select></label>' +
-              '<label>Responsável<input name="responsavel" placeholder="Ex.: Equipe Semear"></label>' +
-            '</div>' +
-            '<label>Local<input name="local" placeholder="Ex.: Sede da Ação Social, Guamá..."></label>' +
-            '<label>Descrição<textarea name="descricao" rows="2" placeholder="Detalhes do evento..."></textarea></label>' +
-            '<button type="submit" class="admin-button primary block"><i class="fa-regular fa-calendar-check"></i>Salvar agendamento</button>' +
-          '</form>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
   function renderTaskModal() {
     return '<div id="task-modal-backdrop" class="admin-modal-backdrop" aria-hidden="true">' +
       '<div class="admin-modal" role="dialog" aria-modal="true" aria-label="Cadastrar tarefa">' +
@@ -5575,7 +5355,6 @@
       { id: "donation-modal-backdrop",  html: renderDonationModal() },
       { id: "gallery-edit-backdrop",    html: renderGalleryEditModal() },
       { id: "task-modal-backdrop",      html: renderTaskModal() },
-      { id: "evento-modal-backdrop",    html: renderEventoModal() },
       { id: "family-modal-backdrop",    html: renderFamilyModal() },
       { id: "volunteer-modal-backdrop", html: renderVolunteerModal() },
       { id: "wa-admin-modal-backdrop",  html: renderWhatsappAdminModal() },
@@ -5592,7 +5371,7 @@
 
   function bindModalBackdrops() {
     ["food-modal-backdrop", "cesta-img-modal-backdrop", "donation-modal-backdrop", "gallery-edit-backdrop",
-     "task-modal-backdrop", "evento-modal-backdrop",
+     "task-modal-backdrop",
      "family-modal-backdrop", "volunteer-modal-backdrop",
      "wa-admin-modal-backdrop"].forEach(function (id) {
       var el = document.getElementById(id);
@@ -5604,8 +5383,6 @@
       ["food-modal-close",      function () { closeFoodModal(); }],
       ["gallery-edit-close",    function () { closeGalleryEdit(); }],
       ["task-modal-close",      function () { closeModal("task-modal-backdrop"); }],
-      ["evento-modal-close",    function () { closeModal("evento-modal-backdrop"); }],
-      ["evento-quick-form",     null, "submit", saveEvento],
       ["family-modal-close",    function () { closeModal("family-modal-backdrop"); }],
       ["volunteer-modal-close", function () { closeModal("volunteer-modal-backdrop"); }],
       ["wa-admin-modal-close",  function () { closeModal("wa-admin-modal-backdrop"); }],

@@ -781,10 +781,6 @@ button {
   align-items: start;
 }
 
-.admin-families-bottom {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-}
-
 .admin-filter-bar {
   display: flex;
   gap: 10px;
@@ -1974,87 +1970,6 @@ aside.admin-grid .admin-side-panel {
   box-shadow: 0 0 0 10px rgba(139, 92, 246, 0.18);
 }
 
-.admin-calendar {
-  padding: 16px 18px 4px;
-}
-
-.admin-cal-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.admin-cal-nav strong {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.admin-cal-dow {
-  display: grid;
-  place-items: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--admin-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding-bottom: 4px;
-}
-
-.admin-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-.admin-calendar-day {
-  min-height: 34px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  position: relative;
-  color: var(--admin-text-soft);
-  background: rgba(255, 255, 255, 0.035);
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: default;
-  transition: background 0.15s;
-}
-.admin-calendar-day:not(.empty):hover {
-  background: rgba(139, 92, 246, 0.15);
-}
-.admin-calendar-day.empty {
-  background: transparent;
-}
-.admin-calendar-day.active {
-  background: linear-gradient(135deg, var(--admin-purple), var(--admin-blue));
-  color: #fff;
-  font-weight: 700;
-}
-.admin-calendar-day.has-event .admin-cal-dot {
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--admin-purple);
-  display: block;
-}
-.admin-calendar-day.active .admin-cal-dot {
-  background: rgba(255,255,255,0.7);
-}
-
-.admin-cal-hint {
-  margin-top: 8px;
-  font-size: 0.75rem;
-  color: var(--admin-text-soft);
-  opacity: 0.7;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
 .admin-kanban {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2693,8 +2608,7 @@ aside.admin-grid .admin-side-panel {
 
   .admin-dashboard-layout,
   .admin-analytics-charts,
-  .admin-analytics-bottom,
-  .admin-families-bottom {
+  .admin-analytics-bottom {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -2870,8 +2784,7 @@ aside.admin-grid .admin-side-panel {
   .admin-kpi-grid,
   .admin-dashboard-layout,
   .admin-analytics-charts,
-  .admin-analytics-bottom,
-  .admin-families-bottom {
+  .admin-analytics-bottom {
     grid-template-columns: 1fr;
   }
 
