@@ -59,14 +59,29 @@ function _withTimeout(promise, ms, fallback) {
   });
 }
 
-/* Lê todos os documentos de uma coleção, ordenados por campo */
+/* Lê todos os documentos de uma coleção, ordenados por campo.
+   Antes, uma falha ou timeout na primeira tentativa virava lista vazia
+   sem nenhum aviso — parecia que os dados tinham "desaparecido" (eram
+   removidos do retorno por uma conexao lenta, nao do banco). Agora
+   tenta de novo uma vez antes de desistir, e sempre avisa no console. */
 async function _getAll(colecao, orderField) {
-  try {
+  function tentar() {
     var q = orderField
       ? _db.collection(colecao).orderBy(orderField, 'desc')
       : _db.collection(colecao);
-    var snap = await _withTimeout(q.get(), 12000, null);
-    if (!snap || !snap.docs) return [];
+    return _withTimeout(q.get(), 12000, null);
+  }
+  try {
+    var snap = await tentar();
+    if (!snap || !snap.docs) {
+      console.warn('[DoaVida]', colecao, '- 1a tentativa falhou ou expirou (12s), tentando novamente...');
+      await new Promise(function (resolve) { setTimeout(resolve, 1200); });
+      snap = await tentar();
+    }
+    if (!snap || !snap.docs) {
+      console.error('[DoaVida]', colecao, '- nao foi possivel carregar apos 2 tentativas (conexao lenta ou indisponivel).');
+      return [];
+    }
     /* { id: d.id } vem por ÚLTIMO de propósito: o ID real do documento no Firestore
        nunca pode ser sobrescrito por um campo "id" que tenha sido salvo (por engano)
        dentro dos próprios dados do documento. */
