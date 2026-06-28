@@ -386,14 +386,14 @@ var DoaVidaAPI = {
     Qualquer alteração aqui reflete tanto no admin quanto no formulário.
   */
   ALIMENTOS_PADRAO: [
-    { id:'arroz',      name:'Arroz 5kg',       peso:5,   img:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&q=70',  goal:2000, kg:0, emoji:'🌾' },
-    { id:'feijao',     name:'Feijão 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1612257999756-3b9d3acd5e66?w=300&q=70',  goal:800,  kg:0, emoji:'🫘' },
-    { id:'macarrao',   name:'Macarrão 500g',    peso:0.5, img:'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=300&q=70',  goal:500,  kg:0, emoji:'🍝' },
-    { id:'oleo',       name:'Óleo de Soja 1L',  peso:1,   img:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&q=70',  goal:400,  kg:0, emoji:'🫙' },
-    { id:'acucar',     name:'Açúcar 1kg',       peso:1,   img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=70',  goal:400,  kg:0, emoji:'🍬' },
-    { id:'sal',        name:'Sal 1kg',           peso:1,   img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300&q=70',  goal:200,  kg:0, emoji:'🧂' },
-    { id:'farinha',    name:'Farinha de Trigo',  peso:1,   img:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&q=70',  goal:300,  kg:0, emoji:'🌾' },
-    { id:'sardinha',   name:'Sardinha 125g',     peso:0.125, img:'https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=300&q=70', goal:100, kg:0, emoji:'🐟' }
+    { id:'arroz',      name:'Arroz 5kg',       peso:5,   img:'img/alimentos/arroz.jpg',     goal:2000, kg:0, emoji:'🌾' },
+    { id:'feijao',     name:'Feijão 1kg',       peso:1,   img:'img/alimentos/feijao.jpg',    goal:800,  kg:0, emoji:'🫘' },
+    { id:'macarrao',   name:'Macarrão 500g',    peso:0.5, img:'img/alimentos/macarrao.jpg',  goal:500,  kg:0, emoji:'🍝' },
+    { id:'oleo',       name:'Óleo de Soja 1L',  peso:1,   img:'img/alimentos/oleo.jpg',      goal:400,  kg:0, emoji:'🫙' },
+    { id:'acucar',     name:'Açúcar 1kg',       peso:1,   img:'img/alimentos/acucar.jpg',    goal:400,  kg:0, emoji:'🍬' },
+    { id:'sal',        name:'Sal 1kg',           peso:1,   img:'img/alimentos/sal.jpg',       goal:200,  kg:0, emoji:'🧂' },
+    { id:'farinha',    name:'Farinha de Trigo',  peso:1,   img:'img/alimentos/farinha.jpg',   goal:300,  kg:0, emoji:'🌾' },
+    { id:'sardinha',   name:'Sardinha 125g',     peso:0.125, img:'img/alimentos/sardinha.jpg', goal:100, kg:0, emoji:'🐟' }
   ],
 
   /*
