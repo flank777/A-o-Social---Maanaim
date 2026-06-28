@@ -1753,7 +1753,7 @@ var PIX_PUBLICO = {
   payload: '00020126580014BR.GOV.BCB.PIX0136736e99a7-993f-4935-a872-98665faed6815204000053039865802BR5916MARCIO GUIMARAES6009SAO PAULO621405108VJZBLD7AJ6304D474',
   chave: '736e99a7-993f-4935-a872-98665faed681',
   titular: 'Márcio Guimarães',
-  banco: 'Banco nao informado',
+  banco: 'Caixa Econômica',
   whatsappFallback: '5591986054141'
 };
 

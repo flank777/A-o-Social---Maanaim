@@ -16,7 +16,7 @@
     o bug de continuar mostrando a versão antiga do admin depois de
     cada deploy, mesmo trocando o CACHE_NAME.
 */
-const CACHE_NAME = "doavida-v10";
+const CACHE_NAME = "doavida-v11";
 
 const APP_SHELL = [
   "./",
