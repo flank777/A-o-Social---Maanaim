@@ -871,17 +871,17 @@ body::before {
   padding:     60px 0 32px;
   margin-top:  auto;
   /* Redefine variáveis CSS para texto branco dentro do footer */
-  --text2:     rgba(255, 255, 255, 0.65);
+  --text2:     #ffffff;
   --cream:     #ffffff;
   --border:    rgba(255, 255, 255, 0.15);
-  --gold:      rgba(255, 255, 255, 0.90);
+  --gold:      #ffffff;
 }
 
-/* Grid de 4 colunas no desktop */
+/* Grid de 3 colunas no desktop */
 .footer-grid {
   display:               grid;
-  grid-template-columns: 1.7fr 1fr 1.25fr 1fr;
-  /* Primeira coluna maior para as marcas; demais colunas para redes, cultos e CTA. */
+  grid-template-columns: 1.4fr 1fr 1.6fr;
+  /* Primeira coluna maior para as marcas; última maior para os horários dos cultos. */
   gap:         48px;
   padding-bottom: 48px;
   border-bottom:  1px solid var(--border);
