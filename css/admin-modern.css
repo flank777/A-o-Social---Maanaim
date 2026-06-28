@@ -81,11 +81,13 @@ button {
 }
 
 .admin-shell {
-  min-height: 100vh;
+  min-height: 100vh; /* fallback */
+  min-height: 100dvh;
 }
 
 .admin-login {
-  min-height: 100vh;
+  min-height: 100vh; /* fallback */
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -221,7 +223,8 @@ button {
 
 .admin-app {
   display: none;
-  min-height: 100vh;
+  min-height: 100vh; /* fallback */
+  min-height: 100dvh;
 }
 
 .admin-app.visible {
@@ -232,7 +235,8 @@ button {
 .admin-sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100vh; /* fallback */
+  height: 100dvh;
   padding: 32px 18px 22px;
   border-right: 1px solid var(--admin-border);
   background: rgba(2, 8, 24, 0.78);
@@ -3057,7 +3061,8 @@ aside.admin-grid .admin-side-panel {
   border-radius: 20px;
   width: 100%;
   max-width: 520px;
-  max-height: 90vh;
+  max-height: 90vh; /* fallback */
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.56);

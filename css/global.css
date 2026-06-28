@@ -1786,7 +1786,8 @@ body::before {
   max-width:     540px;
   width:         100%;
   position:      relative;
-  max-height:    90vh;
+  max-height:    90vh; /* fallback */
+  max-height:    90dvh;
   overflow-y:    auto;
   animation:     modalIn 0.35s ease both;
 }
@@ -2231,6 +2232,17 @@ select:focus {
   border-color: var(--sage, #5a8a4a); /* borda verde esperança */
   box-shadow: 0 0 0 3px rgba(90, 138, 74, 0.25); /* ring verde translúcido */
   transition: border-color 0.3s ease, box-shadow 0.3s ease; /* transição suave */
+}
+
+/* ─── Comportamento seguro do teclado mobile ──────────────────────── */
+/* iOS faz zoom automático ao focar um campo com font-size < 16px.
+   Forçamos 16px só no mobile, sem alterar o design no desktop. */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* ─── Seleção de texto ────────────────────────────────────────────── */

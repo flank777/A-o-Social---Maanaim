@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /> <title>Seja Voluntário | Semear Ação Social</title> <meta name="robots" content="noindex, nofollow" /> <!-- PWA: instalável na tela inicial do celular --> <link rel="manifest" href="manifest.json" /> <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" /> <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" /> <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" /> <meta name="theme-color" content="#1A3312" /> <meta name="apple-mobile-web-app-capable" content="yes" /> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <meta name="apple-mobile-web-app-title" content="Maanaim" /> <link rel="preconnect" href="https://fonts.googleapis.com" /> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript> <link rel="stylesheet" href="css/global.css" /> <style> :root {
+﻿<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" /> <title>Seja Voluntário | Semear Ação Social</title> <meta name="robots" content="noindex, nofollow" /> <!-- PWA: instalável na tela inicial do celular --> <link rel="manifest" href="manifest.json" /> <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" /> <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" /> <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" /> <meta name="theme-color" content="#1A3312" /> <meta name="apple-mobile-web-app-capable" content="yes" /> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <meta name="apple-mobile-web-app-title" content="Maanaim" /> <link rel="preconnect" href="https://fonts.googleapis.com" /> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" /><noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript> <link rel="stylesheet" href="css/global.css" /> <style> :root {
       --green-main: #2d6e1f;
       --green-light: #3a8a27;
       --green-pale: #e8f5e2;
       --green-border: #b8dba8;
       --radius: 20px;
     }
-    body { background: #f4f6f2; min-height: 100vh; }
+    body { background: #f4f6f2; min-height: 100vh; min-height: 100dvh; }
     /* Desktop: page scrolls normally, navbar is fixed */
     @media (min-width: 601px) {
       .vol-form-page {
@@ -37,6 +37,7 @@
     /*  Wrapper  */
     .vol-form-page {
       min-height: 100vh;
+      min-height: 100dvh;
       background: var(--bg-page);
       padding-bottom: 120px;
     }
@@ -408,7 +409,7 @@
       background: var(--green-main); border-color: var(--green-main); color: #fff;
     }
     .obs-counter { display: block; text-align: right; font-size: .72rem; color: #999; margin-top: 6px; }
-        .vfc-actions-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 40px; border-top: 1px solid #eef2eb; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .vfc-actions-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 40px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #eef2eb; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
     .vfc-bar-summary { display: flex; align-items: center; gap: 12px; }
     .vfc-bar-icon { width: 38px; height: 38px; border-radius: 50%; background: #dde8d9; color: #aaa; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; transition: background .25s, color .25s; }
     .vfc-bar-icon.has-sel { background: var(--green-main); color: #fff; box-shadow: 0 3px 10px rgba(45,110,31,.35); }
@@ -540,6 +541,7 @@
         box-shadow: none;
         max-width: 100%;
         min-height: 100vh;
+        min-height: 100dvh;
       }
 
       /* Header: mobile mostra o lado direito (folhas) com overlay reforçado */

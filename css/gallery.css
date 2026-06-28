@@ -219,7 +219,8 @@
   border-radius: var(--r-lg, 12px); /* cantos arredondados */
   max-width: 800px;                /* largura máxima */
   width: 100%;                     /* ocupa todo o espaço disponível */
-  max-height: 90vh;                /* altura máxima 90% da tela */
+  max-height: 90vh;                /* fallback */
+  max-height: 90dvh;                /* altura máxima 90% da tela visível, sem esticar com teclado */
   overflow-y: auto;                /* scroll se necessário */
   animation: modalSlideIn 0.3s ease; /* animação de entrada */
 }
@@ -412,7 +413,8 @@
   }
   .gallery-modal-box {
     max-width: 100%;               /* tela toda */
-    max-height: 100vh;             /* altura total */
+    max-height: 100vh;             /* fallback */
+    max-height: 100dvh;             /* altura total visível, sem esticar com teclado */
     border-radius: 0;              /* sem cantos arredondados */
   }
   .gallery-modal-media {
