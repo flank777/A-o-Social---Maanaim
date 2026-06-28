@@ -1,5 +1,4 @@
-﻿# A-o-Social-
-Ação Social - Arrecadação de Alimentos
+﻿# Ação Social - Arrecadação de Alimentos
 
 Este projeto foi desenvolvido para auxiliar a ação social da igreja na arrecadação de alimentos, organização de doações e atendimento às famílias em situação de necessidade.
 
