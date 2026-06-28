@@ -386,14 +386,14 @@ var DoaVidaAPI = {
     Qualquer alteração aqui reflete tanto no admin quanto no formulário.
   */
   ALIMENTOS_PADRAO: [
-    { id:'arroz',      name:'Arroz 5kg',       peso:5,   img:'img/alimentos/arroz.jpg',     goal:2000, kg:0, emoji:'🌾' },
-    { id:'feijao',     name:'Feijão 1kg',       peso:1,   img:'img/alimentos/feijao.jpg',    goal:800,  kg:0, emoji:'🫘' },
-    { id:'macarrao',   name:'Macarrão 500g',    peso:0.5, img:'img/alimentos/macarrao.jpg',  goal:500,  kg:0, emoji:'🍝' },
-    { id:'oleo',       name:'Óleo de Soja 1L',  peso:1,   img:'img/alimentos/oleo.jpg',      goal:400,  kg:0, emoji:'🫙' },
-    { id:'acucar',     name:'Açúcar 1kg',       peso:1,   img:'img/alimentos/acucar.jpg',    goal:400,  kg:0, emoji:'🍬' },
-    { id:'sal',        name:'Sal 1kg',           peso:1,   img:'img/alimentos/sal.jpg',       goal:200,  kg:0, emoji:'🧂' },
-    { id:'farinha',    name:'Farinha de Trigo',  peso:1,   img:'img/alimentos/farinha.jpg',   goal:300,  kg:0, emoji:'🌾' },
-    { id:'sardinha',   name:'Sardinha 125g',     peso:0.125, img:'img/alimentos/sardinha.jpg', goal:100, kg:0, emoji:'🐟' }
+    { id:'arroz',      name:'Arroz 5kg',       peso:5,   img:'img/alimentos/arroz.webp',     goal:2000, kg:0, emoji:'🌾' },
+    { id:'feijao',     name:'Feijão 1kg',       peso:1,   img:'img/alimentos/feijao.webp',    goal:800,  kg:0, emoji:'🫘' },
+    { id:'macarrao',   name:'Macarrão 500g',    peso:0.5, img:'img/alimentos/macarrao.webp',  goal:500,  kg:0, emoji:'🍝' },
+    { id:'oleo',       name:'Óleo de Soja 1L',  peso:1,   img:'img/alimentos/oleo.webp',      goal:400,  kg:0, emoji:'🫙' },
+    { id:'acucar',     name:'Açúcar 1kg',       peso:1,   img:'img/alimentos/acucar.webp',    goal:400,  kg:0, emoji:'🍬' },
+    { id:'sal',        name:'Sal 1kg',           peso:1,   img:'img/alimentos/sal.webp',       goal:200,  kg:0, emoji:'🧂' },
+    { id:'farinha',    name:'Farinha de Trigo',  peso:1,   img:'img/alimentos/farinha.webp',   goal:300,  kg:0, emoji:'🌾' },
+    { id:'sardinha',   name:'Sardinha 125g',     peso:0.125, img:'img/alimentos/sardinha.webp', goal:100, kg:0, emoji:'🐟' }
   ],
 
   /*

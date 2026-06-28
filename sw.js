@@ -16,7 +16,7 @@
     o bug de continuar mostrando a versão antiga do admin depois de
     cada deploy, mesmo trocando o CACHE_NAME.
 */
-const CACHE_NAME = "doavida-v13";
+const CACHE_NAME = "doavida-v14";
 
 const APP_SHELL = [
   "./",
@@ -28,14 +28,14 @@ const APP_SHELL = [
   "js/api.js",
   "img/icons/icon-192.png",
   "img/icons/icon-512.png",
-  "img/alimentos/arroz.jpg",
-  "img/alimentos/feijao.jpg",
-  "img/alimentos/macarrao.jpg",
-  "img/alimentos/oleo.jpg",
-  "img/alimentos/acucar.jpg",
-  "img/alimentos/sal.jpg",
-  "img/alimentos/farinha.jpg",
-  "img/alimentos/sardinha.jpg",
+  "img/alimentos/arroz.webp",
+  "img/alimentos/feijao.webp",
+  "img/alimentos/macarrao.webp",
+  "img/alimentos/oleo.webp",
+  "img/alimentos/acucar.webp",
+  "img/alimentos/sal.webp",
+  "img/alimentos/farinha.webp",
+  "img/alimentos/sardinha.webp",
 ];
 
 self.addEventListener("install", function (event) {
