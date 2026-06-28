@@ -1750,9 +1750,9 @@ window.gerarProtocolo = gerarProtocolo;
   Nao salva doacao no banco e nao cria card/registro na area do admin.
 */
 var PIX_PUBLICO = {
-  payload: '00020126580014BR.GOV.BCB.PIX0136736e99a7-993f-4935-a872-98665faed6815204000053039865802BR5922Flank Kaua Santos Dias6009SAO PAULO621405108VJZBLD7AJ63044F57',
+  payload: '00020126580014BR.GOV.BCB.PIX0136736e99a7-993f-4935-a872-98665faed6815204000053039865802BR5916MARCIO GUIMARAES6009SAO PAULO621405108VJZBLD7AJ6304D474',
   chave: '736e99a7-993f-4935-a872-98665faed681',
-  titular: 'Flank Kaua Santos Dias',
+  titular: 'Márcio Guimarães',
   banco: 'Banco nao informado',
   whatsappFallback: '5591986054141'
 };
