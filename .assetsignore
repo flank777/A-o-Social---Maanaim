@@ -1,0 +1,8 @@
+.git
+node_modules
+.wrangler
+.netlify
+*.log
+.env
+.env.local
+wrangler.jsonc
