@@ -148,6 +148,7 @@
   padding: 17px 18px;
   background: #fff;
   border-bottom: 1px solid var(--dona-line);
+  flex-shrink: 0; /* nunca encolhe — só .dona-messages cede espaço com o teclado aberto */
 }
 
 .dona-avatar {
@@ -414,6 +415,9 @@
   padding: 12px 18px 14px;
   background: var(--dona-paper);
   border-top: 1px solid rgba(15, 23, 42, 0.06);
+  flex-shrink: 0; /* botões rápidos nunca empurram o campo de mensagem para fora */
+  max-height: 35vh;
+  overflow-y: auto;
 }
 
 .dona-sug-btn {
@@ -444,6 +448,7 @@
   padding: 14px 18px;
   background: #fff;
   border-top: 1px solid var(--dona-line);
+  flex-shrink: 0; /* campo de mensagem sempre visível, mesmo com o teclado aberto */
 }
 
 .dona-input-icon {

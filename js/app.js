@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   inicializarRipplesBotoes();
   registrarServiceWorker();
   inicializarInstalarApp();
+  inicializarTecladoMobile();
 }); /* Fim do DOMContentLoaded */
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -1441,6 +1442,84 @@ function inicializarInstalarApp() {
     botoes.forEach(function (b) { b.hidden = true; });
     _deferredInstallPrompt = null;
   });
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TECLADO MOBILE — evita que barras fixas (ex: "Continuar"/"Confirmar
+   doação") cubram o campo em foco quando o teclado virtual abre.
+
+   PROBLEMA: barras com position:fixed; bottom:0 são ancoradas na
+   viewport de LAYOUT, que em vários Android/iOS não encolhe junto com
+   o teclado (só a viewport VISUAL encolhe). Resultado: a barra fica
+   flutuando sobre o teclado ou "no meio da tela", cobrindo o campo
+   que o usuário está preenchendo.
+
+   SOLUÇÃO: ao focar um campo de texto no mobile, escondemos essas
+   barras (translateY + opacity, sem alterar o design — elas voltam
+   exatamente iguais ao perder o foco) e rolamos o campo focado para
+   o centro da área visível. window.visualViewport é a única API que
+   informa corretamente a altura realmente visível em Chrome e Safari.
+   ══════════════════════════════════════════════════════════════════════ */
+function inicializarTecladoMobile() {
+  var SELETOR_BARRAS_FIXAS =
+    ".cart-bar-fixa, .rs2-bottom-bar, .cf-bottom-bar, .vfc-actions-bar";
+  var LIMIAR_TECLADO_PX = 120; /* diferença mínima p/ considerar o teclado aberto */
+  var campoComFoco = null;
+
+  function ehCampoDeTexto(el) {
+    if (!el) return false;
+    if (el.tagName === "TEXTAREA") return true;
+    if (el.tagName === "INPUT") {
+      var tipo = (el.getAttribute("type") || "text").toLowerCase();
+      return (
+        ["text", "tel", "email", "number", "search", "password", "url", "date"].indexOf(tipo) !== -1
+      );
+    }
+    return false;
+  }
+
+  function tecladoProvavelmenteAberto() {
+    /* Sem suporte à API: assume o pior caso (esconde a barra por segurança) */
+    if (!window.visualViewport) return true;
+    return window.innerHeight - window.visualViewport.height > LIMIAR_TECLADO_PX;
+  }
+
+  function atualizarBarrasFixas() {
+    var esconder = !!campoComFoco && tecladoProvavelmenteAberto();
+    var barras = document.querySelectorAll(SELETOR_BARRAS_FIXAS);
+    for (var i = 0; i < barras.length; i++) {
+      barras[i].classList.toggle("kb-hidden", esconder);
+    }
+  }
+
+  document.addEventListener("focusin", function (e) {
+    if (!ehCampoDeTexto(e.target)) return;
+    campoComFoco = e.target;
+    atualizarBarrasFixas();
+    /* Aguarda a animação do teclado abrir antes de rolar até o campo */
+    setTimeout(function () {
+      if (document.activeElement === e.target && e.target.scrollIntoView) {
+        e.target.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }, 320);
+  });
+
+  document.addEventListener("focusout", function (e) {
+    if (e.target !== campoComFoco) return;
+    /* Pequeno atraso: ao trocar de campo com Tab/Próximo, o focusin do
+       novo campo já deve ter disparado antes de decidirmos restaurar
+       a barra, evitando o "flash" de ela reaparecer e desaparecer. */
+    setTimeout(function () {
+      if (!ehCampoDeTexto(document.activeElement)) {
+        campoComFoco = null;
+        atualizarBarrasFixas();
+      }
+    }, 60);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", atualizarBarrasFixas);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════

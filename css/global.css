@@ -2245,6 +2245,28 @@ select:focus {
   }
 }
 
+/* ─── Barras fixas inferiores: somem enquanto o teclado está aberto ─
+   js/app.js (inicializarTecladoMobile) alterna .kb-hidden quando um
+   campo de texto está focado e o teclado virtual realmente abriu —
+   evita que a barra fique flutuando sobre o teclado/por cima do
+   formulário. Volta exatamente como era ao perder o foco. */
+.cart-bar-fixa,
+.rs2-bottom-bar,
+.cf-bottom-bar,
+.vfc-actions-bar {
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+@media (max-width: 768px) {
+  .cart-bar-fixa.kb-hidden,
+  .rs2-bottom-bar.kb-hidden,
+  .cf-bottom-bar.kb-hidden,
+  .vfc-actions-bar.kb-hidden {
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 /* ─── Seleção de texto ────────────────────────────────────────────── */
 /* Texto selecionado ganha tom verde do projeto */
 ::selection {
