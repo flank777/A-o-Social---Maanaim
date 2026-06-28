@@ -573,22 +573,92 @@
 
   /*
     No Android/iOS, o teclado virtual encolhe a "visual viewport" mas o
-    chat (position:fixed, ancorado por inset) continua medindo a partir
-    da viewport cheia — o teclado sobe e cobre a parte de baixo do chat.
-    Aqui empurramos o `bottom` do chat para cima exatamente pela altura
-    que o teclado está ocupando, usando a Visual Viewport API (suportada
-    nos dois sistemas, ao contrário do meta interactive-widget, que só
-    funciona em navegadores Chromium).
+    chat (position:fixed, ancorado por top/bottom + max-height:100dvh)
+    continua medindo a partir da viewport de LAYOUT, que nem sempre
+    acompanha o teclado. Resultado real no celular: o painel ficava
+    cortado — cabeçalho ou campo de mensagem saindo da área visível.
+
+    Em vez de só empurrar o `bottom` (que ainda depende de top/max-height
+    calculados a partir de uma viewport que pode estar errada), quando o
+    teclado está de fato aberto fixamos `top` + `height` do chat usando
+    diretamente vv.offsetTop/vv.height — a ÚNICA medida que reflete a
+    área realmente visível em Chrome e Safari. Sem teclado, removemos os
+    estilos inline e o CSS original (com safe-area) volta a valer.
   */
   function setupKeyboardFix(chat) {
     if (!window.visualViewport) return;
     var vv = window.visualViewport;
-    function ajustar() {
-      var coberto = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      chat.style.bottom = coberto > 0 ? coberto + "px" : "";
+    var LIMIAR_TECLADO_PX = 120;
+    var MARGEM_PX = 12;
+
+    function tecladoAberto() {
+      return window.innerHeight - vv.height > LIMIAR_TECLADO_PX;
     }
+
+    /* IMPORTANTE: classList.add()/remove() rodam os "update steps" do
+       DOMTokenList sempre, mesmo quando a classe já está (ou já não está)
+       presente — ou seja, SEMPRE disparam um novo registro de mutação no
+       atributo "class", mesmo sem mudança real. Como o MutationObserver
+       abaixo observa exatamente esse atributo para reagir a abrir/fechar
+       o chat, chamar add/remove sem essa guarda recriava a mutação a
+       cada chamada e entrava em loop infinito (chegou a travar a aba).
+       Por isso só tocamos a classe quando o estado realmente muda. */
+    function alternarClasse(classe, devePresente) {
+      var presente = chat.classList.contains(classe);
+      if (presente === devePresente) return;
+      if (devePresente) chat.classList.add(classe);
+      else chat.classList.remove(classe);
+    }
+
+    function ajustar() {
+      if (!chat.classList.contains("active")) return;
+
+      if (!tecladoAberto()) {
+        chat.style.top = "";
+        chat.style.bottom = "";
+        chat.style.height = "";
+        chat.style.maxHeight = "";
+        alternarClasse("kb-aberto", false);
+        return;
+      }
+
+      /* Com o teclado aberto sobra pouca altura — as sugestões rápidas
+         (várias linhas de chips) por si só já podem consumir o espaço
+         que o cabeçalho e o campo de mensagem precisam. Em vez de
+         arriscar cortar o campo de mensagem, escondemos as sugestões
+         enquanto o teclado estiver aberto (.kb-aberto, ver CSS); elas
+         voltam normalmente ao fechar o teclado. */
+      alternarClasse("kb-aberto", true);
+
+      var topo = vv.offsetTop + MARGEM_PX;
+      var alturaVisivel = vv.height - MARGEM_PX * 2;
+      chat.style.top = topo + "px";
+      chat.style.bottom = "auto";
+      chat.style.maxHeight = "none";
+      chat.style.height = Math.max(260, alturaVisivel) + "px";
+    }
+
     vv.addEventListener("resize", ajustar);
     vv.addEventListener("scroll", ajustar);
+
+    /* O teclado às vezes demora a redimensionar a visual viewport depois
+       do foco — reagimos também no foco/blur do próprio campo, em vez de
+       esperar só pelo evento da API, para o painel nunca aparecer cortado
+       nem por um instante. */
+    chat.addEventListener("focusin", function () {
+      ajustar();
+      setTimeout(ajustar, 80);
+      setTimeout(ajustar, 350);
+    });
+    chat.addEventListener("focusout", function () {
+      setTimeout(ajustar, 80);
+    });
+
+    /* Recalcula também ao abrir/fechar o chat (classe "active" alternada
+       em openChat/closeChat) — garante o painel já correto antes mesmo
+       de o teclado começar a animar. */
+    var observer = new MutationObserver(ajustar);
+    observer.observe(chat, { attributes: true, attributeFilter: ["class"] });
   }
 
   function refreshIdentity() {

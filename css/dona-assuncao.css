@@ -420,6 +420,16 @@
   overflow-y: auto;
 }
 
+/* Com o teclado aberto sobra pouca altura: os chips de sugestão (que
+   podem ocupar 3+ linhas) competiriam por espaço com o cabeçalho e o
+   campo de mensagem. js/dona-assuncao.js (setupKeyboardFix) marca
+   .kb-aberto no painel enquanto o teclado estiver de fato aberto —
+   as sugestões somem temporariamente e voltam exatamente iguais ao
+   fechar o teclado. */
+.dona-chat.kb-aberto .dona-sugestoes {
+  display: none;
+}
+
 .dona-sug-btn {
   border: 1px solid #d6eadb;
   border-radius: 999px;
@@ -561,7 +571,11 @@ body.etapa1 .dona-chat {
   }
 
   .dona-messages {
-    min-height: 280px;
+    /* SEM min-height fixo: com o teclado aberto a área visível encolhe e
+       esse mínimo "empurrava" cabeçalho/campo de mensagem para fora do
+       painel (overflow:hidden cortava a barra de digitação). flex:1 já
+       garante que ela ocupe o espaço disponível quando há espaço de sobra. */
+    min-height: 0;
     max-height: none;
     padding: 14px;
   }
