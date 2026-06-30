@@ -15,15 +15,38 @@
     <meta name="theme-color" content="#0d0d0b" />
     <!-- PWA: instalável na tela inicial do celular -->
     <link rel="manifest" href="manifest.json" />
-    <link rel="icon" href="img/icons/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="icon" href="img/icons/favicon-16.png" sizes="16x16" type="image/png" />
+    <link
+      rel="icon"
+      href="img/icons/favicon-32.png"
+      sizes="32x32"
+      type="image/png"
+    />
+    <link
+      rel="icon"
+      href="img/icons/favicon-16.png"
+      sizes="16x16"
+      type="image/png"
+    />
     <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="Maanaim" />
     <!-- Preload imagens críticas (above the fold) -->
-    <link rel="preload" as="image" href="img/hero-banner.jpg" media="(min-width:769px)" />
-    <link rel="preload" as="image" href="img/hero-banner-mobile.jpg" media="(max-width:768px)" />
+    <link
+      rel="preload"
+      as="image"
+      href="img/hero-banner.jpg"
+      media="(min-width:769px)"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="img/hero-banner-mobile.jpg"
+      media="(max-width:768px)"
+    />
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,18 +55,27 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
       media="print"
-      onload="this.media='all'"
+      onload="this.media = 'all'"
     />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" /></noscript>
+    <noscript
+      ><link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet"
+    /></noscript>
     <!-- Font Awesome (ícones  WhatsApp, etc.) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       crossorigin="anonymous"
       media="print"
-      onload="this.media='all'"
+      onload="this.media = 'all'"
     />
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" /></noscript>
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        crossorigin="anonymous"
+    /></noscript>
     <!-- CSS Global (estilos base compartilhados) -->
     <link rel="stylesheet" href="css/global.css" />
     <!-- Carrossel v2 (novo sistema) -->
@@ -335,7 +367,7 @@
       /* 
        HERO  Desktop: banner tela cheia | Mobile: layout limpo
      */
-            /* HERO DESKTOP — imagem largura total, texto sobreposto na base */
+      /* HERO DESKTOP — imagem largura total, texto sobreposto na base */
       #hero {
         position: relative;
         width: 100%;
@@ -350,15 +382,23 @@
         z-index: 0;
       }
       #hero::after {
-        content: '';
+        content: "";
         position: absolute;
-        bottom: 0; left: 0; right: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         height: 50%;
-        background: linear-gradient(to top, rgba(5,10,4,0.75) 0%, transparent 100%);
+        background: linear-gradient(
+          to top,
+          rgba(5, 10, 4, 0.75) 0%,
+          transparent 100%
+        );
         z-index: 1;
         pointer-events: none;
       }
-      #hero::before { display: none; }
+      #hero::before {
+        display: none;
+      }
       #hero > .container {
         position: absolute;
         inset: 0;
@@ -368,7 +408,9 @@
         z-index: 2;
         padding-bottom: 88px;
       }
-      .hero-visual { display: none !important; }
+      .hero-visual {
+        display: none !important;
+      }
       .hero-inner {
         display: flex;
         flex-direction: column;
@@ -383,10 +425,19 @@
         align-items: center;
         width: 100%;
       }
-      .hero-badge { display: none; }
+      .hero-badge {
+        display: none;
+      }
       @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50%       { opacity: 0.5; transform: scale(1.4); }
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(1.4);
+        }
       }
       .hero-title {
         font-family: var(--ff-display);
@@ -396,13 +447,15 @@
         color: rgba(255, 255, 255, 0.95);
         margin-bottom: 24px;
         text-align: center;
-        text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 4px 40px rgba(0,0,0,0.7);
+        text-shadow:
+          0 2px 20px rgba(0, 0, 0, 0.9),
+          0 4px 40px rgba(0, 0, 0, 0.7);
         animation: fadeInUp 0.8s ease 0.15s both;
       }
       .hero-title em {
         font-style: italic;
-        color: #5A8A4A;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        color: #5a8a4a;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
       }
       .hero-title .line2 {
         display: block;
@@ -416,7 +469,7 @@
         margin-bottom: 32px;
         line-height: 1.8;
         text-align: center;
-        text-shadow: 0 1px 12px rgba(0,0,0,0.9);
+        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9);
         animation: fadeInUp 0.8s ease 0.3s both;
       }
       .hero-actions {
@@ -467,7 +520,9 @@
         width: 100%;
         max-width: 560px;
         border-radius: 20px;
-        box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3);
+        box-shadow:
+          0 24px 64px rgba(0, 0, 0, 0.5),
+          0 8px 24px rgba(0, 0, 0, 0.3);
         object-fit: contain;
         animation: fadeInUp 0.8s ease 0.3s both;
       }
@@ -834,12 +889,12 @@
           border-radius: 14px;
           min-height: 0;
           box-shadow:
-            0 3px 12px rgba(0, 0, 0, 0.10),
+            0 3px 12px rgba(0, 0, 0, 0.1),
             0 1px 4px rgba(0, 0, 0, 0.06);
         }
         .step:hover {
           box-shadow:
-            0 6px 20px rgba(45, 110, 31, 0.20),
+            0 6px 20px rgba(45, 110, 31, 0.2),
             0 2px 6px rgba(0, 0, 0, 0.08);
         }
         /* Badge lateral colorido com o número */
@@ -881,12 +936,25 @@
       }
       /* Ajuste fino para telas ≤ 360px (SE, Moto G) */
       @media (max-width: 360px) {
-        .steps-track { gap: 8px; }
-        .step-top    { width: 56px; min-width: 56px; }
-        .step-num    { font-size: 1.65rem; }
-        .step-body   { padding: 12px 12px 12px 12px; }
-        .step-title  { font-size: 0.85rem; }
-        .step-desc   { font-size: 0.73rem; }
+        .steps-track {
+          gap: 8px;
+        }
+        .step-top {
+          width: 56px;
+          min-width: 56px;
+        }
+        .step-num {
+          font-size: 1.65rem;
+        }
+        .step-body {
+          padding: 12px 12px 12px 12px;
+        }
+        .step-title {
+          font-size: 0.85rem;
+        }
+        .step-desc {
+          font-size: 0.73rem;
+        }
       }
       /* 
        GALERIA  Seção (layout e cabeçalho)
@@ -1374,7 +1442,11 @@
           overflow: hidden;
           border-radius: 30px;
           background:
-            radial-gradient(circle at 88% 24%, rgba(116, 177, 75, 0.2), transparent 23%),
+            radial-gradient(
+              circle at 88% 24%,
+              rgba(116, 177, 75, 0.2),
+              transparent 23%
+            ),
             linear-gradient(180deg, #165123 0%, #0f431e 100%) !important;
           box-shadow: 0 20px 46px rgba(15, 67, 30, 0.24);
         }
@@ -1702,7 +1774,10 @@
             class="loader-logo-img"
             src="logo-semear.jpeg"
             alt="Ação Social Semear"
-            onerror="this.style.display = 'none'" loading="eager" decoding="async">
+            onerror="this.style.display = 'none'"
+            loading="eager"
+            decoding="async"
+          />
           <span class="ldr-scan"></span>
         </div>
         <p class="loader-text" aria-hidden="true">
@@ -1739,7 +1814,7 @@
             <div class="hero-text">
               <div class="hero-badge" aria-hidden="true">
                 <span class="dot"></span>
-                Belém, Pará  Brasil
+                Belém, Pará Brasil
               </div>
               <h1 class="hero-title" id="hero-title">
                 Transformamos <em>doações</em>
@@ -1849,7 +1924,7 @@
               <div class="step-body">
                 <h3 class="step-title">Informe seus Dados</h3>
                 <p class="step-desc">
-                  Nome, WhatsApp e forma de entrega  leva menos de 1 minuto.
+                  Nome, WhatsApp e forma de entrega leva menos de 1 minuto.
                   Combinamos tudo por mensagem.
                 </p>
               </div>
@@ -1887,76 +1962,374 @@
       <!-- ════════════════════════════════════════════════════
            SEÇÃO: Contato, Redes Sociais e Cultos
       ════════════════════════════════════════════════════ -->
-      <section id="contato" aria-labelledby="contato-title" style="padding:72px 0 80px;background:var(--surface,#fff);">
+      <section
+        id="contato"
+        aria-labelledby="contato-title"
+        style="padding: 72px 0 80px; background: var(--surface, #fff)"
+      >
         <div class="container">
-          <div class="section-header" style="text-align:center;margin-bottom:48px;">
-            <span class="section-tag" style="font-family:var(--ff-mono);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);background:rgba(90,138,74,0.10);padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:14px;">Conheça a gente</span>
-            <h2 id="contato-title" style="font-family:var(--ff-display);font-size:clamp(1.6rem,4vw,2.2rem);color:var(--heading,#1A3312);margin:0 0 10px;">Contato &amp; Redes Sociais</h2>
-            <p style="font-size:0.97rem;color:var(--text-muted,#555550);max-width:520px;margin:0 auto;">Fale com a equipe, acompanhe nas redes ou venha participar dos cultos.</p>
+          <div
+            class="section-header"
+            style="text-align: center; margin-bottom: 48px"
+          >
+            <span
+              class="section-tag"
+              style="
+                font-family: var(--ff-mono);
+                font-size: 0.72rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--sage);
+                background: rgba(90, 138, 74, 0.1);
+                padding: 4px 14px;
+                border-radius: 20px;
+                display: inline-block;
+                margin-bottom: 14px;
+              "
+              >Conheça a gente</span
+            >
+            <h2
+              id="contato-title"
+              style="
+                font-family: var(--ff-display);
+                font-size: clamp(1.6rem, 4vw, 2.2rem);
+                color: var(--heading, #1a3312);
+                margin: 0 0 10px;
+              "
+            >
+              Contato &amp; Redes Sociais
+            </h2>
+            <p
+              style="
+                font-size: 0.97rem;
+                color: var(--text-muted, #555550);
+                max-width: 520px;
+                margin: 0 auto;
+              "
+            >
+              Fale com a equipe, acompanhe nas redes ou venha participar dos
+              cultos.
+            </p>
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:960px;margin:0 auto;">
-
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+              gap: 24px;
+              max-width: 960px;
+              margin: 0 auto;
+            "
+          >
             <!-- Card 1: Missão -->
-            <div class="card" style="border-radius:16px;padding:28px 24px;border:1px solid rgba(90,138,74,0.20);box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;flex-direction:column;gap:16px;">
+            <div
+              class="card"
+              style="
+                border-radius: 16px;
+                padding: 28px 24px;
+                border: 1px solid rgba(90, 138, 74, 0.2);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
               <!-- Logos lado a lado -->
-              <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
-                <img src="logo-semear.jpeg" alt="Ação Social Semear" loading="lazy" decoding="async"
-                     style="height:72px;width:auto;border-radius:8px;object-fit:cover;">
-                <img src="logo-maanaim.jpeg" alt="Comunidade Evangélica Maanaim" loading="lazy" decoding="async"
-                     style="height:72px;width:72px;border-radius:50%;object-fit:cover;">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 20px;
+                "
+              >
+                <img
+                  src="logo-semear.jpeg"
+                  alt="Ação Social Semear"
+                  loading="lazy"
+                  decoding="async"
+                  style="
+                    height: 72px;
+                    width: auto;
+                    border-radius: 8px;
+                    object-fit: cover;
+                  "
+                />
+                <img
+                  src="logo-maanaim.jpeg"
+                  alt="Comunidade Evangélica Maanaim"
+                  loading="lazy"
+                  decoding="async"
+                  style="
+                    height: 72px;
+                    width: 72px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                  "
+                />
               </div>
-              <p style="font-size:0.88rem;color:var(--text-muted,#555550);line-height:1.65;margin:0;">
-                Esta plataforma nasceu para conectar pessoas que precisam de apoio a pessoas dispostas a ajudar por meio de doações para a <strong style="color:var(--heading,#1A3312);">Ação Social Semear</strong> e a <strong style="color:var(--heading,#1A3312);">Comunidade Evangélica Maanaim</strong>. Juntos, promovemos solidariedade e transformamos vidas em Belém, Pará.
+              <p
+                style="
+                  font-size: 0.88rem;
+                  color: var(--text-muted, #555550);
+                  line-height: 1.65;
+                  margin: 0;
+                "
+              >
+                Esta plataforma nasceu para conectar pessoas que precisam de
+                apoio a pessoas dispostas a ajudar por meio de doações!<strong
+                  style="color: var(--heading, #1a3312)"
+                ></strong
+                ><strong style="color: var(--heading, #1a3312)"></strong>
+                Juntos, promovemos solidariedade e transformamos vidas em Belém,
+                Pará.
               </p>
             </div>
 
             <!-- Card 2: Redes Sociais -->
-            <div class="card" style="border-radius:16px;padding:28px 24px;border:1px solid rgba(90,138,74,0.20);box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;flex-direction:column;gap:16px;">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                <span style="width:36px;height:36px;border-radius:8px;background:rgba(90,138,74,0.12);display:flex;align-items:center;justify-content:center;">
-                  <i class="fas fa-share-nodes" style="color:var(--sage);font-size:1rem;" aria-hidden="true"></i>
+            <div
+              class="card"
+              style="
+                border-radius: 16px;
+                padding: 28px 24px;
+                border: 1px solid rgba(90, 138, 74, 0.2);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  margin-bottom: 4px;
+                "
+              >
+                <span
+                  style="
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    background: rgba(90, 138, 74, 0.12);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-share-nodes"
+                    style="color: var(--sage); font-size: 1rem"
+                    aria-hidden="true"
+                  ></i>
                 </span>
-                <strong style="font-family:var(--ff-display);font-size:1rem;color:var(--heading,#1A3312);">Redes Sociais</strong>
+                <strong
+                  style="
+                    font-family: var(--ff-display);
+                    font-size: 1rem;
+                    color: var(--heading, #1a3312);
+                  "
+                  >Redes Sociais</strong
+                >
               </div>
-              <a href="https://www.youtube.com/channel/UC3oyub4mQz80janwbWI5TpQ" target="_blank" rel="noopener noreferrer"
-                 style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text,#1A1A18);font-size:0.9rem;padding:10px 12px;border-radius:10px;border:1px solid rgba(90,138,74,0.15);transition:background 0.2s;" onmouseover="this.style.background='rgba(90,138,74,0.08)'" onmouseout="this.style.background='transparent'">
-                <i class="fab fa-youtube" style="color:#FF0000;font-size:1.2rem;" aria-hidden="true"></i>
+              <a
+                href="https://www.youtube.com/channel/UC3oyub4mQz80janwbWI5TpQ"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  text-decoration: none;
+                  color: var(--text, #1a1a18);
+                  font-size: 0.9rem;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid rgba(90, 138, 74, 0.15);
+                  transition: background 0.2s;
+                "
+                onmouseover="this.style.background = 'rgba(90,138,74,0.08)'"
+                onmouseout="this.style.background = 'transparent'"
+              >
+                <i
+                  class="fab fa-youtube"
+                  style="color: #ff0000; font-size: 1.2rem"
+                  aria-hidden="true"
+                ></i>
                 <span>YouTube</span>
               </a>
-              <a href="https://www.instagram.com/comunidade_evangelica_maanaim?igsh=MXJydnV1M2dudXUyeA==" target="_blank" rel="noopener noreferrer"
-                 style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text,#1A1A18);font-size:0.9rem;padding:10px 12px;border-radius:10px;border:1px solid rgba(90,138,74,0.15);transition:background 0.2s;" onmouseover="this.style.background='rgba(90,138,74,0.08)'" onmouseout="this.style.background='transparent'">
-                <i class="fab fa-instagram" style="color:#E1306C;font-size:1.2rem;" aria-hidden="true"></i>
+              <a
+                href="https://www.instagram.com/comunidade_evangelica_maanaim?igsh=MXJydnV1M2dudXUyeA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  text-decoration: none;
+                  color: var(--text, #1a1a18);
+                  font-size: 0.9rem;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid rgba(90, 138, 74, 0.15);
+                  transition: background 0.2s;
+                "
+                onmouseover="this.style.background = 'rgba(90,138,74,0.08)'"
+                onmouseout="this.style.background = 'transparent'"
+              >
+                <i
+                  class="fab fa-instagram"
+                  style="color: #e1306c; font-size: 1.2rem"
+                  aria-hidden="true"
+                ></i>
                 <span>Instagram</span>
               </a>
             </div>
 
             <!-- Card 3: Contato e Cultos -->
-            <div class="card" style="border-radius:16px;padding:28px 24px;border:1px solid rgba(90,138,74,0.20);box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;flex-direction:column;gap:12px;">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                <span style="width:36px;height:36px;border-radius:8px;background:rgba(90,138,74,0.12);display:flex;align-items:center;justify-content:center;">
-                  <i class="fas fa-church" style="color:var(--sage);font-size:1rem;" aria-hidden="true"></i>
+            <div
+              class="card"
+              style="
+                border-radius: 16px;
+                padding: 28px 24px;
+                border: 1px solid rgba(90, 138, 74, 0.2);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  margin-bottom: 4px;
+                "
+              >
+                <span
+                  style="
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    background: rgba(90, 138, 74, 0.12);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-church"
+                    style="color: var(--sage); font-size: 1rem"
+                    aria-hidden="true"
+                  ></i>
                 </span>
-                <strong style="font-family:var(--ff-display);font-size:1rem;color:var(--heading,#1A3312);">Contato e Cultos</strong>
+                <strong
+                  style="
+                    font-family: var(--ff-display);
+                    font-size: 1rem;
+                    color: var(--heading, #1a3312);
+                  "
+                  >Contato e Cultos</strong
+                >
               </div>
-              <a href="https://wa.me/5591986054141" target="_blank" rel="noopener noreferrer"
-                 style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text,#1A1A18);font-size:0.88rem;">
-                <i class="fab fa-whatsapp" style="color:#25D366;font-size:1.1rem;" aria-hidden="true"></i>
+              <a
+                href="https://wa.me/5591986054141"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  text-decoration: none;
+                  color: var(--text, #1a1a18);
+                  font-size: 0.88rem;
+                "
+              >
+                <i
+                  class="fab fa-whatsapp"
+                  style="color: #25d366; font-size: 1.1rem"
+                  aria-hidden="true"
+                ></i>
                 (91) 98605-4141
               </a>
-              <p style="display:flex;align-items:flex-start;gap:8px;font-size:0.88rem;color:var(--text-muted,#555550);margin:0;">
-                <i class="fas fa-location-dot" style="color:var(--sage);margin-top:2px;" aria-hidden="true"></i>
+              <p
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 8px;
+                  font-size: 0.88rem;
+                  color: var(--text-muted, #555550);
+                  margin: 0;
+                "
+              >
+                <i
+                  class="fas fa-location-dot"
+                  style="color: var(--sage); margin-top: 2px"
+                  aria-hidden="true"
+                ></i>
                 Rua Quinze de Agosto, 1818
               </p>
-              <div style="height:1px;background:rgba(90,138,74,0.15);margin:4px 0;"></div>
-              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
-                <li style="font-size:0.82rem;color:var(--text-muted,#555550);"><i class="fas fa-sun" style="color:var(--sage);width:16px;" aria-hidden="true"></i> Seg., ter. e qua.: oração do meio-dia</li>
-                <li style="font-size:0.82rem;color:var(--text-muted,#555550);"><i class="fas fa-star" style="color:var(--gold);width:16px;" aria-hidden="true"></i> Sexta: culto da família às 19h30</li>
-                <li style="font-size:0.82rem;color:var(--text-muted,#555550);"><i class="fas fa-fire" style="color:var(--sage2);width:16px;" aria-hidden="true"></i> Sábado: culto dos jovens às 19h</li>
-                <li style="font-size:0.82rem;color:var(--text-muted,#555550);"><i class="fas fa-hands-praying" style="color:var(--sage);width:16px;" aria-hidden="true"></i> Domingo: culto às 18h</li>
+              <div
+                style="
+                  height: 1px;
+                  background: rgba(90, 138, 74, 0.15);
+                  margin: 4px 0;
+                "
+              ></div>
+              <ul
+                style="
+                  list-style: none;
+                  padding: 0;
+                  margin: 0;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 6px;
+                "
+              >
+                <li
+                  style="font-size: 0.82rem; color: var(--text-muted, #555550)"
+                >
+                  <i
+                    class="fas fa-sun"
+                    style="color: var(--sage); width: 16px"
+                    aria-hidden="true"
+                  ></i>
+                  Seg., ter. e qua.: oração do meio-dia
+                </li>
+                <li
+                  style="font-size: 0.82rem; color: var(--text-muted, #555550)"
+                >
+                  <i
+                    class="fas fa-star"
+                    style="color: var(--gold); width: 16px"
+                    aria-hidden="true"
+                  ></i>
+                  Sexta: culto da família às 19h30
+                </li>
+                <li
+                  style="font-size: 0.82rem; color: var(--text-muted, #555550)"
+                >
+                  <i
+                    class="fas fa-fire"
+                    style="color: var(--sage2); width: 16px"
+                    aria-hidden="true"
+                  ></i>
+                  Sábado: culto dos jovens às 19h
+                </li>
+                <li
+                  style="font-size: 0.82rem; color: var(--text-muted, #555550)"
+                >
+                  <i
+                    class="fas fa-hands-praying"
+                    style="color: var(--sage); width: 16px"
+                    aria-hidden="true"
+                  ></i>
+                  Domingo: culto às 18h
+                </li>
               </ul>
             </div>
-
           </div>
         </div>
       </section>
@@ -1966,19 +2339,28 @@
  -->
     <footer id="footer" role="contentinfo">
       <div class="container">
-
         <!--  Linha de créditos  -->
         <div class="footer-bottom">
           <p class="footer-copy">
             &copy; <span id="footer-year">2026</span>
             DoaVida · Ação Social · Maanaim
           </p>
-          <a class="footer-admin-link" href="admin.html" aria-label="Acessar painel administrativo">
+          <a
+            class="footer-admin-link"
+            href="admin.html"
+            aria-label="Acessar painel administrativo"
+          >
             <i class="fas fa-lock" aria-hidden="true"></i>
             Acessar Admin
           </a>
         </div>
-        <a class="footer-help-pill" href="https://wa.me/5591986054141" target="_blank" rel="noopener noreferrer" aria-label="Precisa de ajuda pelo WhatsApp">
+        <a
+          class="footer-help-pill"
+          href="https://wa.me/5591986054141"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Precisa de ajuda pelo WhatsApp"
+        >
           <span><i class="fas fa-comment-dots" aria-hidden="true"></i></span>
           Precisa de ajuda?
         </a>
@@ -2095,9 +2477,18 @@
      SCRIPTS
  -->
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"
+      defer
+    ></script>
     <script src="js/services/firebase.js" defer></script>
     <!-- api.js: localStorage (fallback quando offline) -->
     <script src="js/api.js" defer></script>
@@ -2152,11 +2543,16 @@
             var rawHeroBanner = localStorage.getItem("doavida_hero_fotos");
             if (rawHeroBanner) {
               var heroBanner = JSON.parse(rawHeroBanner);
-              if (heroBanner && heroBanner.foto1) aplicarBannerHero(heroBanner.foto1);
+              if (heroBanner && heroBanner.foto1)
+                aplicarBannerHero(heroBanner.foto1);
             }
           } catch (e) {}
           function buscarBannerHeroSupabase() {
-            if (!window.DoaVidaSync || typeof DoaVidaSync.getBanners !== "function") return;
+            if (
+              !window.DoaVidaSync ||
+              typeof DoaVidaSync.getBanners !== "function"
+            )
+              return;
             DoaVidaSync.getBanners()
               .then(function (b) {
                 if (b && b.hero) aplicarBannerHero(b.hero);
@@ -2166,7 +2562,11 @@
           if (window.DoaVidaSync) {
             buscarBannerHeroSupabase();
           } else {
-            window.addEventListener("DoaVidaSyncPronto", buscarBannerHeroSupabase, { once: true });
+            window.addEventListener(
+              "DoaVidaSyncPronto",
+              buscarBannerHeroSupabase,
+              { once: true },
+            );
             setTimeout(buscarBannerHeroSupabase, 1000);
           }
           /* Inicializa o carrossel quando os scripts estiverem prontos */
@@ -2439,8 +2839,7 @@
         setText("rec-alimento", dados.alimento || "");
         setText(
           "rec-qtd",
-          (dados.quantidade || "") +
-            (dados.unidade ? " " + dados.unidade : ""),
+          (dados.quantidade || "") + (dados.unidade ? " " + dados.unidade : ""),
         );
         setText(
           "rec-data",
