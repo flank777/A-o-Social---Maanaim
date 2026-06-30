@@ -23,7 +23,8 @@
     }
     #nav .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .nav-back {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex: 1;
       font-size: .85rem; font-weight: 600; color: var(--green-main);
       text-decoration: none; transition: gap .2s;
     }
@@ -336,7 +337,8 @@
     }
     .avail-grid { display: flex; flex-wrap: wrap; gap: 10px; }
     .avail-chip {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex: 1;
       padding: 10px 16px;
       border: 2px solid #e5ede0;
       border-radius: 50px;
@@ -409,14 +411,9 @@
       background: var(--green-main); border-color: var(--green-main); color: #fff;
     }
     .obs-counter { display: block; text-align: right; font-size: .72rem; color: #999; margin-top: 6px; }
-        .vfc-actions-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 40px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #eef2eb; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
-    .vfc-bar-summary { display: flex; align-items: center; gap: 12px; }
-    .vfc-bar-icon { width: 38px; height: 38px; border-radius: 50%; background: #dde8d9; color: #aaa; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; transition: background .25s, color .25s; }
-    .vfc-bar-icon.has-sel { background: var(--green-main); color: #fff; box-shadow: 0 3px 10px rgba(45,110,31,.35); }
-    .vfc-bar-label { display: block; font-size: .8rem; font-weight: 700; color: #222; }
-    .vfc-bar-count { display: block; font-size: .78rem; color: #aaa; transition: color .2s; }
-    .vfc-bar-count.has-sel { color: var(--green-main); font-weight: 600; }
-    .vfc-bar-btns { display: flex; align-items: center; gap: 10px; }
+        .vfc-actions-bar { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 24px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #eef2eb; background: #fff; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+    
+    .vfc-bar-btns { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 480px; }
     .btn-vol-back {
       padding: 13px 28px;
       border: 2px solid #ddd; border-radius: 50px;
@@ -434,7 +431,8 @@
       font-size: .92rem; font-weight: 700;
       color: #fff; cursor: pointer;
       font-family: var(--ff-body);
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex: 1;
       transition: all .2s;
       box-shadow: 0 4px 18px rgba(45,110,31,.32);
       white-space: nowrap;
@@ -593,11 +591,9 @@
       }
 
       /* Barra de ações mobile */
-      .vfc-actions-bar { padding: 10px 14px; gap: 8px; }
-      .vfc-bar-label { font-size: .74rem; }
-      .vfc-bar-count { font-size: .72rem; }
-      .btn-vol-next { padding: 11px 18px; font-size: .84rem; }
-      .btn-vol-back { padding: 10px 14px; font-size: .82rem; }
+      .vfc-actions-bar { padding: 10px 16px; gap: 10px; }
+      .btn-vol-next { padding: 13px 20px; font-size: .86rem; }
+      .btn-vol-back { padding: 12px 16px; font-size: .84rem; }
     }
   </style> </head> <body> <!-- Loader de transição entre páginas --> <div id="loader" role="status" aria-label="Carregando"> <div class="loader-inner"> <div class="ldr-stage" aria-hidden="true"> <span class="ldr-halo"></span> <span class="ldr-ring ldr-ring-1"></span> <span class="ldr-ring ldr-ring-2"></span> <span class="ldr-ring ldr-ring-3"></span> <span class="ldr-orbit"> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> <span class="ldr-dot"></span> </span> <img class="loader-logo-img" src="logo-semear.jpeg" alt="Ação Social Semear" onerror="this.style.display='none'" loading="eager" decoding="async"> <span class="ldr-scan"></span> </div> <p class="loader-text" aria-hidden="true">Ação Social Semear · Belém, PA</p> <div class="loader-bar-wrap" aria-hidden="true"><div class="loader-bar"></div></div> </div> </div> <!-- Navbar --> <nav id="nav"> <div class="container"> <a href="voluntario.html" class="nav-back"> <i class="fas fa-arrow-left"></i> Voltar
       </a> <div class="nav-brand-text"> Semear <span>Ação Social</span> </div> </div> </nav> <div class="vol-form-page"> <div class="vol-form-card"> <!-- Cabeçalho --> <div class="vfc-header"> <img class="vfc-header-bg" src="img/folha-header.jpg" alt="" aria-hidden="true" loading="eager" decoding="async"><div class="vfc-header-inner"><div class="vfc-header-icon"> <i class="fas fa-hands-helping"></i> </div> <h1>Quero ser Voluntário</h1> <p>Preencha os campos abaixo e entraremos em contato em breve.</p> </div></div> <!-- Progresso --> <div class="vfc-progress"> <div class="vfc-steps"> <div class="vfc-step-item"> <div class="vfc-step-bubble active" id="bubble-1">1</div> <span class="vfc-step-label active" id="label-1">Como quer ajudar</span> </div> <div class="vfc-step-line" id="line-1"></div> <div class="vfc-step-item"> <div class="vfc-step-bubble" id="bubble-2">2</div> <span class="vfc-step-label" id="label-2">Seus dados</span> </div> <div class="vfc-step-line" id="line-2"></div> <div class="vfc-step-item" style="flex:0;"> <div class="vfc-step-bubble" id="bubble-3"><i class="fas fa-check"></i></div> <span class="vfc-step-label" id="label-3">Concluído</span> </div> </div> </div> <!-- Corpo --> <div class="vfc-body"> <!-- PASSO 1 --> <div class="step-panel active" id="step-1"> <h2 class="step-title">Como você quer ajudar?</h2> <p class="step-subtitle">Selecione uma ou mais áreas  você pode marcar quantas quiser.</p> <div class="help-options-grid"> <div class="help-opt" data-key="alimentos" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=320&fit=crop&auto=format" alt="Organização dos Alimentos" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Organização dos Alimentos</p> <p class="help-opt-desc">Separe, organize e monte as cestas básicas para distribuição.</p> </div> </div> <div class="help-opt" data-key="espiritual" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&h=320&fit=crop&auto=format" alt="Apoio Espiritual" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Apoio Espiritual</p> <p class="help-opt-desc">Ore, escute e ofereça suporte emocional e espiritual.</p> </div> </div> <div class="help-opt" data-key="transporte" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=320&fit=crop&auto=format" alt="Transporte" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Transporte</p> <p class="help-opt-desc">Entregue e transporte alimentos e doações com segurança.</p> </div> </div> <div class="help-opt" data-key="coleta" onclick="toggleOpt(this)"> <div class="help-opt-check"><i class="fas fa-check"></i></div> <div class="help-opt-img"> <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=320&fit=crop&auto=format" alt="Ajuda na Coleta de Alimentos" loading="lazy" decoding="async"> </div> <div class="help-opt-body"> <p class="help-opt-name">Ajuda na Coleta de Alimentos</p> <p class="help-opt-desc">Apoie ações de arrecadação em mercados e pontos parceiros.</p> </div> </div> </div> <p class="field-error" id="error-opt" style="margin-top:14px;"> Por favor, selecione pelo menos uma área de atuação.
@@ -622,7 +618,7 @@
             </p> <div class="success-verse"> <p> "Porque tive fome, e vocês me deram de comer; tive sede,
                 e me deram de beber; fui estrangeiro, e me hospedaram;
                 precisei de roupas, e me vestiram." </p> <cite>Mateus 25:35</cite> </div> <a href="voluntario.html" class="success-back-btn"> <i class="fas fa-arrow-left"></i> Voltar à página
-            </a> </div> </div> <!-- Barra de ações  fora do scroll, sempre visível --> <div class="vfc-actions-bar" id="vfc-actions-bar"> <div class="vfc-bar-summary"> <div class="vfc-bar-icon" id="vfc-bar-icon"><i class="fas fa-check"></i></div> <div> <span class="vfc-bar-label">Resumo da seleção</span> <span class="vfc-bar-count" id="vfc-bar-count">Nenhuma área selecionada</span> </div> </div> <div class="vfc-bar-btns"> <button class="btn-vol-back" id="btn-back" style="display:none" onclick="goStep1()"><i class="fas fa-arrow-left"></i> Voltar</button> <button class="btn-vol-next" id="btn-next" onclick="acaoAtual()">Próxima etapa <i class="fas fa-arrow-right"></i></button> </div> </div> </div> </div> <!-- Firebase SDK --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script> <script src="js/services/firebase.js" defer></script> <!-- app.js: loader, navbar scroll, transição entre páginas --> <script src="js/app.js" defer></script> <script> var pasoAtual = 1;
+            </a> </div> </div> <!-- Barra de ações  fora do scroll, sempre visível --> <div class="vfc-actions-bar" id="vfc-actions-bar"> <div class="vfc-bar-btns"> <button class="btn-vol-back" id="btn-back" style="display:none" onclick="goStep1()"><i class="fas fa-arrow-left"></i> Voltar</button> <button class="btn-vol-next" id="btn-next" onclick="acaoAtual()">Próxima etapa <i class="fas fa-arrow-right"></i></button> </div> </div> </div> </div> <!-- Firebase SDK --> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script> <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script> <script src="js/services/firebase.js" defer></script> <!-- app.js: loader, navbar scroll, transição entre páginas --> <script src="js/app.js" defer></script> <script> var pasoAtual = 1;
     var nomesArea = {
       alimentos:  'Organização dos Alimentos',
       espiritual: 'Apoio Espiritual',
