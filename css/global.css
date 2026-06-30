@@ -1149,8 +1149,10 @@ body::before {
 /* ── Stage: container de todos os elementos animados ── */
 .ldr-stage {
   position: relative;
-  width: min(62vw, 260px);
-  height: min(93vw, 390px);
+  width: 62vw;
+  max-width: 260px;
+  height: 93vw;
+  max-height: 390px;
   display: flex;
   align-items: center;
   justify-content: center;
